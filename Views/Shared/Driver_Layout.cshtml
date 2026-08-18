@@ -1,0 +1,65 @@
+@{
+    var isAuthenticated = User?.Identity?.IsAuthenticated ?? false;
+    // isAuthenticated = true;
+    ViewData["Title"] ??= "機場接送司機端";
+}
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - 機場接送司機端</title>
+    <link rel="stylesheet" href="/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="/css/layout-v2.css" />
+</head>
+<body class="layout-v2 driver-v2 d-flex flex-column min-vh-100">
+    <header class="shadow-sm">
+        <nav class="navbar navbar-expand-lg navbar-dark driver-v2-nav" aria-label="司機端主選單">
+            <div class="container">
+                <a class="navbar-brand py-0 d-flex align-items-center" href="/" aria-label="機場接送首頁">
+                    <img src="/Images/webLogo_driver.png" class="layout-v2-logo" alt="機場接送司機端" />
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#driverV2Menu" aria-controls="driverV2Menu" aria-expanded="false" aria-label="開啟選單"><span class="navbar-toggler-icon"></span></button>
+                <div class="collapse navbar-collapse" id="driverV2Menu">
+                    <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-2">
+                        <li class="nav-item"><a class="nav-link" href="/DriverOrder">未來訂單</a></li>
+                        <li class="nav-item"><a class="nav-link" href="/DriverOrder">歷史訂單</a></li>
+                        @if (isAuthenticated)
+                        {
+                            <li class="nav-item"><form action="/Account/Logout" method="post"><button class="btn btn-outline-light btn-sm px-3" type="submit">登出</button></form></li>
+                        }
+                        else
+                        {
+                            <li class="nav-item"><a class="btn btn-warning btn-sm px-3" href="/Account/Login">登入</a></li>
+                        }
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+    <main class="flex-grow-1 py-4 py-lg-5"><div class="container layout-v2-content">@RenderBody()</div></main>
+    <footer class="layout-v2-footer py-4 mt-auto">
+        <div class="container">
+            <div class="row justify-content-center text-center text-md-start gy-2">
+                <div class="col-12 col-md-auto">
+                    <span class="fw-semibold">萬馬接車</span>
+                </div>
+                <div class="col-12 col-md-auto">
+                    公司統編：85124513
+                </div>
+                <div class="col-12 col-md-auto">
+                    電話號碼：(02)2485-6162
+                </div>
+            </div>
+
+            <hr class="my-3 opacity-25" />
+
+            <div class="text-center small">
+                © 2026 機場接送 · 安心抵達每一段旅程
+            </div>
+        </div>
+    </footer>
+    <script src="/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>
