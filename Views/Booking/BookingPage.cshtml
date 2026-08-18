@@ -1,4 +1,6 @@
-﻿@{
+﻿@model List<FinalProject.Models.Driver>
+
+@{
 }
 <!DOCTYPE html>
 <html lang="en">
@@ -28,6 +30,23 @@
 </head>
 
 <body>
+    
+
+@foreach (var driver in Model)
+{
+    <p>@driver.DriverId - @driver.DriverName</p>
+}
+
+
+
+
+
+
+
+
+
+
+
     <!-- ======================= << Header >> ======================= -->
     <header class="site-header">
         <nav class="navbar">
