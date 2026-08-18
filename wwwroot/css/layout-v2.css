@@ -1,0 +1,25 @@
+/* V2 共用品牌樣式；Bootstrap 處理所有元件與響應式格線。 */
+.layout-v2 { color: #243447; }
+.client-v2 { background: radial-gradient(circle at 92% 0, rgb(61 150 242 / 18%), transparent 28rem), #f7faff; }
+.driver-v2 { background: radial-gradient(circle at 8% 0, rgb(255 193 7 / 16%), transparent 25rem), #f5f7f9; }
+.client-v2-nav { min-height: 4.75rem; background: linear-gradient(110deg, #18232c, #30495e);border-bottom: 3px solid #ffc107;}
+
+.driver-v2-nav { min-height: 4.75rem; background: linear-gradient(110deg, #18232c, #30495e); border-bottom: 3px solid #ffc107; }
+.layout-v2-logo { width: auto; height: 100px; max-width: 220px; object-fit: contain; filter: drop-shadow(0 .1rem .15rem rgb(0 0 0 / 20%)); }
+.layout-v2 .nav-link { padding: .65rem .85rem; font-weight: 500; border-radius: .5rem; }
+.layout-v2 .nav-link:hover, .layout-v2 .nav-link:focus { color: #fff; background: rgb(255 255 255 / 14%); }
+.client-v2 .btn-light { color: #0755a3; font-weight: 600; border: 0; }
+.driver-v2 .btn-warning { color: #18232c; font-weight: 700; border: 0; }
+.layout-v2-content { min-height: 20rem; }
+.layout-v2-footer { color: #70808d; background: rgb(255 255 255 / 82%); border-top: 1px solid rgb(34 70 104 / 12%); }
+.layout-v2 .dropdown-menu { padding: .45rem; border-radius: .75rem; }
+.layout-v2 .dropdown-item { padding: .55rem .75rem; border-radius: .45rem; }
+@media (min-width: 992px) {
+    .client-v2 .dropdown:hover > .dropdown-menu {
+        display: block;
+        margin-top: 0;
+    }
+}
+@media (max-width: 991.98px) { .layout-v2 .navbar-nav { padding: .75rem 0 .25rem; } .layout-v2 .nav-link, .layout-v2 .navbar .btn { display: inline-block; margin-bottom: .3rem; } }
+@media (max-width: 575.98px) { .client-v2-nav, .driver-v2-nav { min-height: 4.25rem; } .layout-v2-logo { height: 36px; max-width: 150px; } }
+
