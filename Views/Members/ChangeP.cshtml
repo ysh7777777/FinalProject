@@ -1,0 +1,53 @@
+﻿<!DOCTYPE html>
+<html lang="zh-Hant-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>會員註冊表單</title>
+    <!-- 引入 Bootstrap 5  -->
+    <link href="~/lib/bootstrap/dist/css/bootstrap.css" rel="stylesheet">
+    <link href="~/css/Members/CangeP.css" rel="stylesheet">
+</head>
+<body>
+
+    <div class="register-container">
+        <div class="register-row">
+            <div class="register-card">
+                <h2 class="register-title">修改密碼</h2>
+                <form action="/Change" method="get" class="register-form" novalidate>
+                    <!-- 密碼 -->
+                    <div class="fg">
+                        <label for="password" class="form-label">密碼(區分大小寫)<span class="text-danger">*</span></label>
+                        <div class="password-wrapper">
+                            <input type="password" class="form-input" id="password" name="password" maxlength="11" pattern="[A-Za-z0-9]{6,11}" required placeholder="請輸入密碼（6~11位英數）">
+                            <button type="button" class="password-toggle-btn" id="togglepassword">
+                                <img src="~/icon/eye-fill.svg" alt="顯示密碼">
+                            </button>
+                            <div class="error-feedback">請輸入密碼（6~11位英數）</div>
+                        </div>
+                    </div>
+
+                    <!-- 確認密碼 -->
+                    <div class="fg-confirm-password">
+                        <label for="Confirmpassword" class="form-label">確認密碼(區分大小寫)<span class="text-danger">*</span></label>
+                        <div class="password-wrapper">
+                            <input type="password" class="form-input" id="Confirmpassword" name="Confirmpassword" maxlength="11" pattern="[A-Za-z0-9]{6,11}" required placeholder="請輸入密碼（6~11位英數）">
+                            <button type="button" class="password-toggle-btn" id="toggleConfirmpassword">
+                                <img src="~/icon/eye-fill.svg" alt="顯示密碼">
+                            </button>
+                            <div class="error-feedback">請輸入密碼（6~11位英數）</div>
+                        </div>
+                    </div>
+
+                    <!-- 提交按鈕 -->
+                    <button type="submit" class="submit-btn">送出</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    @* <script src="~/js/Members/Register.js"></script> *@
+    <script src="~/js/Members/icon.js"></script>
+
+</body>
+</html>
