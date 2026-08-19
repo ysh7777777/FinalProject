@@ -1,4 +1,11 @@
+using FinalProject.Models;
+using Microsoft.EntityFrameworkCore;
+
 var builder = WebApplication.CreateBuilder(args);
+
+// 連線到資料庫，勿動。名稱 "letmesee" 與 appsettings.json 的名稱有關係
+builder.Services.AddDbContext<RideHailingDbContext>(
+            options => options.UseSqlServer(builder.Configuration.GetConnectionString("letmesee")));
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
@@ -22,7 +29,7 @@ app.MapStaticAssets();
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}")
+    pattern: "{controller=Booking}/{action=BookingPage}/{id?}")
     .WithStaticAssets();
 
 
