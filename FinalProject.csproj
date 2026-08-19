@@ -17,6 +17,8 @@
 
   <ItemGroup>
     <Folder Include="DataBase\" />
+    <Folder Include="wwwroot\css\Booking\" />
+    <Folder Include="wwwroot\js\Booking\" />
   </ItemGroup>
 
   <ItemGroup>

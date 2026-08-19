@@ -13,16 +13,17 @@ namespace FinalProject.Controllers
             _context = context;
         }
 
-        //public IActionResult BookingPage()
-        //{
-        //    return View();
-        //}
-        public async Task<IActionResult> BookingPage()
+        public IActionResult BookingPage()
         {
-            var data = await _context.Drivers.ToListAsync();
-
-            return View("~/Views/Booking/BookingPage.cshtml", data);
+            return View();
         }
+
+        //public async Task<IActionResult> BookingPage()
+        //{
+        //    var data = await _context.Drivers.ToListAsync();
+
+        //    return View("~/Views/Booking/BookingPage.cshtml", data);
+        //}
 
 
 
