@@ -1,16 +1,21 @@
 ﻿document.addEventListener('DOMContentLoaded', function () {
 
-    // 控制「密碼」的眼睛
-    const togglepassword = document.querySelector('#togglepassword');
+    // 控制「密碼」眼睛
+    const togglepassword = document.querySelector('#togglePassword');
     if (togglepassword) {
         togglepassword.addEventListener('click', function () {
-            const passwordInput = document.querySelector('#password');
+            // 對應 HTML 的 id="passWord"
+            const passwordInput = document.querySelector('#passWord');
             const img = this.querySelector('img');
             if (!passwordInput || !img) return;
 
+            if (!passwordInput || !img) {
+                return;
+            }
+
             const currentSrc = img.getAttribute('src');
 
-            if (passwordInput.type == 'password') {
+            if (passwordInput.type === 'password') {
                 passwordInput.type = 'text';
                 img.src = currentSrc.replace('eye-fill.svg', 'eye-slash-fill.svg');
             } else {
@@ -20,13 +25,18 @@
         });
     }
 
-    // 控制「確認密碼」的眼睛
-    const toggleConfirmpassword = document.querySelector('#toggleConfirmpassword');
+    // 控制「確認密碼」眼睛
+    // 對應 HTML 的 id="toggleConfirmPassword"
+    const toggleConfirmpassword = document.querySelector('#toggleConfirmPassword');
     if (toggleConfirmpassword) {
         toggleConfirmpassword.addEventListener('click', function () {
-            const confirmpasswordInput = document.querySelector('#Confirmpassword');
+            // 對應 HTML 的 id="confirmPassword"
+            const confirmpasswordInput = document.querySelector('#confirmPassword');
             const img = this.querySelector('img');
-            if (!confirmpasswordInput || !img) return;
+
+            if (!confirmpasswordInput || !img) {
+                return;
+            }
 
             const currentSrc = img.getAttribute('src');
 
@@ -50,5 +60,6 @@
             }
             form.classList.add('was-validated');
         }, false);
-    });
+    
+
 });
