@@ -176,9 +176,13 @@
                                         <label for="pickupAddress" class="form-label">
                                             上車地址
                                         </label>
-                                        <input type="text" id="pickupAddress" class="form-control"
+                                        <input type="text" id="pickupAddress" 
+                                            class="form-control" 
+                                            style="display:none"
                                                placeholder="請輸入上車地址">
                                     </div>
+                                    <div id="pickup-autocomplete-container"></div>
+                                    <button id="temp1" onclick="TempData()">temp</button>
                                 </div>
                             </div>
                             <!-- ======================= 上車：機場 div ======================= -->
@@ -901,7 +905,9 @@
 
     <!-- ======================= JS ======================== -->
     <script src="./js/Booking/0810.js"></script>
-
+    <script src="./js/Booking/place-autocomplete.js"></script>
+    <!-- 串接地址轉換 API JS ======================== -->
+    <script async src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAk5HVk6NmgjgNL9vu5m2HRjvcbghlyMn4&libraries=places&callback=initAutocomplete"></script>
 </body>
 
 </html>
