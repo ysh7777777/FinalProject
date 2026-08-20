@@ -1,0 +1,1107 @@
+         /* Custom CSS */
+
+         /* ======================= 基本設定 ======================= */
+         :root {
+             --primary-color: #12385f;
+             --primary-dark: #0c2947;
+             --primary-light: #eaf1f8;
+             --text-color: #222;
+             --muted-color: #6c757d;
+             --border-color: #d9dee5;
+             --background-color: #f5f7fa;
+             --card-radius: 12px;
+             --shadow: 0 4px 18px rgba(18, 56, 95, 0.08);
+             --shadow-hover: 0 8px 25px rgba(18, 56, 95, 0.15);
+         }
+
+         * { box-sizing: border-box; }
+
+         body {
+             margin: 0;
+             background-color: var(--background-color);
+             color: var(--text-color);
+             font-family:
+                 "Noto Sans TC",
+                 "Microsoft JhengHei",
+                 sans-serif;
+             line-height: 1.6;
+         }
+
+         /* ======================= Navbar ======================= */
+         .site-header {
+             background-color: #fff;
+             border-bottom: 1px solid #e9ecef;
+             position: sticky;
+             top: 0;
+             z-index: 1000;
+         }
+
+         .navbar-brand {
+             color: var(--primary-color) !important;
+             font-weight: 700;
+         }
+
+         .navbar-brand i { margin-right: 6px; }
+
+         /* ======================= 頁面 ======================= */
+         /* 原本
+            .booking-page {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding:
+                32px 20px 60px;
+        } */
+         /* 更新 在頁面正中間 */
+         .booking-page {
+             width: 100%;
+             max-width: 1100px;
+             margin-left: auto;
+             margin-right: auto;
+             padding: 32px 20px 60px;
+         }
+
+
+         .page-title {
+             color: var(--primary-color);
+             font-size: 28px;
+             font-weight: 700;
+             margin-bottom: 24px;
+         }
+
+         /* ======================= Card ======================= */
+         .booking-card {
+             background: #fff;
+             border: 1px solid #e1e5ea;
+             border-radius: var(--card-radius);
+             box-shadow: var(--shadow);
+             margin-bottom: 20px;
+             overflow: hidden;
+             transition:
+                 box-shadow .25s ease,
+                 transform .25s ease;
+         }
+
+         .booking-card:hover {
+             box-shadow: var(--shadow-hover);
+         }
+
+         .booking-card-header {
+             padding: 18px 22px;
+             border-bottom: 1px solid #e9ecef;
+             background-color: #fff;
+         }
+
+         .booking-card-title {
+             margin: 0;
+             font-size: 19px;
+             font-weight: 700;
+             color: var(--primary-color);
+         }
+
+         .booking-card-title i { margin-right: 7px; }
+         .booking-card-body { padding: 22px; }
+
+         /* ======================= Form ======================= */
+         .form-label {
+             font-weight: 600;
+             margin-bottom: 7px;
+             color: #343a40;
+         }
+
+         .form-control,
+         .form-select {
+             min-height: 44px;
+             border-radius: 8px;
+             border-color: #cfd5dc;
+             box-shadow: none;
+             transition:
+                 border-color .2s ease,
+                 box-shadow .2s ease;
+         }
+
+         .form-control:focus,
+         .form-select:focus {
+             border-color: var(--primary-color);
+             box-shadow: 0 0 0 3px rgba(18, 56, 95, 0.10);
+         }
+
+         /* ======================= 乘車時間 ======================= */
+         .ride-time-row {
+             display: grid;
+             grid-template-columns: minmax(0, 1.6fr) minmax(110px, .7fr) minmax(110px, .7fr);
+             gap: 14px;
+         }
+
+         /* ======================= 地點區塊 ======================= */
+         .location-block { position: relative; }
+
+         .location-block+.location-block {
+             margin-top: 26px;
+             padding-top: 26px;
+             border-top: 1px solid #e4e7eb;
+         }
+
+         .location-title {
+             display: flex;
+             align-items: center;
+             gap: 9px;
+             font-size: 17px;
+             font-weight: 700;
+             color: #222;
+             margin-bottom: 15px;
+         }
+
+         .location-title .location-icon {
+             width: 32px;
+             height: 32px;
+             display: inline-flex;
+             align-items: center;
+             justify-content: center;
+             border-radius: 50%;
+             color: #fff;
+             background: var(--primary-color);
+             font-size: 15px;
+         }
+
+         /* ======================= 地點切換按鈕 ======================= */
+         .location-type-switch {
+             display: flex;
+             gap: 0;
+             margin-bottom: 16px;
+         }
+
+         .location-type-switch .btn {
+             min-width: 120px;
+             min-height: 42px;
+             border-radius: 0;
+             font-weight: 600;
+             border-color: var(--primary-color);
+             color: var(--primary-color);
+             background-color: #fff;
+         }
+
+         .location-type-switch .btn:first-child { border-radius: 8px 0 0 8px;}
+         .location-type-switch .btn:last-child { border-radius: 0 8px 8px 0;}
+
+         .location-type-switch .btn.active {
+             color: #fff;
+             background-color: var(--primary-color);
+             border-color: var(--primary-color);
+         }
+
+         /* ======================= 常用地址 ======================= */
+         .favorite-address-group {
+             display: flex;
+             gap: 8px;
+         }
+
+         .favorite-address-group .form-select { flex: 1; }
+
+         .favorite-add-btn {
+             width: 44px;
+             height: 44px;
+             flex: 0 0 44px;
+             display: inline-flex;
+             align-items: center;
+             justify-content: center;
+             border-radius: 8px;
+             color: var(--primary-color);
+             background-color: #fff;
+             border: 1px solid var(--primary-color);
+             font-size: 20px;
+             text-decoration: none;
+             transition:
+                 background-color .2s ease,
+                 color .2s ease,
+                 transform .2s ease;
+         }
+
+         .favorite-add-btn:hover {
+             background-color: var(--primary-color);
+             color: #fff;
+             transform: translateY(-1px);
+         }
+
+         /* ======================= 機場選擇 ======================= */
+         .airport-panel {
+             animation: fadeIn .2s ease;
+         }
+
+         @keyframes fadeIn {
+             from {
+                 opacity: 0;
+                 transform: translateY(-4px);
+             }
+
+             to {
+                 opacity: 1;
+                 transform: translateY(0);
+             }
+         }
+
+         /* ======================= 上下車互換 ======================= */
+         .swap-wrapper {
+             display: flex;
+             justify-content: center;
+             margin: -6px 0 -6px;
+             position: relative;
+             z-index: 5;
+         }
+
+         .swap-btn {
+             width: 42px;
+             height: 42px;
+             display: inline-flex;
+             align-items: center;
+             justify-content: center;
+             border-radius: 50%;
+             border: 1px solid #d7dce2;
+             background: #fff;
+             color: var(--primary-color);
+             box-shadow: 0 3px 10px rgba(0, 0, 0, .08);
+             transition:
+                 transform .25s ease,
+                 background-color .2s ease,
+                 color .2s ease;
+         }
+
+         .swap-btn:hover {
+             background-color: var(--primary-color);
+             color: #fff;
+             transform: rotate(180deg);
+         }
+
+         /* ======================= 訂單總覽 ======================= */
+         .summary-card {
+             position: sticky;
+             top: 90px;
+         }
+
+         .summary-item {
+             display: grid;
+             grid-template-columns: 90px minmax(0, 1fr);
+             gap: 12px;
+             padding: 12px 0;
+             border-bottom: 1px solid #edf0f3;
+         }
+
+         .summary-item:last-child { border-bottom: 0; }
+
+         .summary-label {
+             color: #6c757d;
+             font-size: 14px;
+             font-weight: 500;
+         }
+
+         .summary-value {
+             font-weight: 600;
+             word-break: break-word;
+         }
+
+         /* ======================= 隱藏 ======================= */
+         .d-none-custom { display: none !important; }
+
+
+         /* 0811 */
+         /* ======================= 停靠點 ======================= */
+         .stopover-container {
+             display: flex;
+             flex-direction: column;
+             gap: 12px;
+         }
+
+         /* ======================= 單一停靠點 ======================= */
+         .stopover-item {
+             display: grid;
+             grid-template-columns: 90px minmax(0, 1fr) auto;
+             align-items: center;
+             gap: 12px;
+             padding: 10px 0;
+             animation: stopoverFadeIn .25s ease;
+         }
+
+         @keyframes stopoverFadeIn {
+             from {
+                 opacity: 0;
+                 transform: translateY(-6px);
+             }
+
+             to {
+                 opacity: 1;
+                 transform: translateY(0);
+             }
+         }
+
+         /* ======================= 停靠點標題 ======================= */
+         .stopover-label {
+             font-weight: 600;
+             color: #343a40;
+             white-space: nowrap;
+         }
+
+         /* ======================= 停靠點輸入框 ======================= */
+         .stopover-input {
+             min-height: 44px;
+             width: 100%;
+             border: 1px solid #cfd5dc;
+             border-radius: 8px;
+             padding: 8px 12px;
+             outline: none;
+             transition:
+                 border-color .2s ease,
+                 box-shadow .2s ease;
+         }
+
+         .stopover-input:focus {
+             border-color: var(--primary-color);
+             box-shadow: 0 0 0 3px rgba(18, 56, 95, 0.10);
+         }
+
+         /* ======================= 加減按鈕 ======================= */
+         .stopover-actions {
+             display: flex;
+             align-items: center;
+             gap: 7px;
+         }
+
+         .stopover-action-btn {
+             width: 32px;
+             height: 32px;
+             padding: 0;
+             display: inline-flex;
+             align-items: center;
+             justify-content: center;
+             border-radius: 50%;
+             border: 0;
+             font-size: 16px;
+             transition:
+                 transform .2s ease,
+                 box-shadow .2s ease,
+                 background-color .2s ease;
+         }
+
+         /* 加號 */
+         .stopover-add-item {
+             background-color: var(--primary-color);
+             color: #fff;
+         }
+
+         .stopover-add-item:hover {
+             background-color: var(--primary-dark);
+             color: #fff;
+             transform: scale(1.08);
+             box-shadow: 0 4px 10px rgba(18, 56, 95, .20);
+         }
+
+         /* 減號 */
+         .stopover-remove-item {
+             background-color: #b55a61;
+             color: #fff;
+         }
+
+         .stopover-remove-item:hover {
+             background-color: #963f47;
+             color: #fff;
+             transform: scale(1.08);
+             box-shadow: 0 4px 10px rgba(181, 90, 97, .20);
+         }
+
+         /* ======================= 沒有停靠點 ======================= */
+         .stopover-empty {
+             min-height: 90px;
+             display: flex;
+             align-items: center;
+             justify-content: center;
+             flex-direction: column;
+             gap: 5px;
+             color: #8a929b;
+             border: 1px dashed #cfd5dc;
+             border-radius: 10px;
+             background-color: #fafbfc;
+         }
+
+         .stopover-empty i { font-size: 24px; }
+
+         /* ======================= 底部新增按鈕 ======================= */
+         .stopover-add-wrapper {
+             margin-top: 12px;
+             padding-top: 16px;
+             border-top: 1px solid #edf0f3;
+             display: flex;
+             justify-content: center;
+         }
+
+         .stopover-add-btn {
+             min-height: 42px;
+             padding: 8px 20px;
+             border-radius: 8px;
+             background-color: var(--primary-color);
+             border-color: var(--primary-color);
+             font-weight: 600;
+             transition:
+                 background-color .2s ease,
+                 transform .2s ease,
+                 box-shadow .2s ease;
+         }
+
+         .stopover-add-btn:hover {
+             background-color: var(--primary-dark);
+             border-color: var(--primary-dark);
+             transform: translateY(-2px);
+             box-shadow: 0 5px 14px rgba(18, 56, 95, .20);
+         }
+
+         /* ======================= RWD ======================= */
+         @media (max-width: 767.98px) {
+             .stopover-item {
+                 grid-template-columns: 1fr auto;
+                 gap: 8px;
+                 padding: 10px 0;
+             }
+             .stopover-label { grid-column: 1 / -1; }
+             .stopover-input { grid-column: 1; }
+             .stopover-actions {
+                 grid-column: 2;
+                 grid-row: 2;
+             }
+         }
+
+         @media (max-width: 575.98px) {
+             .stopover-add-btn { width: 100%; }
+         }
+
+        /* ======================= RWD ======================= */
+         @media (max-width: 991.98px) {
+             .booking-page { max-width: 760px; }
+             .summary-card { position: static; }
+         }
+
+         @media (max-width: 767.98px) {
+             .booking-page { padding: 20px 14px 40px; }
+
+             .page-title {
+                 font-size: 23px;
+                 margin-bottom: 18px;
+             }
+
+             .booking-card-body { padding: 17px; }
+             .booking-card-header { padding: 15px 17px; }
+             .ride-time-row { grid-template-columns: 1fr 1fr; }
+             .ride-time-row .date-field { grid-column: 1 / -1; }
+
+             .location-type-switch .btn {
+                 min-width: 0;
+                 flex: 1;
+             }
+
+             .summary-item { grid-template-columns: 80px minmax(0, 1fr); }
+         }
+
+         @media (max-width: 575.98px) {
+             .location-type-switch .btn { font-size: 14px; }
+             .form-label { font-size: 14px; }
+         }
+
+
+/* 0811 STR ------------------------------------------------------------------------------------------- */
+
+/* ======================= 車型區塊 ======================= */
+/* ======================= 車型卡片 ======================= */
+.car-card {
+    position: relative;
+    height: 100%;
+    background-color: #fff;
+    border: 2px solid #e4e8ed;
+    border-radius: 12px;
+    overflow: hidden;
+    cursor: pointer;
+    transition:
+        transform .25s ease,
+        box-shadow .25s ease,
+        border-color .25s ease,
+        background-color .25s ease;
+}
+/* Hover */
+.car-card:hover {
+    transform: translateY(-4px);
+    border-color: #9baabd;
+    box-shadow:
+        0 10px 25px
+        rgba(15, 38, 64, .12);
+}
+
+/* ======================= 選取狀態 ======================= */
+.car-card.selected {
+    border-color: var(--primary-color, #12385f);
+    box-shadow:
+        0 8px 25px
+        rgba(18, 56, 95, .20);
+    background-color: #f7faff;
+}
+/* 選取時左上角勾勾 */
+.car-selected-check {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    z-index: 5;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background-color: var(--primary-color, #12385f);
+    color: #fff;
+    font-size: 15px;
+    opacity: 0;
+    transform: scale(.7);
+    transition: opacity .2s ease, transform .2s ease;
+}
+
+.car-card.selected
+.car-selected-check {
+    opacity: 1;
+    transform: scale(1);
+}
+
+/* ======================= 車輛圖片 ======================= */
+.car-image-wrapper {
+    position: relative;
+    width: 100%;
+    height: 180px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #f5f7fa;
+    overflow: hidden;
+}
+.car-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform .35s ease;
+}
+
+.car-card:hover
+.car-image { transform: scale(1.04); }
+
+/* ======================= 車型內容 ======================= */
+.car-card-body { padding: 18px; }
+
+/* ======================= 車名 ======================= */
+.car-name {
+    margin: 0;
+    color: #1d2733;
+    font-size: 18px;
+    font-weight: 700;
+    line-height: 1.4;
+}
+.car-description {
+    margin-top: 4px;
+    color: #7b858f;
+    font-size: 13px;
+}
+
+/* ======================= 車型規格 ======================= */
+.car-spec-list {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+    margin-top: 15px;
+}
+.car-spec {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    min-height: 36px;
+    padding: 7px 9px;
+    border-radius: 7px;
+    background-color: #f5f7fa;
+    color: #4d5864;
+    font-size: 13px;
+}
+.car-spec i {
+    color: var(--primary-color, #12385f);
+    font-size: 15px;
+}
+.car-card.selected
+.car-spec { background-color: #edf4fb; }
+
+/* ======================= 車輛特色 ======================= */
+/* .car-features {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 14px;
+}
+.car-feature {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding:
+        4px 9px;
+    border-radius: 20px;
+    background-color:
+        #f0f3f6;
+    color:
+        #596572;
+    font-size: 12px;
+    line-height: 1.4;
+} */
+.car-card.selected
+/* .car-feature {
+    background-color:
+        #e7f0f8;
+    color:
+        #294d70;
+} */
+
+/* ======================= 價格 ======================= */
+.car-price-wrapper {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 10px;
+    margin-top: 18px;
+    padding-top: 15px;
+    border-top: 1px solid #e9edf1;
+}
+.car-price {
+    color: var(--primary-color, #12385f);
+    font-size: 20px;
+    font-weight: 700;
+}
+
+/* ======================= 選擇按鈕 ======================= */
+.car-select-status {
+    margin-top: 12px;
+    width: 100%;
+    min-height: 38px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    border: 1px solid #d9e0e7;
+    border-radius: 8px;
+    background-color: #fff;
+    color: #66727e;
+    font-size: 13px;
+    font-weight: 600;
+    transition:
+        background-color .2s ease,
+        border-color .2s ease,
+        color .2s ease;
+}
+.car-card.selected
+.car-select-status {
+    border-color: var(--primary-color, #12385f);
+    background-color: var(--primary-color, #12385f);
+    color: #fff;
+}
+
+/* ======================= RWD ======================= */
+/* 平板 */
+@media (max-width: 991.98px) {
+    .car-image-wrapper { height: 160px; }
+    .car-card-body { padding: 15px; }
+}
+/* 手機 */
+@media (max-width: 575.98px) {
+    .car-image-wrapper { height: 190px; }
+    .car-card-body { padding: 16px; }
+    .car-name { font-size: 17px; }
+    .car-price { font-size: 19px; }
+}
+/* 0811 END ------------------------------------------------------------------------------------------- */
+
+
+
+/* 0812 STR ------------------------------------------------------------------------------------------- */
+
+/* ======================= 人數 / 行李 / 嬰兒座椅 ======================= */
+.quantity-field {
+    width: 100%;
+}
+/* Label */
+.quantity-field .form-label {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    margin-bottom: 8px;
+    color: #263442;
+    font-size: 14px;
+    font-weight: 600;
+}
+.quantity-field .form-label i {
+    color: #12385f;
+    font-size: 16px;
+}
+
+/* ======================= Input Group ======================= */
+.quantity-input-group {
+    height: 46px;
+}
+.quantity-input-group .quantity-btn {
+    width: 46px;
+    border-color: #d8dee5;
+    background-color: #fff;
+    color: #12385f;
+    transition:
+        background-color .2s ease,
+        color .2s ease,
+        border-color .2s ease;
+}
+.quantity-input-group .quantity-btn:hover {
+    border-color: #12385f;
+    background-color: #12385f;
+    color: #fff;
+}
+.quantity-input-group .quantity-btn:active {
+    transform: scale(.96);
+}
+
+/* ======================= 數量 Input ======================= */
+.quantity-input {
+    min-width: 0;
+    border-color: #d8dee5;
+    text-align: center;
+    color: #263442;
+    font-size: 16px;
+    font-weight: 600;
+    box-shadow: none !important;
+}
+.quantity-input:focus {
+    border-color: #12385f;
+    z-index: 2;
+}
+/* Chrome / Edge 移除 number arrow */
+.quantity-input::-webkit-inner-spin-button,
+.quantity-input::-webkit-outer-spin-button {
+    margin: 0;
+    -webkit-appearance: none;
+}
+/* Firefox */ /* 覺得用不到 */
+/* .quantity-input {-moz-appearance: textfield;} */
+
+/* ======================= 上限文字 ======================= */
+.quantity-limit {
+    min-height: 20px;
+    margin-top: 6px;
+    color: #7b858f;
+    font-size: 12px;
+}
+.quantity-limit.active { color: #12385f; }
+
+/* ======================= 航班追蹤 ======================= */
+.flight-track-switch {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    margin: 0;
+    padding-left: 0;
+}
+.flight-track-switch .form-check-input {
+    float: none;
+    flex-shrink: 0;
+    width: 42px;
+    height: 22px;
+    margin: 2px 0 0 0;
+    cursor: pointer;
+}
+.flight-track-switch .form-check-input:checked {
+    background-color: #12385f;
+    border-color: #12385f;
+}
+.flight-track-switch .form-check-input:focus {
+    border-color: #12385f;
+    box-shadow:
+        0 0 0 .2rem
+        rgba(18, 56, 95, .15);
+}
+.flight-track-switch .form-check-label {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    cursor: pointer;
+}
+/* 標題 */
+.flight-switch-title {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    color: #263442;
+    font-size: 15px;
+    font-weight: 600;
+}
+.flight-switch-title i { color: #12385f; }
+/* 說明 */
+.flight-switch-description {
+    color: #7b858f;
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+/* ======================= 航班編號 ======================= */
+.flight-number-wrapper {
+    max-width: 500px;
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid #e8ecf0;
+}
+.flight-number-wrapper .form-label {
+    margin-bottom: 8px;
+    color: #263442;
+    font-size: 14px;
+    font-weight: 600;
+}
+.flight-number-wrapper .input-group { height: 46px; }
+
+.flight-number-wrapper .input-group-text {
+    min-width: 46px;
+    justify-content: center;
+    border-color: #d8dee5;
+    background-color: #f5f7fa;
+    color: #12385f;
+}
+.flight-number-wrapper .form-control {
+    border-color: #d8dee5;
+    box-shadow: none;
+    text-transform: uppercase;
+}
+.flight-number-wrapper .form-control:focus {
+    border-color: #12385f;
+    box-shadow:
+        0 0 0 .2rem
+        rgba(18, 56, 95, .10);
+}
+.flight-number-wrapper .form-text {
+    margin-top: 6px;
+    color: #7b858f;
+    font-size: 12px;
+}
+
+/* ======================= 航班欄位顯示動畫 ======================= */
+.flight-number-wrapper { animation: flightFieldIn .25s ease; }
+
+@keyframes flightFieldIn {
+    from {
+        opacity: 0;
+        transform: translateY(-5px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ======================= RWD ======================= */
+@media (max-width: 767.98px) {
+    .quantity-field { margin-bottom: 4px; }
+    .flight-number-wrapper { max-width: 100%; }
+}
+
+@media (max-width: 575.98px) {
+    .quantity-input-group { height: 48px; }
+    .quantity-input-group .quantity-btn { width: 48px; }
+    .flight-switch-description { line-height: 1.6; }
+}
+
+/* 0812 END ------------------------------------------------------------------------------------------- */
+
+
+
+
+/* 0812 STR 乘客資訊跟航班資訊加入訂單總覽 ------------------------------------------------------------------------------------------- */
+/* 訂單總覽 CSS */
+.order-summary-list {
+    display: flex;
+    flex-direction: column;
+}
+.summary-item {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 14px 0;
+    border-bottom: 1px solid #edf0f3;
+}
+.summary-item:last-child {
+    border-bottom: 0;
+}
+.summary-label {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    flex-shrink: 0;
+    color: #6c757d;
+    font-size: 14px;
+}
+.summary-label i {
+    color: #12385f;
+}
+.summary-value {
+    color: #263442;
+    font-size: 14px;
+    font-weight: 500;
+    text-align: right;
+}
+.summary-section-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 10px;
+    padding: 15px 0 8px;
+    border-bottom: 1px solid #12385f;
+    color: #12385f;
+    font-size: 14px;
+    font-weight: 700;
+}
+.summary-section-title i {
+    font-size: 16px;
+}
+
+
+/* 手機版 */
+@media (max-width: 575.98px) {
+    .summary-item {
+        gap: 12px;
+    }
+    .summary-label {
+        font-size: 13px;
+    }
+    .summary-value {
+        max-width: 65%;
+        font-size: 13px;
+    }
+}
+
+
+
+/* 0812 END 乘客資訊跟航班資訊加入訂單總覽 ------------------------------------------------------------------------------------------- */
+
+
+/* 0820 STR 送出訂單區域 ------------------------------------------------------------------------------------------- */
+/* =========================================================
+   送出訂單區域
+========================================================== */
+.order-submit-area {
+    margin-top: 24px;
+    padding-top: 24px;
+/*    border-top: 1px solid #e8ecf0;*/
+    text-align: center;
+}
+
+/* =========================================================
+   送出訂單按鈕
+========================================================== */
+.order-submit-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 9px;
+    min-width: 220px;
+    min-height: 52px;
+    padding: 12px 28px;
+    border: none;
+    border-radius: 12px;
+    background-color: #12385f;
+    color: #ffffff;
+    font-size: 16px;
+    font-weight: 600;
+    box-shadow: 0 6px 18px rgba(18, 56, 95, 0.18);
+    transition: background-color .2s ease, transform .2s ease, box-shadow .2s ease;
+}
+
+    /* Hover */
+    .order-submit-btn:hover {
+        background-color: #0d2d4d;
+        color: #ffffff;
+        transform: translateY(-2px);
+        box-shadow: 0 10px 24px rgba(18, 56, 95, 0.25);
+    }
+
+    /* 點擊 */
+    .order-submit-btn:active {
+        transform: translateY(0);
+        box-shadow: 0 4px 10px rgba(18, 56, 95, 0.18);
+    }
+
+    /* Focus */
+    .order-submit-btn:focus-visible {
+        box-shadow: 0 0 0 4px rgba(18, 56, 95, 0.15);
+    }
+
+    /* Disabled */
+    .order-submit-btn:disabled {
+        cursor: not-allowed;
+        opacity: .7;
+        transform: none;
+        box-shadow: none;
+    }
+
+    /* Icon */
+    .order-submit-btn i {
+        font-size: 17px;
+    }
+
+/* =========================================================
+   送出提示文字
+========================================================== */
+.order-submit-hint {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    margin-top: 12px;
+    color: #7b858f;
+    font-size: 12px;
+}
+
+    .order-submit-hint i {
+        color: #12385f;
+        font-size: 14px;
+    }
+
+/* =========================================================
+   Loading Spinner
+========================================================== */
+.order-submit-btn .spinner-border {
+    width: 17px;
+    height: 17px;
+    border-width: 2px;
+}
+
+/* =========================================================
+   Bootstrap Validation
+========================================================== */
+.booking-form .form-control.is-invalid,
+.booking-form .form-select.is-invalid {
+    border-color: #dc3545;
+}
+
+    .booking-form .form-control.is-invalid:focus,
+    .booking-form .form-select.is-invalid:focus {
+        border-color: #dc3545;
+        box-shadow: 0 0 0 .2rem rgba(220, 53, 69, .10);
+    }
+
+/* =========================================================
+   RWD
+========================================================== */
+@media (max-width: 575.98px) {
+    .order-submit-area {
+        margin-top: 20px;
+        padding-top: 20px;
+    }
+
+    .order-submit-btn {
+        width: 100%;
+        min-height: 50px;
+    }
+
+    .order-submit-hint {
+        line-height: 1.5;
+    }
+}
+/* 0820 END 送出訂單區域 ------------------------------------------------------------------------------------------- */
+

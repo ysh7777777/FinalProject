@@ -1,5 +1,4 @@
 ﻿@model List<FinalProject.Models.Driver>
-
 @{
 }
 <!DOCTYPE html>
@@ -26,29 +25,21 @@
           rel="stylesheet">
 
     <!-- ======================= CSS ======================= -->
-    <link rel="stylesheet" href="./0810.css">
+    <link rel="stylesheet" href="./css/Booking/0810.css">
 </head>
 
 <body>
     
-
+@* 測試連接資料庫用(成功)
 @foreach (var driver in Model)
 {
     <p>@driver.DriverId - @driver.DriverName</p>
 }
-
-
-
-
-
-
-
-
-
+*@
 
 
     <!-- ======================= << Header >> ======================= -->
-    <header class="site-header">
+    @* <header class="site-header">
         <nav class="navbar">
             <div class="container">
                 <a href="#" class="navbar-brand">
@@ -57,7 +48,7 @@
                 </a>
             </div>
         </nav>
-    </header>
+    </header> *@
 
     <!-- ======================= Main ======================= -->
     <main class="booking-page">
@@ -74,7 +65,6 @@
             </div>
         </div>
         -->
-
         <div class="row">
             <!-- ======================= 主要表單 div ======================= -->
             <div class="col-12">
@@ -216,11 +206,11 @@
                             </div>
                         </div>
                         <!-- ======================= 上下車互換 div ======================= -->
-                        <div class="swap-wrapper">
+                        @* <div class="swap-wrapper">
                             <button type="button" id="swapLocationBtn" class="swap-btn" title="交換上車與下車地點">
                                 <i class="bi bi-arrow-down-up"></i>
                             </button>
-                        </div>
+                        </div> *@
                         <!-- ======================= 下車地點 div ======================= -->
                         <div class="location-block" id="dropoffLocation">
                             <div class="location-title">
@@ -767,6 +757,7 @@
                 </section>
                 <!-- 0812 END ------------------------------------------------------------------------------------------- -->
             </div>
+        <form id="bookingForm" class="booking-form" novalidate>
 
             <div class="col-12">
                 <!-- ======================= 訂單總覽 section ======================= -->
@@ -872,9 +863,31 @@
                                 -
                             </div>
                         </div>
+						<!-- ======================= 送出訂單 div ======================= -->
+						<!-- 送出訂單 -->
+						<div class="order-submit-area">
+							<button type="submit"
+									class="btn btn-primary order-submit-btn"
+									id="submitOrderBtn">
+								<i class="bi bi-check-circle-fill"></i>
+								<span class="submit-btn-text">
+									送出訂單
+								</span>
+
+								<span class="spinner-border spinner-border-sm d-none"
+										id="submitOrderSpinner"
+										role="status"
+										aria-hidden="true"></span>
+							</button>
+							<div class="order-submit-hint">
+								<i class="bi bi-shield-check"></i>
+								請確認訂單資訊無誤後再送出
+							</div>
+						</div>
                     </div>
                 </section>
             </div>
+        </form>
         </div>
     </main>
 
@@ -887,7 +900,7 @@
     <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/zh-tw.js"></script>
 
     <!-- ======================= JS ======================== -->
-    <script src="./0810.js"></script>
+    <script src="./js/Booking/0810.js"></script>
 
 </body>
 
