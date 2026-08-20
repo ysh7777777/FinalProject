@@ -1,3 +1,5 @@
+using System.Text.Encodings.Web;
+using System.Text.Unicode;
 using FinalProject.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -7,8 +9,12 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<RideHailingDbContext>(
             options => options.UseSqlServer(builder.Configuration.GetConnectionString("letmesee")));
 
-// Add services to the container.
-builder.Services.AddControllersWithViews();
+// 這段是 JSON 回傳中文時，盡量直接顯示中文
+builder.Services.AddControllersWithViews().AddJsonOptions(options =>
+{
+    options.JsonSerializerOptions.Encoder =
+        JavaScriptEncoder.Create(UnicodeRanges.All);
+});
 
 var app = builder.Build();
 
@@ -29,7 +35,7 @@ app.MapStaticAssets();
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Booking}/{action=BookingPage}/{id?}")
+    pattern: "{controller=Logic}/{action=Index}/{id?}")
     .WithStaticAssets();
 
 

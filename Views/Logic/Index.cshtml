@@ -1,0 +1,59 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}
+<h2>派車 Function 測試</h2>
+
+<button id="btnDispatch">測試派車</button>
+
+<hr />
+
+<div id="result"></div>
+
+<script>
+    document.getElementById("btnDispatch")
+        .addEventListener("click", async function () {
+
+            // 模擬前端已經準備好的訂單資料
+            // 不包含司機與車輛
+            const trip = {
+
+                account: "user01",
+
+                departureTime: "2026-08-11T18:30:00",
+
+                estimatedDuration: 40,
+
+                pickupLocation: "台北車站",
+
+                destination: "台北101",
+
+                vehicleType: "休旅車",
+
+                passengerCount: 4,
+
+                luggageCount: 3
+            };
+
+
+            const response = await fetch("/Logic/TestDispatch", {
+
+                method: "POST",
+
+                headers: {
+                    "Content-Type": "application/json"
+                },
+
+                body: JSON.stringify(trip)
+            });
+
+
+            const data = await response.json();
+
+
+            document.getElementById("result").innerHTML =
+                "司機：" + data.driverId +
+                "<br>車牌：" + data.licensePlate;
+        });
+</script>
