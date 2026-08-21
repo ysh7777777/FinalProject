@@ -1,5 +1,4 @@
 using FinalProject.Models;
-using FinalProject.Services;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -11,8 +10,7 @@ builder.Services.AddDbContext<RideHailingDbContext>(
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
-// Members 建構式用
-builder.Services.AddScoped<MembersServices>();
+
 
 var app = builder.Build();
 
@@ -34,7 +32,7 @@ app.MapStaticAssets();
 app.MapControllerRoute(
     name: "default",
     //pattern: "{controller=Booking}/{action=BookingPage}/{id?}")
-    pattern: "{controller=Members}/{action=Login}/{id?}")
+    pattern: "{controller=Members}/{action=Register}/{id?}")
     .WithStaticAssets();
 
 
