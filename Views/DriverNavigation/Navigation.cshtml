@@ -1,6 +1,21 @@
-﻿@{
+﻿@model FinalProject.Models.Trip
+@{
     ViewData["Title"] = "司機導航";
 }
+@* 測試資料 *@
+<div>
+    訂單編號：@Model?.OrderNo
+</div>
+
+<div>
+    上車地點：@Model?.PickupLocation
+</div>
+
+<div>
+    目的地：@Model?.Destination
+</div>
+
+@* 測試資料 *@
 
 <div class="container-fluid p-0">
 
@@ -33,7 +48,7 @@
                     <div class="col-md-6">
                         <strong>訂單編號：</strong>
                         <span id="order-no">
-                            R-342827955
+                            @Model?.OrderNo
                         </span>
                     </div>
 
