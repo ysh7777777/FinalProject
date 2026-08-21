@@ -7,7 +7,6 @@
             // 對應 HTML 的 id="passWord"
             const passwordInput = document.querySelector('#passWord');
             const img = this.querySelector('img');
-            if (!passwordInput || !img) return;
 
             if (!passwordInput || !img) {
                 return;
@@ -26,11 +25,9 @@
     }
 
     // 控制「確認密碼」眼睛
-    // 對應 HTML 的 id="toggleConfirmPassword"
     const toggleConfirmpassword = document.querySelector('#toggleConfirmPassword');
     if (toggleConfirmpassword) {
         toggleConfirmpassword.addEventListener('click', function () {
-            // 對應 HTML 的 id="confirmPassword"
             const confirmpasswordInput = document.querySelector('#confirmPassword');
             const img = this.querySelector('img');
 
@@ -60,6 +57,6 @@
             }
             form.classList.add('was-validated');
         }, false);
-    
+    });
 
 });
