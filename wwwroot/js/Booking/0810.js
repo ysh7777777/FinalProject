@@ -1182,6 +1182,7 @@ bookingForm.addEventListener(
         /*
          * 這裡之後接後端 API
          */
+        console.log("訂單驗證成功，準備送出" );
         console.log( "訂單驗證成功，準備送出" );
     }
 );

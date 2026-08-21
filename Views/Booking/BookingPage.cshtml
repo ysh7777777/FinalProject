@@ -178,11 +178,13 @@
                                         </label>
                                         <input type="text" id="pickupAddress" 
                                             class="form-control" 
-                                            style="display:none"
+                                            @* style="display:none" *@
                                                placeholder="請輸入上車地址">
                                     </div>
+                                    @* 接轉換地址的API
                                     <div id="pickup-autocomplete-container"></div>
-                                    <button id="temp1" onclick="TempData()">temp</button>
+                                    <button id="temp1" onclick="TempData()">temp</button> 
+                                    *@
                                 </div>
                             </div>
                             <!-- ======================= 上車：機場 div ======================= -->
@@ -353,6 +355,19 @@
                     <div class="booking-card-body">
                         <div class="row g-3">
                             <!-- ======================= 車型 1：一般轎車 div ======================= -->
+                            @* 拉資料庫成功後可以用這個讓所有卡片近來()
+                            @foreach (var 資料表Model名稱 in Model)
+                            {
+                                <div class="car">
+                                    <img src="@car.ImageUrl"
+                                         alt="@car.CarName"
+                                         class="car-image">
+                                    <p>@car.CarName</p>
+                                </div>
+                            }
+                            *@
+
+                            
                             <div class="col-12 col-sm-6 col-lg-4 col-xl-4">
                                 <div class="car-card" tabindex="0" data-car-id="standard" data-car-name="一般轎車"
                                      data-passengers="3" data-luggage="2" data-price="1200">
