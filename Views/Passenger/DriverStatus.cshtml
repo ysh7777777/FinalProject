@@ -1,0 +1,147 @@
+﻿@{
+    ViewData["Title"] = "司機狀態";
+}
+
+<div class="container py-4">
+
+    <div class="mb-3">
+
+        <h2 class="fw-bold">
+            司機狀態
+        </h2>
+
+        <p class="text-muted">
+            可查看目前司機位置與行程狀態。
+        </p>
+
+    </div>
+
+
+    <!-- ========================= -->
+    <!-- 地圖 -->
+    <!-- ========================= -->
+
+    <div id="passenger-map"
+         class="border rounded"
+         style="width:100%; height:500px;">
+    </div>
+
+
+    <!-- ========================= -->
+    <!-- 司機資料 -->
+    <!-- ========================= -->
+
+    <div class="card shadow-sm mt-3">
+
+        <div class="card-body">
+
+            <div class="row mb-2">
+
+                <div class="col-md-6">
+
+                    <strong>司機：</strong>
+                    <span id="driver-name">
+                        林志明
+                    </span>
+
+                </div>
+
+
+                <div class="col-md-6">
+
+                    <strong>車牌：</strong>
+                    <span>
+                        NSS-1088
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <div class="row mb-2">
+
+                <div class="col-md-6">
+
+                    <strong>車型：</strong>
+                    <span>
+                        白色 TOYOTA 五人座
+                    </span>
+
+                </div>
+
+
+                <div class="col-md-6">
+
+                    <strong>車資：</strong>
+                    <span>
+                        1020 元
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <div class="row mb-2">
+
+                <div class="col-md-12">
+
+                    <strong>目的地：</strong>
+                    <span id="passenger-destination">
+                        台中市南屯區公益路二段51號
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <div class="row">
+
+                <div class="col-md-6">
+
+                    <strong>目前狀態：</strong>
+
+                    <span id="passenger-trip-status"
+                          class="badge bg-secondary">
+
+                        等待司機上線
+
+                    </span>
+
+                </div>
+
+
+                <div class="col-md-6">
+
+                    <strong>司機位置更新：</strong>
+
+                    <span id="last-update">
+                        尚未收到資料
+                    </span>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+@section Scripts {
+
+   
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/8.0.7/signalr.min.js"></script>
+    <script src="~/js/passenger-driver-status.js"></script>
+
+    <script async
+            src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAk5HVk6NmgjgNL9vu5m2HRjvcbghlyMn4&callback=initPassengerMap">
+    </script>
+
+
+
+}

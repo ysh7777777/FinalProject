@@ -1,3 +1,4 @@
+using finalProject.Hubs;
 using FinalProject.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -9,6 +10,8 @@ builder.Services.AddDbContext<RideHailingDbContext>(
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+
+builder.Services.AddSignalR();
 
 var app = builder.Build();
 
@@ -29,8 +32,13 @@ app.MapStaticAssets();
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Booking}/{action=BookingPage}/{id?}")
+    pattern: "{controller=DriverNavigation}/{action=Navigation}/{id?}")
+
+    //pattern: "{controller=Members}/{action=Login}/{id?}")
     .WithStaticAssets();
 
+app.MapHub<DriverLocationHub>(
+    "/driverLocationHub"
+);
 
 app.Run();
