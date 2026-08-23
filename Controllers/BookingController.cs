@@ -13,17 +13,24 @@ namespace FinalProject.Controllers
             _context = context;
         }
 
-        public IActionResult BookingPage()
-        {
-            return View();
-        }
-        // 連接資料庫測試用(成功)
-        //public async Task<IActionResult> BookingPage()
+
+        //public IActionResult BookingPage()
         //{
-        //    var data = await _context.Drivers.ToListAsync();
-
-        //    return View("~/Views/Booking/BookingPage.cshtml", data);
+        //    return View();
         //}
+        // 連接資料庫測試用(成功)
+        public async Task<IActionResult> BookingPage()
+        {
+            var Drivers = await _context.Drivers.ToListAsync();
+            var VehicleMenu = await _context.VehicleMenu.ToListAsync();
+
+            ViewBag.Drivers = Drivers;
+            ViewBag.VehicleMenu = VehicleMenu;
+            ViewData["VehicleMenuSin"] = VehicleMenu;  // 我想要一個一個取
+
+            return View();
+            //return View("~/Views/Booking/BookingPage.cshtml", data);
+        }
 
 
 
@@ -33,7 +40,7 @@ namespace FinalProject.Controllers
 
 
 
-        
+
 
     }
 }

@@ -1,5 +1,10 @@
-﻿@model List<FinalProject.Models.Driver>
+﻿@* @model List<FinalProject.Models.Driver> *@
 @{
+    var Drivers = ViewBag.Drivers;
+    var VehicleMenu = ViewBag.VehicleMenu;
+
+    @* 我想要一個一個取，取法如下 -> <img src="@vehicleMenuSin[0].ImageUrl"> *@
+    var vehicleMenuSin = ViewData["VehicleMenuSin"] as List<VehicleMenu>;
 }
 <!DOCTYPE html>
 <html lang="en">
@@ -29,14 +34,16 @@
 </head>
 
 <body>
-    
-@* 測試連接資料庫用(成功)
-@foreach (var driver in Model)
-{
+@*  測試連接資料庫用(成功)
+    @foreach (var driver in Drivers)
+    {
     <p>@driver.DriverId - @driver.DriverName</p>
-}
+    }
+    @foreach (var VehicleImg in VehicleMenu)
+    {
+        <div>@VehicleImg.VehicleType - @VehicleImg.ImageUrl</div>
+    }
 *@
-
 
     <!-- ======================= << Header >> ======================= -->
     @* <header class="site-header">
@@ -66,6 +73,7 @@
         </div>
         -->
         <div class="row">
+        <form id="bookingForm" class="booking-form" novalidate>
             <!-- ======================= 主要表單 div ======================= -->
             <div class="col-12">
                 <!-- ======================= 乘車時間 section ======================= -->
@@ -309,7 +317,8 @@
                 </section>
 
                 <!-- ======================= 增加停靠 section ======================= -->
-                <section class="booking-card">
+                <section class="booking-card" style="display:none">
+                    @* 讓停靠點section隱藏 *@
                     <div class="booking-card-header">
                         <h2 class="booking-card-title">
                             <i class="bi bi-signpost-split"></i>
@@ -354,278 +363,101 @@
                     </div>
                     <div class="booking-card-body">
                         <div class="row g-3">
-                            <!-- ======================= 車型 1：一般轎車 div ======================= -->
-                            @* 拉資料庫成功後可以用這個讓所有卡片近來()
-                            @foreach (var 資料表Model名稱 in Model)
+                            <!-- 車型卡 -->
+                            @foreach (var Car in VehicleMenu)
                             {
-                                <div class="car">
-                                    <img src="@car.ImageUrl"
-                                         alt="@car.CarName"
-                                         class="car-image">
-                                    <p>@car.CarName</p>
+                                <div class="col-12 col-sm-6 col-lg-4 col-xl-4">
+                                    <div class="car-card" tabindex="0" data-car-id="standard" data-car-name="一般轎車"
+                                         data-passengers="@Car.MaxPassengers" data-luggage="@Car.MaxLuggage" data-price="@Car.BaseFare">
+                                        <!-- 選取狀態 -->
+                                        <div class="car-selected-check">
+                                            <i class="bi bi-check-lg"></i>
+                                        </div>
+                                        <!-- 車輛圖片 -->
+                                        <div class="car-image-wrapper">
+                                                <img src="@Car.ImageUrl" alt="@Car.ImageTitle" class="car-image">
+                                        </div>
+                                        <!-- 車型內容 -->
+                                        <div class="car-card-body">
+                                            <h3 class="car-name"> @Car.VehicleType </h3>
+                                            <div class="car-description"> @Car.Description </div>
+                                            <!-- 人數 / 行李 -->
+                                            <div class="car-spec-list">
+                                                <div class="car-spec">
+                                                    <i class="bi bi-person-fill"></i>
+                                                    <span> @Car.MaxPassengers 人 </span>
+                                                </div>
+                                                <div class="car-spec">
+                                                    <i class="bi bi-luggage-fill"></i>
+                                                    <span> @Car.MaxLuggage 件 </span>
+                                                </div>
+                                            </div>
+                                            <!-- 價格 -->
+                                            <div class="car-price-wrapper">
+                                                <span class="car-price-label"> 接送價格 </span>
+                                                <span class="car-price"> NT$ @Car.BaseFare <span class="car-price-unit"> 起 </span> </span>
+                                            </div>
+                                            <!-- 選擇按鈕 -->
+                                            <div class="car-select-status"> <i class="bi bi-circle"></i> 選擇此車型 </div>
+                                        </div>
+                                    </div>
                                 </div>
                             }
-                            *@
-
-                            
+                            <!-- 車型卡：保留範本
                             <div class="col-12 col-sm-6 col-lg-4 col-xl-4">
                                 <div class="car-card" tabindex="0" data-car-id="standard" data-car-name="一般轎車"
                                      data-passengers="3" data-luggage="2" data-price="1200">
-                                    <!-- 選取狀態 -->
+                                    @*選取狀態*@
                                     <div class="car-selected-check">
                                         <i class="bi bi-check-lg"></i>
                                     </div>
-                                    <!-- 車輛圖片 -->
+                                    @*車輛圖片*@
                                     <div class="car-image-wrapper">
-                                        <img src="images/car-standard.jpg" alt="一般轎車" class="car-image">
+                                        <img src="~/Images/CarMenu/五人座休旅車.png" alt="一般轎車" class="car-image">
                                     </div>
-                                    <!-- 車型內容 -->
+                                    @*車型內容*@
                                     <div class="car-card-body">
-                                        <h3 class="car-name">
-                                            一般轎車
-                                        </h3>
-                                        <div class="car-description">
-                                            適合 1～3 人搭乘
-                                        </div>
-                                        <!-- 人數 / 行李 -->
+                                        <h3 class="car-name"> 一般轎車 </h3>
+                                        <div class="car-description"> 適合 1～3 人搭乘 </div>
+                                        @*人數 / 行李*@
                                         <div class="car-spec-list">
                                             <div class="car-spec">
                                                 <i class="bi bi-person-fill"></i>
-                                                <span>
-                                                    3 人
-                                                </span>
+                                                <span> 3 人 </span>
                                             </div>
                                             <div class="car-spec">
                                                 <i class="bi bi-luggage-fill"></i>
-                                                <span>
-                                                    2 件
-                                                </span>
+                                                <span> 2 件 </span>
                                             </div>
                                         </div>
-                                        <!-- 車輛特色 -->
-                                        <!-- <div class="car-features">
+                                        @*車輛特色*@
+                                        <div class="car-features">
                                             <span class="car-feature">
-                                                <i class="bi bi-check2"></i>
-                                                舒適座椅
+                                                <i class="bi bi-check2"></i> 舒適座椅
                                             </span>
                                             <span class="car-feature">
-                                                <i class="bi bi-check2"></i>
-                                                冷氣
+                                                <i class="bi bi-check2"></i> 冷氣
                                             </span>
                                             <span class="car-feature">
-                                                <i class="bi bi-check2"></i>
-                                                免費 Wi-Fi
+                                                <i class="bi bi-check2"></i> 免費 Wi-Fi
                                             </span>
-                                        </div> -->
-                                        <!-- 價格 -->
+                                        </div>
+                                        @*價格*@
                                         <div class="car-price-wrapper">
-                                            <span class="car-price-label">
-                                                接送價格
-                                            </span>
-                                            <span class="car-price">
+                                            <span class="car-price-label"> 接送價格 </span>
+                                            <span class="car-price"> 
                                                 NT$1,200
-                                                <span class="car-price-unit">
-                                                    起
-                                                </span>
+                                                <span class="car-price-unit"> 起 </span>
                                             </span>
                                         </div>
-                                        <!-- 選擇按鈕 -->
+                                        @*選擇按鈕*@
                                         <div class="car-select-status">
-                                            <i class="bi bi-circle"></i>
-                                            選擇此車型
+                                            <i class="bi bi-circle"></i> 選擇此車型
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                            <!-- ======================= 車型 2：SUV div ======================= -->
-                            <div class="col-12 col-sm-6 col-lg-4 col-xl-4">
-                                <div class="car-card" tabindex="0" data-car-id="suv" data-car-name="SUV"
-                                     data-passengers="5" data-luggage="4" data-price="1600">
-                                    <div class="car-selected-check">
-                                        <i class="bi bi-check-lg"></i>
-                                    </div>
-                                    <div class="car-image-wrapper">
-                                        <img src="images/car-suv.jpg" alt="SUV" class="car-image">
-                                    </div>
-                                    <div class="car-card-body">
-                                        <h3 class="car-name">
-                                            SUV
-                                        </h3>
-                                        <div class="car-description">
-                                            適合家庭與多人搭乘
-                                        </div>
-                                        <div class="car-spec-list">
-                                            <div class="car-spec">
-                                                <i class="bi bi-person-fill"></i>
-                                                <span>
-                                                    5 人
-                                                </span>
-                                            </div>
-                                            <div class="car-spec">
-                                                <i class="bi bi-luggage-fill"></i>
-                                                <span>
-                                                    4 件
-                                                </span>
-                                            </div>
-                                        </div>
-                                        <!-- <div class="car-features">
-                                            <span class="car-feature">
-                                                <i class="bi bi-check2"></i>
-                                                寬敞空間
-                                            </span>
-                                            <span class="car-feature">
-                                                <i class="bi bi-check2"></i>
-                                                舒適座椅
-                                            </span>
-                                            <span class="car-feature">
-                                                <i class="bi bi-check2"></i>
-                                                冷氣
-                                            </span>
-                                        </div> -->
-                                        <div class="car-price-wrapper">
-                                            <span class="car-price-label">
-                                                接送價格
-                                            </span>
-                                            <span class="car-price">
-                                                NT$1,600
-                                                <span class="car-price-unit">
-                                                    起
-                                                </span>
-                                            </span>
-                                        </div>
-                                        <div class="car-select-status">
-                                            <i class="bi bi-circle"></i>
-                                            選擇此車型
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <!-- ======================= 車型 3：豪華商務車 div ======================= -->
-                            <div class="col-12 col-sm-6 col-lg-4 col-xl-4">
-                                <div class="car-card" tabindex="0" data-car-id="business" data-car-name="豪華商務車"
-                                     data-passengers="6" data-luggage="4" data-price="2200">
-                                    <div class="car-selected-check">
-                                        <i class="bi bi-check-lg"></i>
-                                    </div>
-                                    <div class="car-image-wrapper">
-                                        <img src="images/car-business.jpg" alt="豪華商務車" class="car-image">
-                                    </div>
-                                    <div class="car-card-body">
-                                        <h3 class="car-name">
-                                            豪華商務車
-                                        </h3>
-                                        <div class="car-description">
-                                            適合多人與高品質接送
-                                        </div>
-                                        <div class="car-spec-list">
-                                            <div class="car-spec">
-                                                <i class="bi bi-person-fill"></i>
-                                                <span>
-                                                    6 人
-                                                </span>
-                                            </div>
-                                            <div class="car-spec">
-                                                <i class="bi bi-luggage-fill"></i>
-                                                <span>
-                                                    4 件
-                                                </span>
-                                            </div>
-                                        </div>
-                                        <!-- <div class="car-features">
-                                            <span class="car-feature">
-                                                <i class="bi bi-check2"></i>
-                                                豪華座椅
-                                            </span>
-                                            <span class="car-feature">
-                                                <i class="bi bi-check2"></i>
-                                                寬敞空間
-                                            </span>
-                                            <span class="car-feature">
-                                                <i class="bi bi-check2"></i>
-                                                免費 Wi-Fi
-                                            </span>
-                                        </div> -->
-                                        <div class="car-price-wrapper">
-                                            <span class="car-price-label">
-                                                接送價格
-                                            </span>
-                                            <span class="car-price">
-                                                NT$2,200
-                                                <span class="car-price-unit">
-                                                    起
-                                                </span>
-                                            </span>
-                                        </div>
-                                        <div class="car-select-status">
-                                            <i class="bi bi-circle"></i>
-                                            選擇此車型
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <!-- ======================= 車型 4：大型商務車 div ======================= -->
-                            <div class="col-12 col-sm-6 col-lg-4 col-xl-4">
-                                <div class="car-card" tabindex="0" data-car-id="van" data-car-name="大型商務車"
-                                     data-passengers="9" data-luggage="8" data-price="3000">
-                                    <div class="car-selected-check">
-                                        <i class="bi bi-check-lg"></i>
-                                    </div>
-                                    <div class="car-image-wrapper">
-                                        <img src="images/car-van.jpg" alt="大型商務車" class="car-image">
-                                    </div>
-                                    <div class="car-card-body">
-                                        <h3 class="car-name">
-                                            大型商務車
-                                        </h3>
-                                        <div class="car-description">
-                                            適合團體旅客
-                                        </div>
-                                        <div class="car-spec-list">
-                                            <div class="car-spec">
-                                                <i class="bi bi-person-fill"></i>
-                                                <span>
-                                                    9 人
-                                                </span>
-                                            </div>
-                                            <div class="car-spec">
-                                                <i class="bi bi-luggage-fill"></i>
-                                                <span>
-                                                    8 件
-                                                </span>
-                                            </div>
-                                        </div>
-                                        <!-- <div class="car-features">
-                                            <span class="car-feature">
-                                                <i class="bi bi-check2"></i>
-                                                多人座
-                                            </span>
-                                            <span class="car-feature">
-                                                <i class="bi bi-check2"></i>
-                                                大型行李空間
-                                            </span>
-                                            <span class="car-feature">
-                                                <i class="bi bi-check2"></i>
-                                                冷氣
-                                            </span>
-                                        </div> -->
-                                        <div class="car-price-wrapper">
-                                            <span class="car-price-label">
-                                                接送價格
-                                            </span>
-                                            <span class="car-price">
-                                                NT$3,000
-                                                <span class="car-price-unit">
-                                                    起
-                                                </span>
-                                            </span>
-                                        </div>
-                                        <div class="car-select-status">
-                                            <i class="bi bi-circle"></i>
-                                            選擇此車型
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+                            -->
                         </div>
                     </div>
                 </section>
@@ -776,7 +608,7 @@
                 </section>
                 <!-- 0812 END ------------------------------------------------------------------------------------------- -->
             </div>
-        <form id="bookingForm" class="booking-form" novalidate>
+        
 
             <div class="col-12">
                 <!-- ======================= 訂單總覽 section ======================= -->
@@ -810,7 +642,7 @@
                             </div>
                         </div>
                         <!-- 停靠 div -->
-                        <div class="summary-item">
+                        @* <div class="summary-item">
                             <div class="summary-label">
                                 <i class="bi bi-signpost-2"></i>
                                 停靠點
@@ -818,7 +650,7 @@
                             <div class="summary-value" id="summaryStopover">
                                 無
                             </div>
-                        </div>
+                        </div> *@
                         <!-- 下車 div -->
                         <div class="summary-item">
                             <div class="summary-label">
