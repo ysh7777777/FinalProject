@@ -78,6 +78,19 @@ INSERT INTO vehicle (license_plate, base_location, vehicle_type, max_passengers,
 ('RZA-1111', N'彰化車站', N'轎車', 4, 2, 0, 100, N'可用');
 
 -- =============================================
+-- 3-1. 車輛表 (vehicle_menu) - 6 筆 (08/23 益)
+-- =============================================
+INSERT INTO vehicle_menu
+    (vehicle_type, max_passengers, max_luggage, child_seats, base_fare, image_title, image_url, description)
+VALUES
+(N'五人座轎車', 4, 2, 2, 800, N'五人座轎車示意圖', N'/Images/CarMenu/五人座轎車.png', N'適合一般乘客與少量行李'),
+(N'五人座休旅車', 4, 4, 2, 1000, N'五人座休旅車示意圖', N'/Images/CarMenu/五人座休旅車.png', N'空間寬敞，適合家庭乘客及較多行李'),
+(N'九人座廂型車', 8, 8, 6, 1800, N'九人座廂型車示意圖', N'/Images/CarMenu/九人座廂型車.png', N'適合多人家庭或團體旅遊使用'),
+(N'阿法', 6, 6, 4, 2600, N'阿法示意圖', N'/Images/CarMenu/阿法.png', N'適合商務接送及多人乘坐'),
+(N'大T', 8, 8, 6, 3200, N'大T示意圖', N'/Images/CarMenu/大T.png', N'適合多人乘坐並可攜帶較多行李'),
+(N'賓士九人座廂型車', 8, 8, 6, 2000, N'賓士九人座廂型車示意圖', N'/Images/CarMenu/賓士九人座廂型車.png', N'提供舒適乘坐體驗，適合多人及高級接送服務');
+
+-- =============================================
 -- 4. 司機表 (driver) - 20 筆
 -- =============================================
 INSERT INTO driver (driver_id, driver_name, base_location, password) VALUES
