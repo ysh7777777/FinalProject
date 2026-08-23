@@ -2,20 +2,33 @@
 @{
     ViewData["Title"] = "司機導航";
 }
-@* 測試資料 *@
-<div>
-    訂單編號：@Model?.OrderNo
-</div>
 
-<div>
-    上車地點：@Model?.PickupLocation
-</div>
 
-<div>
-    目的地：@Model?.Destination
-</div>
 
-@* 測試資料 *@
+
+@{
+    var fare =
+        (Model?.LicensePlateNavigation?.BaseFare ?? 0)
+        + (Model?.EstimatedDuration ?? 0) * 20;
+}
+
+
+
+<button id="tempnshare-btn"
+        type="button"
+        class="">
+
+    測試訂單開始前40分鐘
+
+</button>
+
+<button id="tempyshare-btn"
+        type="button"
+        class="">
+
+    測試訂單開始前20分鐘
+
+</button>
 
 <div class="container-fluid p-0">
 
@@ -55,7 +68,7 @@
                     <div class="col-md-6">
                         <strong>乘客：</strong>
                         <span>
-                            王小明
+                            @Model?.AccountNavigation?.FullName
                         </span>
                     </div>
 
@@ -67,17 +80,18 @@
                     <div class="col-md-6">
                         <strong>出發地：</strong>
                         <span id="pickup-address">
-                            桃園國際機場 T2
+                            @Model?.PickupLocation
                         </span>
                     </div>
 
                     <div class="col-md-6">
                         <strong>目的地：</strong>
                         <span id="destination-address">
-                            台中市南屯區公益路二段51號
+                            @Model?.Destination
                         </span>
                     </div>
 
+                 
                 </div>
 
 
@@ -85,15 +99,35 @@
 
                     <div class="col-md-6">
                         <strong>車牌：</strong>
-                        NSS-1088
+                        @Model?.LicensePlate
                     </div>
 
                     <div class="col-md-6">
                         <strong>車資：</strong>
-                        1020 元
+                        @fare 元
                     </div>
 
+                   
+
                 </div>
+                <div class="row mb-2">
+
+                    <div class="col-md-6">
+                        <strong>乘客乘車時間：</strong>
+                        <span id="departure-time">
+                            @Model?.DepartureTime 
+                        </span>
+                    </div>
+
+
+                    <div class="col-md-6">
+                        <strong>訂單狀態</strong>
+                        <span id="order-status">
+                            @Model?.TripStatus
+                        </span>
+                    </div>
+                </div>
+
 
             </div>
 
@@ -127,6 +161,7 @@
                 </div>
 
             </div>
+           
 
         </div>
 
@@ -136,6 +171,16 @@
         <!-- ========================= -->
 
         <div class="d-flex gap-2 flex-wrap">
+            <button id="temproute-btn"
+                    type="button"
+                    class=""
+                    >
+
+                測試行徑路線功能
+
+            </button>
+
+          
 
             <button id="online-btn"
                     type="button"
@@ -165,11 +210,33 @@
 
             </button>
 
+            <button id="last-order-btn"
+                    type="button"
+                    class="btn btn-outline-primary"
+                    disabled="@(
+                    ViewBag.IsHistory == true
+                        ? !(ViewBag.HasOlderOrder ?? false)
+                        : !(ViewBag.HasCompletedToday ?? false)
+                    )">
+                查看上個訂單
+            </button>
+
+            <button id="nextpage-order-btn"
+                    type="button"
+                    class="btn btn-outline-primary"
+                    style="display:@(ViewBag.IsHistory == true ? "inline-block" : "none");">
+                下一頁
+            </button>
+
             <button id="next-order-btn" 
                     type="button"
-                    class="btn btn-outline-primary" disabled>
+                    class="btn btn-outline-primary"
+                    disabled>
                 前往下個訂單
             </button>
+
+            
+
 
 
             <button id="offline-btn"
@@ -203,6 +270,31 @@
 
 </div>
 
+<script>
+    window.tripData = {
+        driverId: "@Model?.AssignedDriverId",
+
+        orderNo: "@Model?.OrderNo",
+
+        isHistory: @(ViewBag.IsHistory == true ? "true" : "false"),
+
+        tripStatus: "@Model?.TripStatus",
+
+        pickupLat: @((Model?.PickupLat ?? 0)
+                                .ToString(System.Globalization.CultureInfo.InvariantCulture)),
+
+        pickupLng: @((Model?.PickupLng ?? 0)
+                                .ToString(System.Globalization.CultureInfo.InvariantCulture)),
+
+        destinationLat: @((Model?.DestinationLat ?? 0)
+                                .ToString(System.Globalization.CultureInfo.InvariantCulture)),
+
+        destinationLng: @((Model?.DestinationLng ?? 0)
+                                .ToString(System.Globalization.CultureInfo.InvariantCulture)),
+
+        departureTime: "@(Model?.DepartureTime?.ToString("yyyy-MM-ddTHH:mm:ss") ?? "")"
+    };
+</script>
 
 @section Scripts {
 
@@ -214,4 +306,10 @@
             src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAk5HVk6NmgjgNL9vu5m2HRjvcbghlyMn4&callback=initDriverMap">
     </script>
 
+}
+@if (TempData["OrderMessage"] != null)
+{
+    <script>
+        alert('@Html.Raw(TempData["OrderMessage"])');
+    </script>
 }
