@@ -2,6 +2,8 @@
     var isAuthenticated = User?.Identity?.IsAuthenticated ?? false;
     // isAuthenticated = true;
     ViewData["Title"] ??= "機場接送";
+    var pageClass = ViewData["PageClass"]?.ToString() ?? "";
+    var isHomePage = pageClass == "home-index";
 }
 <!DOCTYPE html>
 <html lang="zh-Hant">
@@ -10,9 +12,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - 機場接送</title>
     <link rel="stylesheet" href="/lib/bootstrap/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="/css/layout-v2.css" />
+    <link rel="stylesheet" href="/css/layout-v2.css" asp-append-version="true" />
+    @await RenderSectionAsync("Styles", required: false)
 </head>
-<body class="layout-v2 client-v2 d-flex flex-column min-vh-100">
+<body class="layout-v2 client-v2 d-flex flex-column min-vh-100 @pageClass">
     <header class="shadow-sm">
         <nav class="navbar navbar-expand-lg navbar-dark client-v2-nav" aria-label="乘客端主選單">
             <div class="container">
@@ -47,8 +50,10 @@
             </div>
         </nav>
     </header>
-    <main class="flex-grow-1 py-4 py-lg-5">
-        <div class="container layout-v2-content">@RenderBody()</div>
+    <main class="flex-grow-1 @(isHomePage ? "" : "py-4 py-lg-5")">
+        <div class="layout-v2-content @(isHomePage ? "container-fluid p-0" : "container")">
+            @RenderBody()
+        </div>
     </main>
     <footer class="layout-v2-footer py-4 mt-auto">
         <div class="container">
