@@ -7,7 +7,6 @@ let passengerCurrentDriverLocation = null;
 let passengerRoutePhase = "pickup";
 let passengerLastRouteRequestAt = 0;
 let passengerRouteRequestVersion = 0;
-let passengerRouteRefreshTimer = null;
 
 
 
@@ -19,8 +18,7 @@ const passengerConnection =
         .build();
 const passengerTripSignalId =
     `${window.passengerTripData.driverId}|${window.passengerTripData.orderNo}`;
-const passengerRouteUpdateIntervalMs = 3000;
-const passengerRouteStopDelayMs = 1000;
+const passengerRouteUpdateIntervalMs = 10000;
 
 function setPassengerRouteText(elementId, text) {
     document.getElementById(elementId).textContent = text;
@@ -74,21 +72,6 @@ function getPassengerRouteTarget() {
             lat: window.passengerTripData.pickupLat,
             lng: window.passengerTripData.pickupLng
         }
-    };
-}
-
-function getPassengerTargetIcon() {
-    return {
-        path: google.maps.SymbolPath.CIRCLE,
-        scale: 9,
-        fillColor:
-            passengerRoutePhase === "destination"
-                ? "#fd7e14"
-                : "#0d6efd",
-        fillOpacity: 1,
-        strokeColor: "#ffffff",
-        strokeOpacity: 1,
-        strokeWeight: 2
     };
 }
 
@@ -157,8 +140,7 @@ async function updatePassengerRoute(
                 new google.maps.Marker({
                     map: passengerMap,
                     position: target.position,
-                    title: target.label,
-                    icon: getPassengerTargetIcon()
+                    title: target.label
                 });
         }
         else {
@@ -167,9 +149,6 @@ async function updatePassengerRoute(
             );
             passengerTargetMarker.setTitle(
                 target.label
-            );
-            passengerTargetMarker.setIcon(
-                getPassengerTargetIcon()
             );
         }
 
@@ -228,31 +207,6 @@ async function updatePassengerRoute(
             "暫時無法取得"
         );
     }
-}
-
-function schedulePassengerRouteUpdate(
-    currentLocation
-) {
-    updatePassengerRoute(currentLocation);
-
-    if (passengerRouteRefreshTimer !== null) {
-        clearTimeout(passengerRouteRefreshTimer);
-    }
-
-    passengerRouteRefreshTimer =
-        setTimeout(() => {
-            passengerRouteRefreshTimer = null;
-
-            if (
-                passengerCurrentDriverLocation &&
-                passengerRoutePhase !== "completed"
-            ) {
-                updatePassengerRoute(
-                    passengerCurrentDriverLocation,
-                    true
-                );
-            }
-        }, passengerRouteStopDelayMs);
 }
 
 passengerConnection.on(
@@ -355,9 +309,7 @@ passengerConnection.on(
             driverLocation
         );
 
-        schedulePassengerRouteUpdate(
-            driverLocation
-        );
+        updatePassengerRoute(driverLocation);
     }
 );
 
@@ -555,12 +507,6 @@ passengerConnection.on(
 
         passengerRoutePhase = "completed";
         ++passengerRouteRequestVersion;
-
-        if (passengerRouteRefreshTimer !== null) {
-            clearTimeout(passengerRouteRefreshTimer);
-            passengerRouteRefreshTimer = null;
-        }
-
         sessionStorage.setItem(
             "passengerRoutePhase",
             passengerRoutePhase

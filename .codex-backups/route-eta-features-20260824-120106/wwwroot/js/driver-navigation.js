@@ -4,8 +4,6 @@ let driverRoutePolyline = null;
 let headingToDestination = false;
 let currentDriverLocation = null;
 let canSendLocationToPassenger = false;
-let driverLastRouteRequestAt = 0;
-let driverRouteRequestVersion = 0;
 
 let isTestRouteMode = false;
 
@@ -27,14 +25,6 @@ const driverId =
     window.tripData.driverId;
 const tripSignalId =
     `${driverId}|${window.tripData.orderNo}`;
-const driverRouteUpdateIntervalMs = 3000;
-const driverRoutePhaseStorageKey =
-    `driverRoutePhase:${tripSignalId}`;
-
-headingToDestination =
-    sessionStorage.getItem(
-        driverRoutePhaseStorageKey
-    ) === "destination";
 
 console.log(
     "訂單出發時間：",
@@ -51,156 +41,6 @@ let driverMap = null;
 let driverMarker = null;
 let watchId = null;
 let todayCompletedOrderNos = null;
-
-function setDriverRouteText(elementId, text) {
-    document.getElementById(elementId).textContent = text;
-}
-
-function formatDriverDistance(distanceMeters) {
-    if (distanceMeters < 1000) {
-        return `${Math.max(0, Math.round(distanceMeters))} 公尺`;
-    }
-
-    const digits = distanceMeters < 10000 ? 1 : 0;
-    return `${(distanceMeters / 1000).toFixed(digits)} 公里`;
-}
-
-function formatDriverEta(durationMillis) {
-    if (durationMillis <= 0) {
-        return "已抵達";
-    }
-
-    const minutes = Math.max(
-        1,
-        Math.ceil(durationMillis / 60000)
-    );
-    const arrivalTime =
-        new Date(Date.now() + durationMillis)
-            .toLocaleTimeString(
-                "zh-TW",
-                {
-                    hour: "2-digit",
-                    minute: "2-digit"
-                }
-            );
-
-    return `約 ${minutes} 分鐘（${arrivalTime} 抵達）`;
-}
-
-async function drawDriverRoute(
-    currentLocation,
-    targetLocation,
-    targetLabel,
-    force = false
-) {
-    if (!driverMap) {
-        return;
-    }
-
-    const now = Date.now();
-
-    if (
-        !force &&
-        now - driverLastRouteRequestAt <
-        driverRouteUpdateIntervalMs
-    ) {
-        return;
-    }
-
-    driverLastRouteRequestAt = now;
-    const requestVersion =
-        ++driverRouteRequestVersion;
-
-    setDriverRouteText(
-        "driver-route-target",
-        targetLabel
-    );
-
-    try {
-        const { Route } =
-            await google.maps.importLibrary("routes");
-        const response =
-            await Route.computeRoutes({
-                origin: currentLocation,
-                destination: targetLocation,
-                travelMode: "DRIVING",
-                routingPreference: "TRAFFIC_AWARE",
-                fields: [
-                    "path",
-                    "distanceMeters",
-                    "durationMillis"
-                ]
-            });
-
-        if (
-            requestVersion !==
-            driverRouteRequestVersion
-        ) {
-            return;
-        }
-
-        if (!response.routes.length) {
-            throw new Error("找不到司機端路線");
-        }
-
-        const route = response.routes[0];
-
-        if (driverRoutePolyline) {
-            driverRoutePolyline.setMap(null);
-        }
-
-        driverRoutePolyline =
-            new google.maps.Polyline({
-                map: driverMap,
-                path: route.path,
-                strokeColor: "#198754",
-                strokeOpacity: 0.85,
-                strokeWeight: 5
-            });
-
-        const bounds =
-            new google.maps.LatLngBounds();
-
-        route.path.forEach(point => {
-            bounds.extend(point);
-        });
-
-        if (!bounds.isEmpty()) {
-            driverMap.fitBounds(bounds, 60);
-        }
-
-        setDriverRouteText(
-            "driver-route-distance",
-            formatDriverDistance(
-                route.distanceMeters ?? 0
-            )
-        );
-        setDriverRouteText(
-            "driver-route-eta",
-            formatDriverEta(
-                route.durationMillis ?? 0
-            )
-        );
-    }
-    catch (error) {
-        if (
-            requestVersion !==
-            driverRouteRequestVersion
-        ) {
-            return;
-        }
-
-        console.error("司機端路線計算失敗：", error);
-        setDriverRouteText(
-            "driver-route-distance",
-            "暫時無法取得"
-        );
-        setDriverRouteText(
-            "driver-route-eta",
-            "暫時無法取得"
-        );
-    }
-}
 
 async function getTodayCompletedOrderNos() {
     if (todayCompletedOrderNos !== null) {
@@ -313,18 +153,6 @@ function applyHistoryModeUI() {
     document.getElementById("next-order-btn").style.display = "none";
     document.getElementById("nextpage-order-btn").style.display = "inline-block";
     document.getElementById("driver-status").textContent = "歷史模式";
-    setDriverRouteText(
-        "driver-route-target",
-        "歷史訂單"
-    );
-    setDriverRouteText(
-        "driver-route-distance",
-        "不適用"
-    );
-    setDriverRouteText(
-        "driver-route-eta",
-        "不適用"
-    );
 }
 
 
@@ -440,25 +268,8 @@ async function startDriverOnline() {
         return;
     }
 
-    headingToDestination =
-        sessionStorage.getItem(
-            driverRoutePhaseStorageKey
-        ) === "destination";
-
-    setDriverRouteText(
-        "driver-route-target",
-        headingToDestination
-            ? "目的地"
-            : "乘客上車位置"
-    );
-    setDriverRouteText(
-        "driver-route-distance",
-        "計算中"
-    );
-    setDriverRouteText(
-        "driver-route-eta",
-        "計算中"
-    );
+    // 新一次上線，重設行程狀態
+    headingToDestination = false;
 
 
 
@@ -537,21 +348,6 @@ async function startDriverOnline() {
                 if (testIndex >= testPath.length) {
 
                     clearInterval(testTimer);
-
-                    if (currentDriverLocation) {
-                        if (headingToDestination) {
-                            drawRouteToDestination(
-                                currentDriverLocation,
-                                true
-                            );
-                        }
-                        else {
-                            drawRouteToPickup(
-                                currentDriverLocation,
-                                true
-                            );
-                        }
-                    }
 
                     console.log(
                         "測試司機已抵達台大醫院"
@@ -821,15 +617,10 @@ document
     .addEventListener("click", function () {
 
         headingToDestination = true;
-        sessionStorage.setItem(
-            driverRoutePhaseStorageKey,
-            "destination"
-        );
 
         if (currentDriverLocation) {
             drawRouteToDestination(
-                currentDriverLocation,
-                true
+                currentDriverLocation
             );
         }
 
@@ -853,28 +644,75 @@ document
         ).disabled = true;
     });
 
-async function drawRouteToPickup(
-    currentLocation,
-    force = false
-) {
-    await drawDriverRoute(
-        currentLocation,
-        pickupLocation,
-        "乘客上車位置",
-        force
-    );
+async function drawRouteToPickup(currentLocation) {
+
+    const { Route } =
+        await google.maps.importLibrary("routes");
+
+    const request = {
+        origin: currentLocation,
+        destination: pickupLocation,
+        travelMode: "DRIVING"
+    };
+
+    const response =
+        await Route.computeRoutes({
+            ...request,
+            fields: ["path"]
+        });
+
+    if (!response.routes.length) {
+        console.log("找不到路線");
+        return;
+    }
+
+    const route =
+        response.routes[0];
+
+    if (driverRoutePolyline) {
+        driverRoutePolyline.setMap(null);
+    }
+
+    driverRoutePolyline =
+        new google.maps.Polyline({
+            map: driverMap,
+            path: route.path,
+            strokeWeight: 5
+        });
 }
 
-async function drawRouteToDestination(
-    currentLocation,
-    force = false
-) {
-    await drawDriverRoute(
-        currentLocation,
-        destinationLocation,
-        "目的地",
-        force
-    );
+async function drawRouteToDestination(currentLocation) {
+
+    const { Route } =
+        await google.maps.importLibrary("routes");
+
+    const response =
+        await Route.computeRoutes({
+            origin: currentLocation,
+            destination: destinationLocation,
+            travelMode: "DRIVING",
+            fields: ["path"]
+        });
+
+    if (!response.routes.length) {
+        console.log("找不到目的地路線");
+        return;
+    }
+
+    const route = response.routes[0];
+
+    if (driverRoutePolyline) {
+        driverRoutePolyline.setMap(null);
+    }
+
+    driverRoutePolyline =
+        new google.maps.Polyline({
+            map: driverMap,
+            path: route.path,
+            strokeWeight: 5
+        });
+
+    
 }
 
 
@@ -901,29 +739,6 @@ document
         ).textContent = "已完成";
 
         canSendLocationToPassenger = false;
-        ++driverRouteRequestVersion;
-        sessionStorage.setItem(
-            driverRoutePhaseStorageKey,
-            "completed"
-        );
-
-        if (driverRoutePolyline) {
-            driverRoutePolyline.setMap(null);
-            driverRoutePolyline = null;
-        }
-
-        setDriverRouteText(
-            "driver-route-target",
-            "已抵達目的地"
-        );
-        setDriverRouteText(
-            "driver-route-distance",
-            "0 公尺"
-        );
-        setDriverRouteText(
-            "driver-route-eta",
-            "已抵達"
-        );
 
         connection.invoke(
             "DriverArrivedDestination",
@@ -978,16 +793,6 @@ document
         document.getElementById(
             "driver-status"
         ).textContent = "已下線";
-
-        ++driverRouteRequestVersion;
-        setDriverRouteText(
-            "driver-route-distance",
-            "暫停更新"
-        );
-        setDriverRouteText(
-            "driver-route-eta",
-            "暫停更新"
-        );
 
         document.getElementById(
             "online-btn"

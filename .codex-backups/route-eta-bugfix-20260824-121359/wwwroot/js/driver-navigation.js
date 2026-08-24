@@ -27,7 +27,7 @@ const driverId =
     window.tripData.driverId;
 const tripSignalId =
     `${driverId}|${window.tripData.orderNo}`;
-const driverRouteUpdateIntervalMs = 3000;
+const driverRouteUpdateIntervalMs = 10000;
 const driverRoutePhaseStorageKey =
     `driverRoutePhase:${tripSignalId}`;
 
@@ -537,21 +537,6 @@ async function startDriverOnline() {
                 if (testIndex >= testPath.length) {
 
                     clearInterval(testTimer);
-
-                    if (currentDriverLocation) {
-                        if (headingToDestination) {
-                            drawRouteToDestination(
-                                currentDriverLocation,
-                                true
-                            );
-                        }
-                        else {
-                            drawRouteToPickup(
-                                currentDriverLocation,
-                                true
-                            );
-                        }
-                    }
 
                     console.log(
                         "測試司機已抵達台大醫院"
