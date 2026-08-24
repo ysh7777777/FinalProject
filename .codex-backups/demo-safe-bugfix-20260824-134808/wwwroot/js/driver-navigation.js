@@ -8,13 +8,6 @@ let driverLastRouteRequestAt = 0;
 let driverRouteRequestVersion = 0;
 
 let isTestRouteMode = false;
-let testRouteTimer = null;
-let testRouteRunVersion = 0;
-let testRouteHandlerBound = false;
-let driverConnectionRetryTimer = null;
-let gpsShareScheduleTimer = null;
-let gpsShareCountdownTimer = null;
-let gpsShareDemoMode = false;
 
 // 假 GPS 測試路線
 
@@ -37,22 +30,6 @@ const tripSignalId =
 const driverRouteUpdateIntervalMs = 3000;
 const driverRoutePhaseStorageKey =
     `driverRoutePhase:${tripSignalId}`;
-const driverShareStorageKey =
-    `driverShareEnabled:${tripSignalId}`;
-const gpsShareDemoModeStorageKey =
-    `driverGpsShareDemoMode:${tripSignalId}`;
-const gpsShareLeadTimeMs = 30 * 60 * 1000;
-const maxGpsShareTimerDelayMs = 2147483647;
-
-gpsShareDemoMode =
-    sessionStorage.getItem(
-        gpsShareDemoModeStorageKey
-    ) === "true";
-
-canSendLocationToPassenger =
-    sessionStorage.getItem(
-        driverShareStorageKey
-    ) === "true";
 
 headingToDestination =
     sessionStorage.getItem(
@@ -66,12 +43,6 @@ console.log(
 const connection =
     new signalR.HubConnectionBuilder()
         .withUrl("/driverLocationHub")
-        .withAutomaticReconnect([
-            0,
-            2000,
-            5000,
-            10000
-        ])
         .build();
 
 
@@ -80,401 +51,6 @@ let driverMap = null;
 let driverMarker = null;
 let watchId = null;
 let todayCompletedOrderNos = null;
-
-function stopTestRoute() {
-    ++testRouteRunVersion;
-
-    if (testRouteTimer !== null) {
-        clearInterval(testRouteTimer);
-        testRouteTimer = null;
-    }
-
-    isTestRouteMode = false;
-}
-
-function stopDriverLocationWatch() {
-    if (watchId !== null) {
-        navigator.geolocation.clearWatch(watchId);
-        watchId = null;
-    }
-}
-
-function stopGpsShareSchedule() {
-    if (gpsShareScheduleTimer !== null) {
-        clearTimeout(gpsShareScheduleTimer);
-        gpsShareScheduleTimer = null;
-    }
-}
-
-function disableGpsSharing() {
-    canSendLocationToPassenger = false;
-    sessionStorage.setItem(
-        driverShareStorageKey,
-        "false"
-    );
-}
-
-function canScheduleGpsSharing() {
-    return sessionStorage.getItem("driverOnline") === "true" &&
-        !window.tripData.isHistory &&
-        window.tripData.tripStatus !== "已完成" &&
-        sessionStorage.getItem(
-            driverRoutePhaseStorageKey
-        ) !== "completed";
-}
-
-function updateGpsShareDemoModeButton() {
-    const demoModeButton =
-        document.getElementById("tempyshare-btn");
-
-    demoModeButton.textContent = gpsShareDemoMode
-        ? "Demo 5 秒模式：已啟用"
-        : "啟用 Demo 5 秒模式";
-}
-
-function setGpsShareCountdownText(text) {
-    const countdownElement =
-        document.getElementById(
-            "gps-share-demo-countdown"
-        );
-
-    if (countdownElement) {
-        countdownElement.textContent = text;
-    }
-}
-
-function stopGpsShareCountdown(resetText = false) {
-    if (gpsShareCountdownTimer !== null) {
-        clearInterval(gpsShareCountdownTimer);
-        gpsShareCountdownTimer = null;
-    }
-
-    if (resetText) {
-        setGpsShareCountdownText(
-            "Demo 倒數尚未啟動"
-        );
-    }
-}
-
-function startGpsShareCountdown(shareStartTime) {
-    stopGpsShareCountdown();
-
-    const shareStartTimestamp =
-        new Date(shareStartTime).getTime();
-
-    const updateCountdown = () => {
-        const remainingSeconds = Math.max(
-            0,
-            Math.ceil(
-                (shareStartTimestamp - Date.now()) /
-                1000
-            )
-        );
-
-        if (remainingSeconds <= 0) {
-            stopGpsShareCountdown();
-            setGpsShareCountdownText(
-                "GPS 分享已開始"
-            );
-            return;
-        }
-
-        setGpsShareCountdownText(
-            `GPS 分享將於 ${remainingSeconds} 秒後開始`
-        );
-    };
-
-    updateCountdown();
-    gpsShareCountdownTimer =
-        setInterval(updateCountdown, 250);
-}
-
-async function activateGpsSharing(
-    sourceLabel,
-    sendCurrentLocation = true
-) {
-    stopGpsShareSchedule();
-
-    if (!canScheduleGpsSharing()) {
-        disableGpsSharing();
-        return;
-    }
-
-    canSendLocationToPassenger = true;
-    sessionStorage.setItem(
-        driverShareStorageKey,
-        "true"
-    );
-
-    if (gpsShareDemoMode) {
-        stopGpsShareCountdown();
-        setGpsShareCountdownText(
-            "GPS 分享已開始"
-        );
-    }
-
-    console.log(`${sourceLabel}：GPS 分享已開始`);
-
-    if (
-        sendCurrentLocation &&
-        currentDriverLocation &&
-        connection.state ===
-        signalR.HubConnectionState.Connected
-    ) {
-        try {
-            await connection.invoke(
-                "SendDriverLocation",
-                tripSignalId,
-                currentDriverLocation.lat,
-                currentDriverLocation.lng
-            );
-
-            console.log(
-                "GPS 分享啟用，已立即送出目前位置：",
-                currentDriverLocation
-            );
-        }
-        catch (error) {
-            console.error(
-                "GPS 分享啟用時傳送位置失敗：",
-                error
-            );
-        }
-    }
-}
-
-async function scheduleGpsSharing(
-    shareStartTime,
-    sourceLabel,
-    sendCurrentLocationOnImmediateStart = true
-) {
-    stopGpsShareSchedule();
-
-    if (!canScheduleGpsSharing()) {
-        disableGpsSharing();
-        return;
-    }
-
-    const shareStartTimestamp =
-        new Date(shareStartTime).getTime();
-
-    if (!Number.isFinite(shareStartTimestamp)) {
-        disableGpsSharing();
-        console.error(
-            `${sourceLabel}：無法解析 GPS 分享開始時間`,
-            shareStartTime
-        );
-        return;
-    }
-
-    const remainingMs =
-        shareStartTimestamp - Date.now();
-
-    if (remainingMs <= 0) {
-        await activateGpsSharing(
-            sourceLabel,
-            sendCurrentLocationOnImmediateStart
-        );
-        return;
-    }
-
-    disableGpsSharing();
-
-    console.log(
-        `${sourceLabel}：GPS 分享將於 ${Math.ceil(remainingMs / 1000)} 秒後開始`
-    );
-
-    gpsShareScheduleTimer = setTimeout(() => {
-        gpsShareScheduleTimer = null;
-
-        void scheduleGpsSharing(
-            new Date(shareStartTimestamp),
-            sourceLabel,
-            true
-        );
-    }, Math.min(remainingMs, maxGpsShareTimerDelayMs));
-}
-
-async function scheduleOfficialGpsSharing(
-    sendCurrentLocationOnImmediateStart = true
-) {
-    const departureTimestamp =
-        new Date(window.tripData.departureTime)
-            .getTime();
-    const shareStartTime =
-        new Date(
-            departureTimestamp - gpsShareLeadTimeMs
-        );
-
-    await scheduleGpsSharing(
-        shareStartTime,
-        "正式排程（出發前 30 分鐘）",
-        sendCurrentLocationOnImmediateStart
-    );
-}
-
-function scheduleDriverConnectionRestart() {
-    if (driverConnectionRetryTimer !== null) {
-        return;
-    }
-
-    driverConnectionRetryTimer =
-        setTimeout(async () => {
-            driverConnectionRetryTimer = null;
-
-            if (
-                sessionStorage.getItem(
-                    "driverOnline"
-                ) !== "true" ||
-                connection.state !==
-                signalR.HubConnectionState.Disconnected
-            ) {
-                return;
-            }
-
-            document.getElementById(
-                "online-btn"
-            ).disabled = false;
-
-            if (
-                sessionStorage.getItem(
-                    driverRoutePhaseStorageKey
-                ) === "completed"
-            ) {
-                try {
-                    await connection.start();
-                    await restoreDriverSignalRState();
-                    document.getElementById(
-                        "driver-status"
-                    ).textContent = "行程已完成";
-                }
-                catch (error) {
-                    console.error(
-                        "完成階段重連失敗：",
-                        error
-                    );
-                    scheduleDriverConnectionRestart();
-                }
-
-                return;
-            }
-
-            await startDriverOnline();
-        }, 5000);
-}
-
-async function restoreDriverSignalRState() {
-    const shouldBeOnline =
-        sessionStorage.getItem(
-            "driverOnline"
-        ) === "true";
-
-    if (
-        !shouldBeOnline ||
-        window.tripData.isHistory ||
-        connection.state !==
-        signalR.HubConnectionState.Connected
-    ) {
-        return;
-    }
-
-    await connection.invoke(
-        "DriverOnline",
-        driverId
-    );
-
-    const savedPhase =
-        sessionStorage.getItem(
-            driverRoutePhaseStorageKey
-        );
-
-    if (savedPhase === "destination") {
-        await connection.invoke(
-            "DriverArrivedPassenger",
-            tripSignalId
-        );
-    }
-    else if (savedPhase === "completed") {
-        await connection.invoke(
-            "DriverArrivedDestination",
-            tripSignalId
-        );
-        return;
-    }
-
-    if (
-        canSendLocationToPassenger &&
-        currentDriverLocation
-    ) {
-        await connection.invoke(
-            "SendDriverLocation",
-            tripSignalId,
-            currentDriverLocation.lat,
-            currentDriverLocation.lng
-        );
-    }
-}
-
-connection.onreconnecting(() => {
-    if (
-        sessionStorage.getItem(
-            "driverOnline"
-        ) === "true"
-    ) {
-        document.getElementById(
-            "driver-status"
-        ).textContent = "連線恢復中";
-    }
-});
-
-connection.onreconnected(async () => {
-    try {
-        await restoreDriverSignalRState();
-
-        const savedPhase =
-            sessionStorage.getItem(
-                driverRoutePhaseStorageKey
-            );
-
-        if (savedPhase === "completed") {
-            document.getElementById(
-                "driver-status"
-            ).textContent = "行程已完成";
-            return;
-        }
-
-        if (savedPhase === "destination") {
-            headingToDestination = true;
-        }
-
-        applyOnlineTripPhaseUI();
-    }
-    catch (error) {
-        console.error(
-            "SignalR 狀態恢復失敗：",
-            error
-        );
-    }
-});
-
-connection.onclose(error => {
-    if (
-        sessionStorage.getItem(
-            "driverOnline"
-        ) !== "true"
-    ) {
-        return;
-    }
-
-    console.error("SignalR 連線已中斷：", error);
-    document.getElementById(
-        "driver-status"
-    ).textContent = "連線中斷，請重新上線";
-    document.getElementById(
-        "online-btn"
-    ).disabled = false;
-    scheduleDriverConnectionRestart();
-});
 
 function setDriverRouteText(elementId, text) {
     document.getElementById(elementId).textContent = text;
@@ -806,103 +382,98 @@ function initDriverMap() {
 
 }
 
-// Demo：驗證共用排程會在 5 秒後自動啟用 GPS 分享
-const demoAutoShareButton =
-    document.getElementById("tempnshare-btn");
+//測試前40分鐘
+document
+    .getElementById("tempnshare-btn")
+    .addEventListener("click", function () {
 
-demoAutoShareButton.textContent =
-    "測試 5 秒後自動分享 GPS";
+        const departureTime =
+            new Date(window.tripData.departureTime);
 
-demoAutoShareButton.addEventListener(
-    "click",
-    async function () {
-        if (
-            sessionStorage.getItem("driverOnline") !==
-            "true"
-        ) {
-            alert("請先按下上線，再測試自動分享 GPS");
-            return;
-        }
+        const testNow =
+            new Date(
+                departureTime.getTime()
+                - 40 * 60 * 1000
+            );
 
-        if (!gpsShareDemoMode) {
-            alert("請先下線並啟用 Demo 5 秒模式");
-            return;
-        }
+        const shareStartTime =
+            new Date(
+                departureTime.getTime()
+                - 30 * 60 * 1000
+            );
 
-        if (!canScheduleGpsSharing()) {
-            alert("此訂單已完成，無法再次分享 GPS");
-            return;
-        }
-
-        const testShareStartTime =
-            new Date(Date.now() + 5 * 1000);
-
-        await scheduleGpsSharing(
-            testShareStartTime,
-            "Demo 5 秒排程"
-        );
-
-        startGpsShareCountdown(
-            testShareStartTime
-        );
-    }
-);
-
-// Demo 模式必須在上線前啟用，避免正式排程先送出 GPS。
-const gpsShareDemoModeButton =
-    document.getElementById("tempyshare-btn");
-
-updateGpsShareDemoModeButton();
-
-gpsShareDemoModeButton.addEventListener(
-    "click",
-    function () {
-        if (
-            sessionStorage.getItem("driverOnline") ===
-            "true"
-        ) {
-            alert("請先下線，再切換 Demo 模式");
-            return;
-        }
-
-        gpsShareDemoMode = !gpsShareDemoMode;
-        sessionStorage.setItem(
-            gpsShareDemoModeStorageKey,
-            gpsShareDemoMode ? "true" : "false"
-        );
-
-        stopGpsShareSchedule();
-        stopGpsShareCountdown(true);
-        disableGpsSharing();
-        updateGpsShareDemoModeButton();
+        canSendLocationToPassenger =
+            testNow >= shareStartTime;
 
         console.log(
-            gpsShareDemoMode
-                ? "Demo 5 秒模式已啟用；上線後不執行正式排程"
-                : "Demo 5 秒模式已停用；下次上線恢復正式排程"
+            "測試：出發前40分鐘"
         );
-    }
-);
+
+        console.log(
+            "是否分享 GPS：",
+            canSendLocationToPassenger
+        );
+
+    });
+
+//測試前20分鐘
+document
+    .getElementById("tempyshare-btn")
+    .addEventListener("click", function () {
+
+        const departureTime =
+            new Date(window.tripData.departureTime);
+
+        const testNow =
+            new Date(
+                departureTime.getTime()
+                - 20 * 60 * 1000
+            );
+
+        const shareStartTime =
+            new Date(
+                departureTime.getTime()
+                - 30 * 60 * 1000
+            );
+
+        canSendLocationToPassenger =
+            testNow >= shareStartTime;
+
+        console.log(
+            "測試：出發前20分鐘"
+        );
+
+        console.log(
+            "是否分享 GPS：",
+            canSendLocationToPassenger
+        );
+
+        if (
+            canSendLocationToPassenger &&
+            currentDriverLocation &&
+            connection.state ===
+            signalR.HubConnectionState.Connected
+        ) {
+
+            connection.invoke(
+                "SendDriverLocation",
+                tripSignalId,
+                currentDriverLocation.lat,
+                currentDriverLocation.lng
+            );
+
+            console.log(
+                "開始分享 GPS，立即送出目前位置：",
+                currentDriverLocation
+            );
+        }
+    });
 
 async function startDriverOnline() {
     if (window.tripData.isHistory) {
         applyHistoryModeUI();
         return;
     }
-
-    const onlineButton =
-        document.getElementById("online-btn");
-
-    if (onlineButton.disabled) {
-        return;
-    }
-
-    if (driverConnectionRetryTimer !== null) {
-        clearTimeout(driverConnectionRetryTimer);
-        driverConnectionRetryTimer = null;
-    }
-
-    onlineButton.disabled = true;
 
     headingToDestination =
         sessionStorage.getItem(
@@ -942,7 +513,6 @@ async function startDriverOnline() {
                 error
             );
 
-            onlineButton.disabled = false;
             return;
         }
     }
@@ -950,55 +520,17 @@ async function startDriverOnline() {
 
 
 
-    sessionStorage.setItem(
-        "driverOnline",
-        "true"
+    // 確定連線成功後才通知上線
+    await connection.invoke(
+        "DriverOnline",
+        driverId
     );
 
-    if (gpsShareDemoMode) {
-        stopGpsShareSchedule();
-
-        if (!canSendLocationToPassenger) {
-            disableGpsSharing();
-            setGpsShareCountdownText(
-                "等待按下 5 秒自動分享按鈕"
-            );
-        }
-        else {
-            setGpsShareCountdownText(
-                "GPS 分享已開始"
-            );
-        }
-
-        console.log(
-            "Demo 5 秒模式：等待測試按鈕啟動排程"
+    if (headingToDestination) {
+        await connection.invoke(
+            "DriverArrivedPassenger",
+            tripSignalId
         );
-    }
-    else {
-        stopGpsShareCountdown(true);
-
-        // F5 恢復與一般上線都重新依真實出發時間安排。
-        // 此處由 restoreDriverSignalRState 負責送出當下位置，
-        // 避免重連流程重複傳送同一筆 GPS。
-        await scheduleOfficialGpsSharing(false);
-    }
-
-    try {
-        await restoreDriverSignalRState();
-    }
-    catch (error) {
-        console.error(
-            "SignalR 上線狀態傳送失敗：",
-            error
-        );
-        stopGpsShareSchedule();
-        stopGpsShareCountdown(true);
-        disableGpsSharing();
-        document.getElementById(
-            "driver-status"
-        ).textContent = "連線失敗，請重新上線";
-        onlineButton.disabled = false;
-        return;
     }
 
 
@@ -1006,21 +538,14 @@ async function startDriverOnline() {
 
         alert("目前瀏覽器不支援定位功能");
 
-        stopGpsShareSchedule();
-        stopGpsShareCountdown(true);
-        disableGpsSharing();
-        onlineButton.disabled = false;
         return;
     }
     // 假 GPS 測試
     async function startTestRoute() {
-        stopTestRoute();
         isTestRouteMode = true;
-        const runVersion = testRouteRunVersion;
 
-        try {
-            const { Route } =
-                await google.maps.importLibrary("routes");
+        const { Route } =
+            await google.maps.importLibrary("routes");
 
         // 假設司機一開始在台大醫院南方一點
         const testStartLocation = {
@@ -1030,37 +555,30 @@ async function startDriverOnline() {
 
         // 先請 Google 算出
         // 測試起點 → 台大醫院 的真正行車路線
-            const response =
-                await Route.computeRoutes({
-                    origin: testStartLocation,
-                    destination: pickupLocation,
-                    travelMode: "DRIVING",
-                    fields: ["path"]
-                });
+        const response =
+            await Route.computeRoutes({
+                origin: testStartLocation,
+                destination: pickupLocation,
+                travelMode: "DRIVING",
+                fields: ["path"]
+            });
 
-            if (runVersion !== testRouteRunVersion) {
-                return;
-            }
+        if (!response.routes.length) {
+            console.log("找不到測試路線");
+            return;
+        }
 
-            if (!response.routes.length) {
-                console.log("找不到測試路線");
-                stopTestRoute();
-                return;
-            }
+        const testPath =
+            response.routes[0].path;
 
-            const testPath =
-                response.routes[0].path;
+        let testIndex = 0;
 
-            let testIndex = 0;
-
-            testRouteTimer =
+        const testTimer =
             setInterval(() => {
 
                 if (testIndex >= testPath.length) {
 
-                    clearInterval(testRouteTimer);
-                    testRouteTimer = null;
-                    isTestRouteMode = false;
+                    clearInterval(testTimer);
 
                     if (currentDriverLocation) {
                         if (headingToDestination) {
@@ -1132,16 +650,10 @@ async function startDriverOnline() {
                 );
 
 
-                if (headingToDestination) {
-                    drawRouteToDestination(
-                        currentLocation
-                    );
-                }
-                else {
-                    drawRouteToPickup(
-                        currentLocation
-                    );
-                }
+                // 重新畫目前位置 → 台大醫院
+                drawRouteToPickup(
+                    currentLocation
+                );
 
 
                 // 傳給乘客
@@ -1156,12 +668,7 @@ async function startDriverOnline() {
                         tripSignalId,
                         lat,
                         lng
-                    ).catch(error => {
-                        console.error(
-                            "測試 GPS 傳送失敗：",
-                            error
-                        );
-                    });
+                    );
 
                 }
 
@@ -1169,46 +676,21 @@ async function startDriverOnline() {
                 testIndex++;
 
             }, 500);
-        }
-        catch (error) {
-            if (runVersion === testRouteRunVersion) {
-                stopTestRoute();
-            }
-
-            console.error("測試路線啟動失敗：", error);
-        }
     }
 
 
-    if (!testRouteHandlerBound) {
-        document
-            .getElementById("temproute-btn")
-            .addEventListener("click", function () {
-                if (
-                    sessionStorage.getItem(
-                        "driverOnline"
-                    ) !== "true"
-                ) {
-                    alert("請先按下上線，再執行測試路線");
-                    return;
-                }
+    document
+        .getElementById("temproute-btn")
+        .addEventListener("click", function () {
 
-                if (
-                    sessionStorage.getItem(
-                        driverRoutePhaseStorageKey
-                    ) === "completed"
-                ) {
-                    alert("此訂單已完成，無法再次執行測試路線");
-                    return;
-                }
+            startTestRoute();
 
-                startTestRoute();
-            });
-
-        testRouteHandlerBound = true;
-    }
+        });
     //假 GPS 測試
-    stopDriverLocationWatch();
+    if (watchId !== null) {
+        navigator.geolocation.clearWatch(watchId);
+        watchId = null;
+    }
 
     watchId =
         navigator.geolocation.watchPosition(
@@ -1361,7 +843,7 @@ document
 
 document
     .getElementById("arrived-passenger-btn")
-    .addEventListener("click", async function () {
+    .addEventListener("click", function () {
 
         headingToDestination = true;
         sessionStorage.setItem(
@@ -1376,23 +858,10 @@ document
             );
         }
 
-        try {
-            if (
-                connection.state ===
-                signalR.HubConnectionState.Connected
-            ) {
-                await connection.invoke(
-                    "DriverArrivedPassenger",
-                    tripSignalId
-                );
-            }
-        }
-        catch (error) {
-            console.error(
-                "抵達乘客事件傳送失敗，重連後會重送：",
-                error
-            );
-        }
+        connection.invoke(
+            "DriverArrivedPassenger",
+            tripSignalId
+        );
 
         document.getElementById(
             "driver-status"
@@ -1437,53 +906,16 @@ async function drawRouteToDestination(
 document
     .getElementById("arrived-destination-btn")
     .addEventListener("click", async function () {
-        const completeButton = this;
-        const antiForgeryToken =
-            document.querySelector(
-                "#driver-antiforgery-form " +
-                "input[name='__RequestVerificationToken']"
-            )?.value;
 
-        if (!antiForgeryToken) {
-            alert("缺少安全驗證資料，請重新整理頁面");
-            return;
-        }
-
-        completeButton.disabled = true;
-
-        let response;
-
-        try {
-            const requestBody =
-                new URLSearchParams({
-                    orderNo:
-                        window.tripData.orderNo,
-                    __RequestVerificationToken:
-                        antiForgeryToken
-                });
-
-            response = await fetch(
-                "/DriverNavigation/CompleteTrip",
-                {
-                    method: "POST",
-                    headers: {
-                        "Content-Type":
-                            "application/x-www-form-urlencoded"
-                    },
-                    body: requestBody.toString()
-                }
-            );
-        }
-        catch (error) {
-            console.error("完成訂單請求失敗：", error);
-            alert("訂單完成狀態更新失敗");
-            completeButton.disabled = false;
-            return;
-        }
+        const response = await fetch(
+            `/DriverNavigation/CompleteTrip?orderNo=${encodeURIComponent(window.tripData.orderNo)}`,
+            {
+                method: "POST"
+            }
+        );
 
         if (!response.ok) {
             alert("訂單完成狀態更新失敗");
-            completeButton.disabled = false;
             return;
         }
 
@@ -1493,11 +925,7 @@ document
             "order-status"
         ).textContent = "已完成";
 
-        stopGpsShareSchedule();
-        stopGpsShareCountdown(true);
-        disableGpsSharing();
-        stopTestRoute();
-        stopDriverLocationWatch();
+        canSendLocationToPassenger = false;
         ++driverRouteRequestVersion;
         sessionStorage.setItem(
             driverRoutePhaseStorageKey,
@@ -1522,23 +950,10 @@ document
             "已抵達"
         );
 
-        try {
-            if (
-                connection.state ===
-                signalR.HubConnectionState.Connected
-            ) {
-                await connection.invoke(
-                    "DriverArrivedDestination",
-                    tripSignalId
-                );
-            }
-        }
-        catch (error) {
-            console.error(
-                "送達事件傳送失敗，重連後會重送：",
-                error
-            );
-        }
+        connection.invoke(
+            "DriverArrivedDestination",
+            tripSignalId
+        );
 
         document.getElementById(
             "driver-status"
@@ -1573,24 +988,17 @@ document
 
 document
     .getElementById("offline-btn")
-    .addEventListener("click", async function () {
+    .addEventListener("click", function () {
+
+        navigator.geolocation.clearWatch(watchId);
+        watchId = null;
+
+        connection.stop();
+
         sessionStorage.setItem(
             "driverOnline",
             "false"
         );
-
-        stopGpsShareSchedule();
-        stopGpsShareCountdown(true);
-        disableGpsSharing();
-        stopTestRoute();
-        stopDriverLocationWatch();
-
-        try {
-            await connection.stop();
-        }
-        catch (error) {
-            console.error("SignalR 下線失敗：", error);
-        }
 
         document.getElementById(
             "driver-status"
@@ -1616,12 +1024,6 @@ document
 
         document.getElementById(
             "next-order-btn"
-        ).disabled = true;
-        document.getElementById(
-            "arrived-passenger-btn"
-        ).disabled = true;
-        document.getElementById(
-            "arrived-destination-btn"
         ).disabled = true;
     });
 

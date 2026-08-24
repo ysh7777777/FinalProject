@@ -13,8 +13,6 @@ let testRouteRunVersion = 0;
 let testRouteHandlerBound = false;
 let driverConnectionRetryTimer = null;
 let gpsShareScheduleTimer = null;
-let gpsShareCountdownTimer = null;
-let gpsShareDemoMode = false;
 
 // 假 GPS 測試路線
 
@@ -39,15 +37,8 @@ const driverRoutePhaseStorageKey =
     `driverRoutePhase:${tripSignalId}`;
 const driverShareStorageKey =
     `driverShareEnabled:${tripSignalId}`;
-const gpsShareDemoModeStorageKey =
-    `driverGpsShareDemoMode:${tripSignalId}`;
 const gpsShareLeadTimeMs = 30 * 60 * 1000;
 const maxGpsShareTimerDelayMs = 2147483647;
-
-gpsShareDemoMode =
-    sessionStorage.getItem(
-        gpsShareDemoModeStorageKey
-    ) === "true";
 
 canSendLocationToPassenger =
     sessionStorage.getItem(
@@ -123,72 +114,6 @@ function canScheduleGpsSharing() {
         ) !== "completed";
 }
 
-function updateGpsShareDemoModeButton() {
-    const demoModeButton =
-        document.getElementById("tempyshare-btn");
-
-    demoModeButton.textContent = gpsShareDemoMode
-        ? "Demo 5 秒模式：已啟用"
-        : "啟用 Demo 5 秒模式";
-}
-
-function setGpsShareCountdownText(text) {
-    const countdownElement =
-        document.getElementById(
-            "gps-share-demo-countdown"
-        );
-
-    if (countdownElement) {
-        countdownElement.textContent = text;
-    }
-}
-
-function stopGpsShareCountdown(resetText = false) {
-    if (gpsShareCountdownTimer !== null) {
-        clearInterval(gpsShareCountdownTimer);
-        gpsShareCountdownTimer = null;
-    }
-
-    if (resetText) {
-        setGpsShareCountdownText(
-            "Demo 倒數尚未啟動"
-        );
-    }
-}
-
-function startGpsShareCountdown(shareStartTime) {
-    stopGpsShareCountdown();
-
-    const shareStartTimestamp =
-        new Date(shareStartTime).getTime();
-
-    const updateCountdown = () => {
-        const remainingSeconds = Math.max(
-            0,
-            Math.ceil(
-                (shareStartTimestamp - Date.now()) /
-                1000
-            )
-        );
-
-        if (remainingSeconds <= 0) {
-            stopGpsShareCountdown();
-            setGpsShareCountdownText(
-                "GPS 分享已開始"
-            );
-            return;
-        }
-
-        setGpsShareCountdownText(
-            `GPS 分享將於 ${remainingSeconds} 秒後開始`
-        );
-    };
-
-    updateCountdown();
-    gpsShareCountdownTimer =
-        setInterval(updateCountdown, 250);
-}
-
 async function activateGpsSharing(
     sourceLabel,
     sendCurrentLocation = true
@@ -205,13 +130,6 @@ async function activateGpsSharing(
         driverShareStorageKey,
         "true"
     );
-
-    if (gpsShareDemoMode) {
-        stopGpsShareCountdown();
-        setGpsShareCountdownText(
-            "GPS 分享已開始"
-        );
-    }
 
     console.log(`${sourceLabel}：GPS 分享已開始`);
 
@@ -806,12 +724,12 @@ function initDriverMap() {
 
 }
 
-// Demo：驗證共用排程會在 5 秒後自動啟用 GPS 分享
+// Demo：驗證共用排程會在 10 秒後自動啟用 GPS 分享
 const demoAutoShareButton =
     document.getElementById("tempnshare-btn");
 
 demoAutoShareButton.textContent =
-    "測試 5 秒後自動分享 GPS";
+    "測試 10 秒後自動分享 GPS";
 
 demoAutoShareButton.addEventListener(
     "click",
@@ -824,8 +742,30 @@ demoAutoShareButton.addEventListener(
             return;
         }
 
-        if (!gpsShareDemoMode) {
-            alert("請先下線並啟用 Demo 5 秒模式");
+        if (!canScheduleGpsSharing()) {
+            alert("此訂單已完成，無法再次分享 GPS");
+            return;
+        }
+
+        const testShareStartTime =
+            new Date(Date.now() + 10 * 1000);
+
+        await scheduleGpsSharing(
+            testShareStartTime,
+            "Demo 10 秒排程"
+        );
+    }
+);
+
+//測試前20分鐘
+document
+    .getElementById("tempyshare-btn")
+    .addEventListener("click", async function () {
+        if (
+            sessionStorage.getItem("driverOnline") !==
+            "true"
+        ) {
+            alert("請先按下上線，再測試分享 GPS");
             return;
         }
 
@@ -834,55 +774,11 @@ demoAutoShareButton.addEventListener(
             return;
         }
 
-        const testShareStartTime =
-            new Date(Date.now() + 5 * 1000);
-
         await scheduleGpsSharing(
-            testShareStartTime,
-            "Demo 5 秒排程"
+            new Date(Date.now()),
+            "測試：模擬出發前 20 分鐘"
         );
-
-        startGpsShareCountdown(
-            testShareStartTime
-        );
-    }
-);
-
-// Demo 模式必須在上線前啟用，避免正式排程先送出 GPS。
-const gpsShareDemoModeButton =
-    document.getElementById("tempyshare-btn");
-
-updateGpsShareDemoModeButton();
-
-gpsShareDemoModeButton.addEventListener(
-    "click",
-    function () {
-        if (
-            sessionStorage.getItem("driverOnline") ===
-            "true"
-        ) {
-            alert("請先下線，再切換 Demo 模式");
-            return;
-        }
-
-        gpsShareDemoMode = !gpsShareDemoMode;
-        sessionStorage.setItem(
-            gpsShareDemoModeStorageKey,
-            gpsShareDemoMode ? "true" : "false"
-        );
-
-        stopGpsShareSchedule();
-        stopGpsShareCountdown(true);
-        disableGpsSharing();
-        updateGpsShareDemoModeButton();
-
-        console.log(
-            gpsShareDemoMode
-                ? "Demo 5 秒模式已啟用；上線後不執行正式排程"
-                : "Demo 5 秒模式已停用；下次上線恢復正式排程"
-        );
-    }
-);
+    });
 
 async function startDriverOnline() {
     if (window.tripData.isHistory) {
@@ -955,33 +851,10 @@ async function startDriverOnline() {
         "true"
     );
 
-    if (gpsShareDemoMode) {
-        stopGpsShareSchedule();
-
-        if (!canSendLocationToPassenger) {
-            disableGpsSharing();
-            setGpsShareCountdownText(
-                "等待按下 5 秒自動分享按鈕"
-            );
-        }
-        else {
-            setGpsShareCountdownText(
-                "GPS 分享已開始"
-            );
-        }
-
-        console.log(
-            "Demo 5 秒模式：等待測試按鈕啟動排程"
-        );
-    }
-    else {
-        stopGpsShareCountdown(true);
-
-        // F5 恢復與一般上線都重新依真實出發時間安排。
-        // 此處由 restoreDriverSignalRState 負責送出當下位置，
-        // 避免重連流程重複傳送同一筆 GPS。
-        await scheduleOfficialGpsSharing(false);
-    }
+    // F5 恢復與一般上線都重新依真實出發時間安排。
+    // 此處由 restoreDriverSignalRState 負責送出當下位置，
+    // 避免重連流程重複傳送同一筆 GPS。
+    await scheduleOfficialGpsSharing(false);
 
     try {
         await restoreDriverSignalRState();
@@ -992,7 +865,6 @@ async function startDriverOnline() {
             error
         );
         stopGpsShareSchedule();
-        stopGpsShareCountdown(true);
         disableGpsSharing();
         document.getElementById(
             "driver-status"
@@ -1007,7 +879,6 @@ async function startDriverOnline() {
         alert("目前瀏覽器不支援定位功能");
 
         stopGpsShareSchedule();
-        stopGpsShareCountdown(true);
         disableGpsSharing();
         onlineButton.disabled = false;
         return;
@@ -1494,7 +1365,6 @@ document
         ).textContent = "已完成";
 
         stopGpsShareSchedule();
-        stopGpsShareCountdown(true);
         disableGpsSharing();
         stopTestRoute();
         stopDriverLocationWatch();
@@ -1580,7 +1450,6 @@ document
         );
 
         stopGpsShareSchedule();
-        stopGpsShareCountdown(true);
         disableGpsSharing();
         stopTestRoute();
         stopDriverLocationWatch();

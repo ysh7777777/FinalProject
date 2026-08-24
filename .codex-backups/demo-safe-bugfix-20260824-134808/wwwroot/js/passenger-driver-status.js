@@ -8,7 +8,6 @@ let passengerRoutePhase = "pickup";
 let passengerLastRouteRequestAt = 0;
 let passengerRouteRequestVersion = 0;
 let passengerRouteRefreshTimer = null;
-let passengerConnectionRetryTimer = null;
 
 
 
@@ -17,91 +16,11 @@ let passengerConnectionRetryTimer = null;
 const passengerConnection =
     new signalR.HubConnectionBuilder()
         .withUrl("/driverLocationHub")
-        .withAutomaticReconnect([
-            0,
-            2000,
-            5000,
-            10000
-        ])
         .build();
 const passengerTripSignalId =
     `${window.passengerTripData.driverId}|${window.passengerTripData.orderNo}`;
 const passengerRouteUpdateIntervalMs = 3000;
 const passengerRouteStopDelayMs = 1000;
-
-passengerConnection.onreconnecting(() => {
-    if (passengerRoutePhase === "completed") {
-        return;
-    }
-
-    document.getElementById(
-        "passenger-trip-status"
-    ).textContent = "連線恢復中";
-});
-
-passengerConnection.onreconnected(() => {
-    let statusText = "等待司機上線";
-
-    if (passengerRoutePhase === "destination") {
-        statusText = "前往目的地";
-    }
-    else if (passengerRoutePhase === "completed") {
-        statusText = "已完成";
-    }
-    else if (passengerTrackingStarted) {
-        statusText = "司機已上線";
-    }
-
-    document.getElementById(
-        "passenger-trip-status"
-    ).textContent = statusText;
-});
-
-passengerConnection.onclose(error => {
-    if (passengerRoutePhase === "completed") {
-        return;
-    }
-
-    console.error("乘客 SignalR 連線已中斷：", error);
-    document.getElementById(
-        "passenger-trip-status"
-    ).textContent = "連線中斷，請重新整理";
-
-    schedulePassengerConnectionStart();
-});
-
-function schedulePassengerConnectionStart() {
-    if (passengerConnectionRetryTimer !== null) {
-        return;
-    }
-
-    passengerConnectionRetryTimer =
-        setTimeout(async () => {
-            passengerConnectionRetryTimer = null;
-            await startPassengerConnection();
-        }, 5000);
-}
-
-async function startPassengerConnection() {
-    if (
-        passengerConnection.state !==
-        signalR.HubConnectionState.Disconnected
-    ) {
-        return;
-    }
-
-    try {
-        await passengerConnection.start();
-        console.log("乘客 SignalR 連線成功");
-    }
-    catch (error) {
-        console.error(
-            "乘客 SignalR 連線失敗：",
-            error
-        );
-        schedulePassengerConnectionStart();
-    }
-}
 
 function setPassengerRouteText(elementId, text) {
     document.getElementById(elementId).textContent = text;
@@ -445,7 +364,16 @@ passengerConnection.on(
 
 
 
-startPassengerConnection();
+passengerConnection.start()
+    .then(() => {
+        console.log("乘客 SignalR 連線成功");
+    })
+    .catch(error => {
+        console.error(
+            "乘客 SignalR 連線失敗：",
+            error
+        );
+    });
 
 function initPassengerMap() {
 
@@ -569,6 +497,10 @@ passengerConnection.on(
             return;
         }
 
+        if (!passengerTrackingStarted) {
+            return;
+        }
+
         passengerRoutePhase = "destination";
         sessionStorage.setItem(
             "passengerRoutePhase",
@@ -605,6 +537,10 @@ passengerConnection.on(
             tripSignalId !==
             passengerTripSignalId
         ) {
+            return;
+        }
+
+        if (!passengerTrackingStarted) {
             return;
         }
 

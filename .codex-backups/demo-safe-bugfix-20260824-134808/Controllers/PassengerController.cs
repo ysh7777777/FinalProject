@@ -7,7 +7,6 @@ namespace finalProject.Controllers
     public class PassengerController : Controller
     {
         private readonly RideHailingDbContext _context;
-        private const string DemoOrderNo = "T20260811001";
 
         public PassengerController(
             RideHailingDbContext context)
@@ -15,21 +14,15 @@ namespace finalProject.Controllers
             _context = context;
         }
 
-        private IQueryable<Trip> GetCurrentPassengerTrips()
-        {
-            // AUTH-INTEGRATION:
-            // 登入功能完成後，改成依目前登入會員 Account
-            // 過濾訂單；展示階段保留固定測試訂單。
-            return _context.Trips
-                .Where(t => t.OrderNo == DemoOrderNo);
-        }
-
         public IActionResult DriverStatus()
         {
-            var trip = GetCurrentPassengerTrips()
+            var orderNo = "T20260811021";
+            var trip = _context.Trips
                 .Include(t => t.AssignedDriver)
                 .Include(t => t.LicensePlateNavigation)
-                .FirstOrDefault();
+                .FirstOrDefault(t =>
+                    t.OrderNo == orderNo
+                );
 
             if (trip == null)
             {

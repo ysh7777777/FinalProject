@@ -8,9 +8,8 @@ namespace finalProject.Controllers
     {
         private readonly RideHailingDbContext _context;
 
-        // 專題展示模式使用；登入功能合併後只需替換
-        // GetCurrentDriverTrips() 的資料範圍。
-        private const string DemoDriverId = "D001";
+        // 測試用司機 ID
+        private const string DriverId = "D001";
 
         public DriverNavigationController(
             RideHailingDbContext context)
@@ -18,33 +17,23 @@ namespace finalProject.Controllers
             _context = context;
         }
 
-        private IQueryable<Trip> GetCurrentDriverTrips()
-        {
-            // AUTH-INTEGRATION:
-            // 登入功能完成後，改由目前登入者的司機 ID
-            // 過濾資料；展示階段保留 D001，避免頁面被擋住。
-            return _context.Trips
-                .Where(t =>
-                    t.AssignedDriverId == DemoDriverId);
-        }
-
         public IActionResult Navigation()
         {
             var today = DateTime.Today;
             var tomorrow = today.AddDays(1);
 
-            var trip = GetCurrentDriverTrips()
+            var trip = _context.Trips
                 .Include(t => t.AccountNavigation)
                 .Include(t => t.LicensePlateNavigation)
                 .Where(t =>
+                    t.AssignedDriverId == DriverId &&
                     t.TripStatus == "行程中")
                 .OrderBy(t => t.DepartureTime)
                 .FirstOrDefault();
 
-            ViewBag.HasTrip = trip != null;
-
-            ViewBag.HasCompletedToday = GetCurrentDriverTrips()
+            ViewBag.HasCompletedToday = _context.Trips
                 .Any(t =>
+                    t.AssignedDriverId == DriverId &&
                     t.TripStatus == "已完成" &&
                     t.CompletedAt >= today &&
                     t.CompletedAt < tomorrow
@@ -70,12 +59,12 @@ namespace finalProject.Controllers
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
         public IActionResult CompleteTrip(string orderNo)
         {
-            var trip = GetCurrentDriverTrips()
+            var trip = _context.Trips
                 .FirstOrDefault(t =>
                     t.OrderNo == orderNo &&
+                    t.AssignedDriverId == DriverId &&
                     t.TripStatus == "行程中");
 
             if (trip == null)
@@ -96,10 +85,11 @@ namespace finalProject.Controllers
             var today = DateTime.Today;
             var tomorrow = today.AddDays(1);
 
-            var completedTrips = GetCurrentDriverTrips()
+            var completedTrips = _context.Trips
                 .Include(t => t.AccountNavigation)
                 .Include(t => t.LicensePlateNavigation)
                 .Where(t =>
+                    t.AssignedDriverId == DriverId &&
                     t.TripStatus == "已完成" &&
                     t.CompletedAt >= today &&
                     t.CompletedAt < tomorrow)
@@ -109,7 +99,6 @@ namespace finalProject.Controllers
                 .Skip(offset)
                 .FirstOrDefault();
 
-            ViewBag.HasTrip = trip != null;
             ViewBag.IsHistory = true;
 
             ViewBag.HasOlderOrder =
@@ -124,9 +113,10 @@ namespace finalProject.Controllers
             var today = DateTime.Today;
             var tomorrow = today.AddDays(1);
 
-            var orders = GetCurrentDriverTrips()
+            var orders = _context.Trips
                 .AsNoTracking()
                 .Where(t =>
+                    t.AssignedDriverId == DriverId &&
                     t.TripStatus == "已完成" &&
                     t.CompletedAt >= today &&
                     t.CompletedAt < tomorrow)
@@ -142,8 +132,9 @@ namespace finalProject.Controllers
         [HttpGet]
         public IActionResult HasNextOrder()
         {
-            var hasNextOrder = GetCurrentDriverTrips()
+            var hasNextOrder = _context.Trips
                 .Any(t =>
+                    t.AssignedDriverId == DriverId &&
                     t.TripStatus == "行程中");
 
             return Json(new
@@ -157,11 +148,12 @@ namespace finalProject.Controllers
             var today = DateTime.Today;
             var tomorrow = today.AddDays(1);
 
-            var trip = GetCurrentDriverTrips()
+            var trip = _context.Trips
                 .Include(t => t.AccountNavigation)
                 .Include(t => t.LicensePlateNavigation)
                 .FirstOrDefault(t =>
                     t.OrderNo == orderNo &&
+                    t.AssignedDriverId == DriverId &&
                     t.TripStatus == "已完成" &&
                     t.CompletedAt >= today &&
                     t.CompletedAt < tomorrow);
@@ -171,7 +163,6 @@ namespace finalProject.Controllers
                 return RedirectToAction("Navigation");
             }
 
-            ViewBag.HasTrip = true;
             ViewBag.IsHistory = true;
 
             return View("Navigation", trip);

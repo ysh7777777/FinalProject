@@ -41,8 +41,6 @@ namespace finalProject.Controllers
                 .OrderBy(t => t.DepartureTime)
                 .FirstOrDefault();
 
-            ViewBag.HasTrip = trip != null;
-
             ViewBag.HasCompletedToday = GetCurrentDriverTrips()
                 .Any(t =>
                     t.TripStatus == "已完成" &&
@@ -109,7 +107,6 @@ namespace finalProject.Controllers
                 .Skip(offset)
                 .FirstOrDefault();
 
-            ViewBag.HasTrip = trip != null;
             ViewBag.IsHistory = true;
 
             ViewBag.HasOlderOrder =
@@ -171,7 +168,6 @@ namespace finalProject.Controllers
                 return RedirectToAction("Navigation");
             }
 
-            ViewBag.HasTrip = true;
             ViewBag.IsHistory = true;
 
             return View("Navigation", trip);
