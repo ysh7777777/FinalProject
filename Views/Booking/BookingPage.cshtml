@@ -30,7 +30,7 @@
           rel="stylesheet">
 
     <!-- ======================= CSS ======================= -->
-    <link rel="stylesheet" href="./css/Booking/0810.css">
+    <link rel="stylesheet" href="~/css/Booking/0810.css">
 </head>
 
 <body>
@@ -157,6 +157,9 @@
                                             <!-- 開啟常用地址管理 -->
                                             <a href="favorite-address.html" target="_blank" rel="noopener noreferrer"
                                                class="favorite-add-btn" title="管理常用地址">
+                                                    @* <a asp-controller="FavoriteAddress" asp-action="Index"
+                                                       target="_blank" rel="noopener noreferrer"
+                                                       class="favorite-add-btn" title="管理常用地址"> *@
                                                 <i class="bi bi-plus-lg"></i>
                                             </a>
                                         </div>
@@ -563,49 +566,6 @@
                     </div>
                 </section>
                 <!-- ======================= 航班資訊 section ======================= -->
-                <section class="booking-card" id="flightSection">
-                    <div class="booking-card-header">
-                        <h2 class="booking-card-title">
-                            <i class="bi bi-airplane-fill"></i>
-                            航班資訊
-                        </h2>
-                    </div>
-                    <div class="booking-card-body">
-                        <!-- 追蹤航班 -->
-                        <div class="form-check form-switch flight-track-switch">
-                            <input class="form-check-input" type="checkbox" role="switch" id="trackFlight"
-                                   name="trackFlight">
-                            <label class="form-check-label" for="trackFlight">
-                                <span class="flight-switch-title">
-                                    <i class="bi bi-broadcast"></i>
-                                    是否追蹤航班
-                                </span>
-                                <span class="flight-switch-description">
-                                    開啟後我們會依航班資訊追蹤抵達時間
-                                </span>
-                            </label>
-                        </div>
-                        <!-- ======================= 航班編號 / 預設隱藏 div ======================= -->
-                        <div class="flight-number-wrapper d-none" id="flightNumberWrapper">
-                            <label for="flightNumber" class="form-label">
-                                航班編號
-                                <span class="text-danger">
-                                    *
-                                </span>
-                            </label>
-                            <div class="input-group">
-                                <span class="input-group-text">
-                                    <i class="bi bi-airplane"></i>
-                                </span>
-                                <input type="text" class="form-control" id="flightNumber" name="flightNumber"
-                                       placeholder="例如：BR108" autocomplete="off" maxlength="10">
-                            </div>
-                            <div class="form-text">
-                                請輸入航空公司航班編號，例如 BR108、CI100
-                            </div>
-                        </div>
-                    </div>
-                </section>
                 <!-- 0812 END ------------------------------------------------------------------------------------------- -->
             </div>
         
@@ -743,16 +703,15 @@
     </main>
 
     <!-- ======================= << JS 引用 >> ======================= -->
-    <!-- ======================= Bootstrap JS ======================= -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+ 
 
     <!-- ======================= Flatpickr ======================= -->
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/zh-tw.js"></script>
 
     <!-- ======================= JS ======================== -->
-    <script src="./js/Booking/0810.js"></script>
-    <script src="./js/Booking/place-autocomplete.js"></script>
+    <script src="~/js/Booking/0810.js"></script>
+    <script src="~/js/Booking/place-autocomplete.js"></script>
     <!-- 串接地址轉換 API JS ======================== -->
     <script async src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAk5HVk6NmgjgNL9vu5m2HRjvcbghlyMn4&libraries=places&callback=initAutocomplete"></script>
 </body>
