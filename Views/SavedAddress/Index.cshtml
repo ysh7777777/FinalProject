@@ -1,0 +1,261 @@
+﻿@model List<finalProject.Models.SavedAddressViewModel>
+
+@{
+    ViewData["Title"] = "常用地址管理";
+}
+
+<div class="container mt-5">
+
+    <div class="mb-4">
+        <h2 class="fw-bold">常用地址管理</h2>
+        <p class="text-muted">
+            新增、查看或刪除你的常用地址。
+        </p>
+    </div>
+
+
+    <!-- ========================= -->
+    <!-- 新增常用地址 -->
+    <!-- ========================= -->
+
+    <div class="card shadow-sm border-0 mb-4">
+
+        <div class="card-header bg-white">
+            <h5 class="mb-0">
+                新增常用地址
+            </h5>
+        </div>
+
+        <div class="card-body">
+
+            <form asp-controller="SavedAddress"
+                  asp-action="Create"
+                  method="post">
+
+                <!-- 地址名稱 -->
+                <div class="mb-3">
+
+                    <label for="addressName"
+                           class="form-label">
+                        地址名稱
+                    </label>
+
+                    <input type="text"
+                           class="form-control"
+                           id="addressName"
+                           name="addressName"
+                           placeholder="例如：家、公司、學校"
+                           maxlength="20"
+                           required />
+
+                </div>
+
+
+                <!-- Google Places -->
+                <div class="mb-3">
+
+                    <label class="form-label">
+                        地址搜尋
+                    </label>
+
+                    <div id="autocomplete-container"></div>
+
+                </div>
+
+
+                <!-- 完整地址 -->
+                <div class="mb-3">
+
+                    <label class="form-label">
+                        完整地址
+                    </label>
+
+                    <input type="text"
+                           class="form-control"
+                           id="formattedAddressDisplay"
+                           readonly />
+
+                </div>
+
+
+                <!-- Lat / Lng -->
+                <div class="row">
+
+                    <div class="col-md-6 mb-3">
+
+                        <label class="form-label">
+                            Latitude
+                        </label>
+
+                        <input type="text"
+                               class="form-control"
+                               id="latitude"
+                               name="latitude"
+                               readonly />
+
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+
+                        <label class="form-label">
+                            Longitude
+                        </label>
+
+                        <input type="text"
+                               class="form-control"
+                               id="longitude"
+                               name="longitude"
+                               readonly />
+
+                    </div>
+
+                </div>
+
+
+                <!-- PlaceId -->
+                <div class="mb-3">
+
+                    <label class="form-label">
+                        Google Place ID
+                    </label>
+
+                    <input type="text"
+                           class="form-control"
+                           id="placeId"
+                           name="placeId"
+                           readonly />
+
+                </div>
+
+
+                <!-- 真正送給 Controller -->
+                <input type="hidden"
+                       id="formattedAddress"
+                       name="formattedAddress" />
+
+
+                <button type="submit"
+                        class="btn btn-primary">
+                    新增常用地址
+                </button>
+
+            </form>
+
+        </div>
+
+    </div>
+
+
+    <!-- ========================= -->
+    <!-- 常用地址清單 -->
+    <!-- ========================= -->
+
+    <div class="card shadow-sm border-0">
+
+        <div class="card-header bg-white">
+            <h5 class="mb-0">
+                我的常用地址
+            </h5>
+        </div>
+
+
+        <div class="card-body">
+
+            @if (Model == null || Model.Count == 0)
+            {
+                <div class="text-muted text-center py-4">
+                    目前沒有常用地址。
+                </div>
+            }
+            else
+            {
+                <div class="table-responsive">
+
+                    <table class="table table-hover align-middle">
+
+                        <thead class="table-light">
+
+                            <tr>
+                                <th>名稱</th>
+                                <th>完整地址</th>
+                                <th>緯度</th>
+                                <th>經度</th>
+                                <th>操作</th>
+                            </tr>
+
+                        </thead>
+
+
+                        <tbody>
+
+                            @foreach (var item in Model)
+                            {
+                                <tr>
+
+                                    <td>
+                                        <strong>
+                                            @item.AddressName
+                                        </strong>
+                                    </td>
+
+                                    <td>
+                                        @item.FormattedAddress
+                                    </td>
+
+                                    <td>
+                                        @item.Latitude
+                                    </td>
+
+                                    <td>
+                                        @item.Longitude
+                                    </td>
+
+                                    <td>
+
+                                        <form asp-controller="SavedAddress"
+                                              asp-action="Delete"
+                                              method="post"
+                                              class="d-inline"
+                                              onsubmit="return confirm('確定要刪除這筆常用地址嗎？');">
+
+                                            <input type="hidden"
+                                                   name="savedAddressId"
+                                                   value="@item.SavedAddressId" />
+
+                                            <button type="submit"
+                                                    class="btn btn-outline-danger btn-sm">
+                                                刪除
+                                            </button>
+
+                                        </form>
+
+                                    </td>
+
+                                </tr>
+                            }
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+            }
+
+        </div>
+
+    </div>
+
+</div>
+
+
+@section Scripts {
+
+    <script src="~/js/SavedAddress.js"></script>
+
+    
+
+    <script async
+            src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAk5HVk6NmgjgNL9vu5m2HRjvcbghlyMn4&libraries=places&callback=initAutocomplete">
+    </script>
+
+}
