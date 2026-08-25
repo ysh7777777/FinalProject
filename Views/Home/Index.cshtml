@@ -6,5 +6,26 @@
     <h1 class="display-4">Welcome</h1>
     <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
 </div>
-<h3>212313</h3>
-<h1>5464</h1>
+<button id="tempButton">測試前端取得資料按鈕</button>
+
+<script>
+    document.getElementById('tempButton').addEventListener('click', async function () {
+        const response = await fetch('/api/auth/me');
+        const auth = await response.json();
+
+        console.log(auth);
+
+        if (!auth.isAuthenticated) {
+            alert('目前尚未登入');
+            return;
+        }
+
+        if (auth.role === 'passenger') {
+            alert(`乘客帳號：${auth.userId}`);
+        }
+
+        if (auth.role === 'driver') {
+            alert(`司機帳號：${auth.driverId}`);
+        }
+    });
+</script>
