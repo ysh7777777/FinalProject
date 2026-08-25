@@ -1,73 +1,78 @@
-﻿<!DOCTYPE html>
-<html lang="zh-Hant-TW">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>登入畫面</title>
+@{
+    ViewData["Title"] = "登入";
+    Layout = "Client_Layout";
+}
 
-    <!-- 引入 Bootstrap 5 -->
-    <link href="~/lib/bootstrap/dist/css/bootstrap.css" rel="stylesheet">
-    <link href="~/css/Members/Login.css" rel="stylesheet">
-</head>
+<link href="~/css/Members/Login.css" rel="stylesheet">
 
-<body class="login-body">
+<div class="login-body">
     <div class="login-container">
         <div class="login-row">
             <div class="login-card">
-
-                <!-- 頂部切換按鈕組 -->
-                <div class="role-toggle-group" role="group" aria-label="Role login toggle button group">
-                    <input type="radio" name="roleRadio" id="passengerTab" autocomplete="off" )" checked>
+                <div class="role-toggle-group" role="group" aria-label="登入角色切換">
+                    <input type="radio" name="roleRadio" id="passengerTab" value="passenger" autocomplete="off" checked>
                     <label class="role-toggle-btn" for="passengerTab">乘客登入</label>
 
-                    <input type="radio" name="roleRadio" id="driverTab" autocomplete="off" )">
+                    <input type="radio" name="roleRadio" id="driverTab" value="driver" autocomplete="off">
                     <label class="role-toggle-btn" for="driverTab">司機登入</label>
                 </div>
 
-                <!-- 登入表單 -->
-                <form action="/Login" method="POST" class="needs-validation" novalidate>
+                <form id="loginForm" action="/Login" method="post" class="needs-validation" novalidate>
+                    @Html.AntiForgeryToken()
 
-                    <!-- 表單內容內縮 -->
                     <div class="form-content-wrapper">
-
-                        <!-- 帳號區塊 -->
                         <div class="fg-item">
-                            <label for="account" class="formLabel-title">帳號<span class="required-star">*</span></label>
+                            <label for="account" class="formLabel-title">
+                                帳號<span class="required-star">*</span>
+                            </label>
                             <div class="input-relative-container">
                                 <span class="form-icon-left">
                                     <img src="~/icon/person-fill.svg" alt="帳號圖示" class="icon-img">
                                 </span>
-                                <input type="text" class="form-control-custom input-with-icon-left" id="account" name="account"
-                                       maxlength="6" pattern="[A-Za-z0-9]{6}" placeholder="輸入6位英數" required>
-                                <div class="invalid-feedback-custom">請輸入帳號(輸入6位英數)</div>
+                                <input type="text"
+                                       class="form-control-custom input-with-icon-left"
+                                       id="account"
+                                       name="account"
+                                       maxlength="6"
+                                       pattern="[A-Za-z0-9]{6}"
+                                       placeholder="輸入6位英數"
+                                       autocomplete="username"
+                                       required>
+                                <div class="invalid-feedback-custom" id="accountValidationMessage">請輸入帳號（6 位英數）</div>
                             </div>
                         </div>
 
-                        <!-- 密碼區塊 -->
                         <div class="fg-item-small">
-                            <label for="password" class="formLabel-title">密碼(區分大小寫)<span class="text-danger">*</span></label>
+                            <label for="passWord" class="formLabel-title">
+                                密碼（區分大小寫）<span class="text-danger">*</span>
+                            </label>
                             <div class="input-relative-container">
                                 <span class="form-icon-left">
                                     <img src="~/icon/key-fill.svg" alt="鑰匙圖示" class="icon-img">
                                 </span>
 
-                                <input type="password" class="form-control-custom input-with-icons-both" id="passWord" name="password"
-                                       maxlength="11" pattern="[A-Za-z0-9]{6,11}" required placeholder="請輸入密碼（6~11位英數)">
+                                <input type="password"
+                                       class="form-control-custom input-with-icons-both"
+                                       id="passWord"
+                                       name="password"
+                                       maxlength="11"
+                                       pattern="[A-Za-z0-9]{6,11}"
+                                       autocomplete="current-password"
+                                       required
+                                       placeholder="請輸入密碼（6～11 位英數）">
 
                                 <span class="form-icon-right" id="togglePassword">
                                     <img src="~/icon/eye-fill.svg" alt="顯示密碼" class="icon-img">
                                 </span>
 
-                                <div class="invalid-feedback-custom">請輸入密碼（6~11位英數）</div>
+                                <div class="invalid-feedback-custom">請輸入密碼（6～11 位英數）</div>
                             </div>
                         </div>
 
-                        <!-- 修改密碼連結 -->
                         <div class="forgot-password-wrapper">
                             <a href="/Change" class="forgot-password-link">修改密碼</a>
                         </div>
 
-                        <!-- 註冊按鈕與登入按鈕 並排 -->
                         <div class="button-row">
                             <div class="button-col">
                                 <a href="/Join" class="btn-action-outline">註冊</a>
@@ -76,16 +81,14 @@
                                 <button type="submit" class="btn-action-outline" id="loginBtn">登入</button>
                             </div>
                         </div>
-
                     </div>
-
                 </form>
             </div>
         </div>
     </div>
+</div>
 
+@section Scripts {
     <script src="~/js/Members/Login.js"></script>
-    <!-- 眼睛點擊 -->
     <script src="~/js/Members/icon.js"></script>
-</body>
-</html>
+}

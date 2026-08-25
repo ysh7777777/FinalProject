@@ -1,134 +1,213 @@
-﻿using FinalProject.Models;
-using Microsoft.AspNetCore.Identity.Data;
+using FinalProject.Models;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 
 namespace FinalProject.Controllers
 {
     public class MembersController : Controller
     {
         private readonly RideHailingDbContext _context;
+        private readonly ILogger<MembersController> _logger;
 
-        public MembersController(RideHailingDbContext context)
+        public MembersController(RideHailingDbContext context, ILogger<MembersController> logger)
         {
             _context = context;
+            _logger = logger;
         }
 
         // 會員登入
         [HttpGet("Login")]
         public IActionResult Login()
         {
+            if (User.Identity?.IsAuthenticated == true)
+            {
+                return RedirectToRoleIndex(User.FindFirstValue(ClaimTypes.Role));
+            }
+
             return View();
         }
 
         [HttpPost("Login")]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Login([FromBody] LoginData data)
         {
-            if (data == null || string.IsNullOrEmpty(data.Account) || string.IsNullOrEmpty(data.Password))
+            if (data == null || string.IsNullOrWhiteSpace(data.Account) || string.IsNullOrEmpty(data.Password))
             {
                 return BadRequest(new { success = false, message = "請輸入帳號與密碼" });
             }
 
-            // 設定寫入 Cookie 的安全屬性
-            var cookieOptions = new CookieOptions
+            if (data.Role is not ("passenger" or "driver"))
             {
-                HttpOnly = true,                             // 防止前端 JS 讀取，預防 XSS 攻擊
-                Path = "/",                                  // 設定全站通用路徑
-                Expires = DateTimeOffset.UtcNow.AddDays(1),  // 保留 1 天
-                SameSite = SameSiteMode.Lax,
-                Secure = false                               // 設為 false 才能成功寫入
-            };
-
-            // 司機端登入 
-            if (data.Role == "driver")
-            {
-                try
-                {
-                    // 搜尋司機
-                    var driver = await _context.Drivers
-                        .FirstOrDefaultAsync(d => d.DriverId == data.Account);
-
-                    if (driver == null)
-                    {
-                        return NotFound(new
-                        {
-                            success = false,
-                            needRegister = false,
-                            message = "帳號尚未註冊，請與人資聯絡"
-                        });
-                    }
-
-                    // 驗證密碼
-                    bool isPasswordValid = false;
-                    try
-                    {
-                        // 優先使用 BCrypt 驗證
-                        isPasswordValid = BCrypt.Net.BCrypt.Verify(data.Password, driver.Password);
-                    }
-                    catch
-                    {
-                        // 若 DB 內的密碼不是標準 BCrypt 雜湊，自動退回明文字串比對
-                        isPasswordValid = (driver.Password == data.Password);
-                    }
-
-                    // 驗證完畢後，才判斷是否要攔截並回傳錯誤
-                    if (!isPasswordValid)
-                    {
-                        return Unauthorized(new { success = false, message = "司機帳號或密碼錯誤" });
-                    }
-
-                    // 將資料寫入 Cookie
-                    Response.Cookies.Append("Account", driver.DriverId, cookieOptions);
-                    Response.Cookies.Append("Role", "driver", cookieOptions);
-
-
-                    // 司機密碼正確，回傳成功！
-                    return Ok(new {
-                        success = true, 
-                        account = driver.DriverId, 
-                        role = "driver", 
-                        message = "司機端登入成功！" 
-                    });
-                }
-                catch (Exception ex)
-                {
-                    // 捕捉所有例外，確保回傳 JSON
-                    return StatusCode(500, new { success = false, message = "伺服器處理司機登入時發生錯誤：" + ex.Message });
-                }
+                return BadRequest(new { success = false, message = "登入角色不正確" });
             }
 
-            // 乘客端
-            else
+            data.Account = data.Account.Trim();
+
+            try
             {
-                var member = await _context.Members
-                    .FirstOrDefaultAsync(m => m.Account == data.Account);
-
-                // 帳號不存在，註冊警示
-                if (member == null)
+                if (data.Role == "driver")
                 {
-                    return NotFound(new
-                    {
-                        success = false,
-                        needRegister = true,
-                        message = "帳號尚未註冊，請先進行註冊！"
-                    });
+                    return await LoginDriver(data);
                 }
 
-                if (!BCrypt.Net.BCrypt.Verify(data.Password, member.Password))
+                return await LoginPassenger(data);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(
+                    ex,
+                    "{Role} 帳號 {Account} 登入時發生錯誤",
+                    data.Role,
+                    data.Account);
+
+                return StatusCode(500, new
                 {
-                    return Unauthorized(new { success = false, message = "乘客帳號或密碼錯誤" });
-                }
-
-                //  Cookie
-                Response.Cookies.Append("Account", member.Account, cookieOptions);
-                Response.Cookies.Append("Role", "passenger", cookieOptions);
-
-                return Ok(new { success = true, message = "乘客端登入成功！", account = member.Account, role = "passenger" });
+                    success = false,
+                    message = "伺服器處理登入時發生錯誤"
+                });
             }
         }
 
+        private async Task<IActionResult> LoginDriver(LoginData data)
+        {
+            var driver = await _context.Drivers
+                .FirstOrDefaultAsync(d => d.DriverId == data.Account);
 
-        // 登入: 接收前端 json
+            if (driver == null)
+            {
+                return NotFound(new
+                {
+                    success = false,
+                    needRegister = false,
+                    message = "帳號尚未註冊，請與人資聯絡"
+                });
+            }
+
+            bool isPasswordValid = VerifyPassword(
+                data.Password,
+                driver.Password,
+                allowLegacyPlainText: true,
+                out bool usedLegacyPlainText);
+
+            if (!isPasswordValid)
+            {
+                return Unauthorized(new { success = false, message = "司機帳號或密碼錯誤" });
+            }
+
+            // 舊司機資料若仍是明文密碼，登入成功後立即升級為 BCrypt。
+            if (usedLegacyPlainText)
+            {
+                driver.Password = BCrypt.Net.BCrypt.HashPassword(data.Password);
+                await _context.SaveChangesAsync();
+            }
+
+            await SignInAsync(driver.DriverId, "driver");
+
+            return Ok(new
+            {
+                success = true,
+                account = driver.DriverId,
+                role = "driver",
+                message = "司機端登入成功！",
+                redirectUrl = Url.Action("Index", "Driver")
+            });
+        }
+
+        private async Task<IActionResult> LoginPassenger(LoginData data)
+        {
+            var member = await _context.Members
+                .FirstOrDefaultAsync(m => m.Account == data.Account);
+
+            if (member == null)
+            {
+                return NotFound(new
+                {
+                    success = false,
+                    needRegister = true,
+                    message = "帳號尚未註冊，請先進行註冊！"
+                });
+            }
+
+            if (!VerifyPassword(
+                data.Password,
+                member.Password,
+                allowLegacyPlainText: false,
+                out _))
+            {
+                return Unauthorized(new { success = false, message = "乘客帳號或密碼錯誤" });
+            }
+
+            await SignInAsync(member.Account, "passenger");
+
+            return Ok(new
+            {
+                success = true,
+                message = "乘客端登入成功！",
+                account = member.Account,
+                role = "passenger",
+                redirectUrl = Url.Action("Index", "Home")
+            });
+        }
+
+        private async Task SignInAsync(string account, string role)
+        {
+            var claims = new List<Claim>
+            {
+                new(ClaimTypes.NameIdentifier, account),
+                new(ClaimTypes.Name, account),
+                new(ClaimTypes.Role, role)
+            };
+
+            var identity = new ClaimsIdentity(
+                claims,
+                CookieAuthenticationDefaults.AuthenticationScheme);
+
+            await HttpContext.SignInAsync(
+                CookieAuthenticationDefaults.AuthenticationScheme,
+                new ClaimsPrincipal(identity),
+                new AuthenticationProperties
+                {
+                    IsPersistent = true,
+                    AllowRefresh = true,
+                    ExpiresUtc = DateTimeOffset.UtcNow.AddDays(1)
+                });
+        }
+
+        private IActionResult RedirectToRoleIndex(string? role)
+        {
+            return role == "driver"
+                ? RedirectToAction("Index", "Driver")
+                : RedirectToAction("Index", "Home");
+        }
+
+        private static bool VerifyPassword(
+            string suppliedPassword,
+            string storedPassword,
+            bool allowLegacyPlainText,
+            out bool usedLegacyPlainText)
+        {
+            usedLegacyPlainText = false;
+
+            try
+            {
+                return BCrypt.Net.BCrypt.Verify(suppliedPassword, storedPassword);
+            }
+            catch
+            {
+                if (!allowLegacyPlainText || storedPassword != suppliedPassword)
+                {
+                    return false;
+                }
+
+                usedLegacyPlainText = true;
+                return true;
+            }
+        }
+
+        // 登入: 接收前端 JSON
         public class LoginData
         {
             public string Role { get; set; } = "";
@@ -136,10 +215,9 @@ namespace FinalProject.Controllers
             public string Password { get; set; } = "";
         }
 
-
         // 註冊會員
         [HttpGet("Join")]
-        public async Task<IActionResult> Register()
+        public IActionResult Register()
         {
             return View("Register");
         }
@@ -161,18 +239,14 @@ namespace FinalProject.Controllers
 
             if (isExist)
             {
-                // 回傳 JSON 格式錯誤訊息
                 return BadRequest(new { message = "帳號或 Email 已被註冊" });
             }
 
-            // 密碼進行 BCrypt 雜湊
             request.Password = BCrypt.Net.BCrypt.HashPassword(request.Password);
 
-            // 新增並寫入資料庫
             _context.Members.Add(request);
             await _context.SaveChangesAsync();
 
-            // 回傳成功 JSON
             return Ok(new
             {
                 success = true,
@@ -182,13 +256,16 @@ namespace FinalProject.Controllers
 
         // 登出
         [HttpPost("Logout")]
-        public IActionResult Logout()
+        [HttpPost("Account/Logout")]
+        public async Task<IActionResult> Logout()
         {
-            // 移除 Cookie
+            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+
+            // 清除舊版登入流程可能殘留的 Cookie。
             Response.Cookies.Delete("Account", new CookieOptions { Path = "/" });
             Response.Cookies.Delete("Role", new CookieOptions { Path = "/" });
 
-            return Ok(new { success = true, message = "已成功登出" });
+            return RedirectToAction(nameof(Login));
         }
 
         // 修改密碼
@@ -201,35 +278,32 @@ namespace FinalProject.Controllers
         [HttpPost("Change")]
         public async Task<IActionResult> ChangeP([FromBody] ChangePasswordModel request)
         {
-            string? account = Request.Cookies["Account"];
-            string? role = Request.Cookies["Role"];
+            string? account = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            string? role = User.FindFirstValue(ClaimTypes.Role);
 
             if (string.IsNullOrEmpty(account))
             {
                 return Unauthorized(new { success = false, message = "請先登入" });
             }
 
-            // 對新密碼加密
             string newHash = BCrypt.Net.BCrypt.HashPassword(request.NewPassword);
 
-            // 找到對應帳號並覆蓋密碼
-            if (role == "passenger") 
+            if (role == "passenger")
             {
                 var member = await _context.Members.FirstOrDefaultAsync(m => m.Account == account);
-                if (member == null) return NotFound(new { message = "找不到帳號" });
+                if (member == null)
+                {
+                    return NotFound(new { message = "找不到帳號" });
+                }
 
-                member.Password = newHash; // 直接修改原本資料庫欄位
-
+                member.Password = newHash;
             }
 
-            // 儲存變更寫到 DB
             await _context.SaveChangesAsync();
 
             return Ok(new { success = true, message = "密碼已成功更新！" });
         }
 
-
-        // 用於接收前端傳送的新密碼資料
         public class ChangePasswordModel
         {
             public string NewPassword { get; set; } = "";

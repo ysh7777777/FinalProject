@@ -1,58 +1,98 @@
-﻿document.addEventListener('DOMContentLoaded', function () {
-
+document.addEventListener('DOMContentLoaded', function () {
+    const loginForm = document.getElementById('loginForm');
     const passengerBtn = document.getElementById('passengerTab');
     const driverBtn = document.getElementById('driverTab');
     const loginBtn = document.getElementById('loginBtn');
+    const accountInput = document.getElementById('account');
+    const accountValidationMessage = document.getElementById('accountValidationMessage');
 
-    // 預設起始狀態為 乘客端
-    let currentRole = 'passenger';
+    if (!loginForm || !loginBtn || !accountInput) {
+        return;
+    }
 
-    // 處理 Tab 切換
-    passengerBtn?.addEventListener('click', () => currentRole = 'passenger');
-    driverBtn?.addEventListener('click', () => currentRole = 'driver');
+    function updateAccountRules() {
+        const isDriver = driverBtn?.checked === true;
 
-    // 獨立處理登入發送
-    loginBtn?.addEventListener('click', async (e) => {
-        e.preventDefault();
+        accountInput.maxLength = isDriver ? 15 : 6;
+        accountInput.pattern = isDriver
+            ? '[A-Za-z0-9]{1,15}'
+            : '[A-Za-z0-9]{6}';
+        accountInput.placeholder = isDriver
+            ? '輸入司機帳號（例如 D001）'
+            : '輸入6位英數';
 
-        const account = document.getElementById('account').value.trim();
-        const password = document.getElementById('passWord').value.trim();
+        if (accountValidationMessage) {
+            accountValidationMessage.textContent = isDriver
+                ? '請輸入司機帳號（1～15 位英數）'
+                : '請輸入帳號（6 位英數）';
+        }
+
+        accountInput.setCustomValidity('');
+        loginForm.classList.remove('was-validated');
+    }
+
+    passengerBtn?.addEventListener('change', updateAccountRules);
+    driverBtn?.addEventListener('change', updateAccountRules);
+    updateAccountRules();
+
+    // 使用表單 submit 事件，讓點擊按鈕及按 Enter 都能登入。
+    loginForm.addEventListener('submit', async (event) => {
+        event.preventDefault();
+
+        if (!loginForm.checkValidity()) {
+            loginForm.classList.add('was-validated');
+            return;
+        }
+
+        const account = document.getElementById('account')?.value.trim() ?? '';
+        const password = document.getElementById('passWord')?.value ?? '';
+        const currentRole = driverBtn?.checked ? 'driver' : 'passenger';
+        const requestVerificationToken = loginForm.querySelector(
+            'input[name="__RequestVerificationToken"]'
+        )?.value;
 
         if (!account || !password) {
-            alert("請輸入帳號與密碼");
+            alert('請輸入帳號與密碼');
             return;
         }
 
         loginBtn.disabled = true;
 
         try {
-            const response = await fetch('/Login', {
+            const response = await fetch(loginForm.action, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ Role: currentRole, Account: account, Password: password })
+                headers: {
+                    'Content-Type': 'application/json',
+                    'RequestVerificationToken': requestVerificationToken ?? ''
+                },
+                body: JSON.stringify({
+                    role: currentRole,
+                    account,
+                    password
+                })
             });
 
             const resData = await response.json().catch(() => ({}));
             handleLoginResult(resData, currentRole);
-
         } catch (error) {
-            alert("伺服器連線失敗");
+            alert('伺服器連線失敗');
         } finally {
             loginBtn.disabled = false;
         }
     });
 });
 
-// 處理結果: 成功或失敗
 function handleLoginResult(resData, role) {
     if (resData.success) {
-        alert(resData.message || "登入成功！");
-        window.location.href = '/Home/Index';
+        alert(resData.message || '登入成功！');
+        window.location.assign(
+            resData.redirectUrl || (role === 'driver' ? '/Driver/Index' : '/Home/Index')
+        );
         return;
     }
 
-    alert(resData.message || "登入失敗");
+    alert(resData.message || '登入失敗');
     if (role === 'passenger' && resData.needRegister) {
-        window.location.href = '/Join';
+        window.location.assign('/Join');
     }
 }
