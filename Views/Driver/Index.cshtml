@@ -3,6 +3,32 @@
     Layout = "Driver_Layout";
 }
 
+
+@* 測試log按鈕 *@
+<button id="tempButton">測試前端取得資料按鈕</button>
+
+<script>
+    document.getElementById('tempButton').addEventListener('click', async function () {
+        const response = await fetch('/api/auth/me');
+        const auth = await response.json();
+
+        console.log(auth);
+
+        if (!auth.isAuthenticated) {
+            alert('目前尚未登入');
+            return;
+        }
+
+        if (auth.role === 'passenger') {
+            alert(`乘客帳號：${auth.userId}`);
+        }
+
+        if (auth.role === 'driver') {
+            alert(`司機帳號：${auth.driverId}`);
+        }
+    });
+</script>
+
 <!-- Leaflet 與 Bootstrap Icons -->
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
