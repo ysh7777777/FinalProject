@@ -12,41 +12,60 @@
 }
 
 .client-v2-nav {
-    min-height: 6.5rem;
+    /*    min-height: 6.5rem;
     background: #fff;
     border-bottom: 1px solid #edf0f2;
-    box-shadow: 0 .18rem .7rem rgb(0 0 0 / 7%);
+    box-shadow: 0 .18rem .7rem rgb(0 0 0 / 7%);*/
+    height: 150px;
+    min-height: 78px;
+    padding: 0;
+    overflow: hidden;
+    background-color: #fff;
 }
 
 .driver-v2-nav {
-    min-height: 4.75rem;
-    background: linear-gradient(110deg, #18232c, #30495e);
-    border-bottom: 3px solid #ffc107;
+    height: 150px;
+    min-height: 78px;
+    padding: 0;
+    overflow: hidden;
+    background-color: #fff;
 }
 
 /* 修改：確保固定導覽列永遠顯示在頁面內容上方。 */
 .layout-v2-header {
+    position: sticky;
+    top: 0;
     z-index: 1030;
+    background-color: #fff;
+    border-bottom: 1px solid #edf0f2;
+    box-shadow: 0 .18rem .7rem rgb(0 0 0 / 7%);
 }
 
 .layout-v2 .navbar-brand {
     margin-right: 0.3rem;
 }
 
+
+
 .layout-v2-logo {
     width: auto;
+    height: 110%; /* 放大圖片，減少透明白邊的影響 */
+    max-width: none;
     object-fit: contain;
 }
 
 .client-v2 .layout-v2-logo {
-    height: 130px;
-    max-width: 500px;
+/*    height: 130px;
+    max-width: 500px;*/
+    height: 150px;
+    width: auto;
+    max-width: none;
 }
 
 .driver-v2 .layout-v2-logo {
-    height: 100px;
-    max-width: 220px;
-    filter: drop-shadow(0 .1rem .15rem rgb(0 0 0 / 20%));
+    height: 150px;
+    width: auto;
+    max-width: none;
 }
 
 .layout-v2 .nav-link {
@@ -90,6 +109,40 @@
     .client-v2 .nav-link:focus::after {
         transform: scaleX(1);
     }
+
+
+.driver-v2 .nav-link {
+    position: relative;
+    padding: .65rem .85rem;
+    color: #003c68;
+    font-size: 1.05rem;
+    font-weight: 500;
+    border-radius: 0;
+}
+
+    .driver-v2 .nav-link:hover,
+    .driver-v2 .nav-link:focus {
+        color: #bd3541;
+        background-color: transparent;
+    }
+
+    .driver-v2 .nav-link::after {
+        position: absolute;
+        right: .85rem;
+        bottom: .35rem;
+        left: .85rem;
+        height: 2px;
+        content: "";
+        background-color: #bd3541;
+        transform: scaleX(0);
+        transition: transform .2s ease;
+    }
+
+    .driver-v2 .nav-link:hover::after,
+    .driver-v2 .nav-link:focus::after {
+        transform: scaleX(1);
+    }
+
 
 .client-v2 .btn-light {
     color: #0755a3;
@@ -153,5 +206,39 @@
     .client-v2 .layout-v2-logo, .driver-v2 .layout-v2-logo {
         height: 52px;
         max-width: 170px;
+    }
+}
+@media (max-width: 991.98px) {
+    .driver-v2-nav {
+        height: auto;
+        min-height: 78px;
+        overflow: visible;
+    }
+
+    .driver-v2 .navbar-collapse {
+        padding: 0 .75rem .75rem;
+        background-color: #fff;
+    }
+
+    .driver-v2 .navbar-nav {
+        padding: .75rem 0 .25rem;
+    }
+
+    .driver-v2 .nav-link,
+    .driver-v2 .navbar .btn {
+        display: inline-block;
+        margin-bottom: .3rem;
+    }
+}
+
+@media (max-width: 575.98px) {
+    .driver-v2-nav {
+        min-height: 4.5rem;
+    }
+
+    .driver-v2 .layout-v2-logo {
+        width: auto;
+        height: 72px;
+        max-width: 190px;
     }
 }
