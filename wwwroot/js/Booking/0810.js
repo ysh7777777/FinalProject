@@ -1145,15 +1145,11 @@ const submitBtnText = document.querySelector(".submit-btn-text");
 
 bookingForm.addEventListener(
     "submit",
-    function (event) {
+    async function (event) {
 
         event.preventDefault();
 
-
-        /* =================================================
-           Bootstrap 表單驗證
-        ================================================== */
-
+        /* ======================= Bootstrap 表單驗證 ======================= */
         if (!bookingForm.checkValidity()) {
             event.stopPropagation();
             bookingForm.classList.add( "was-validated" );
@@ -1163,7 +1159,6 @@ bookingForm.addEventListener(
              */
 
             const firstInvalid = bookingForm.querySelector( ":invalid" );
-
             if (firstInvalid) { firstInvalid.focus(); }
             return;
         }
@@ -1172,18 +1167,97 @@ bookingForm.addEventListener(
          */
         bookingForm.classList.add( "was-validated" );
 
-
-        /* =================================================
-           送出中
-        ================================================== */
+        /* ======================= 送出中 ======================= */
         submitOrderBtn.disabled = true;
         submitOrderSpinner.classList.remove( "d-none" );
         submitBtnText.textContent = "訂單送出中...";
         /*
          * 這裡之後接後端 API
          */
-        console.log("訂單驗證成功，準備送出" );
-        console.log( "訂單驗證成功，準備送出" );
+        const bookingData = {
+            DepartureTime: document.getElementById("summaryRideTime").textContent.trim().replace(" ", "T") + ":00",
+            // 加上 .trim().replace(" ", "T") + ":00" 讓時間 2026-08-27 05:25 -> 2026-08-27T05:25:00
+
+            PickupLocation: document.getElementById("pickupAddress").value,
+
+            Destination: document.getElementById("dropoffAddress").value,
+
+            VehicleType: document.querySelector(".car-name").textContent.trim(),
+
+            PassengerCount: Number(document.getElementById("passengerCount").value ),
+
+            LuggageCount: Number(document.getElementById("luggageCount").value ),
+            // babySeat: Number(document.getElementById("babySeatCount").value ),
+
+            // flight: document.getElementById("flightNumber").value
+        };
+
+        console.log("訂單驗證成功，準備送出");
+        console.log("bookingData =", bookingData);
+        console.log("bookingData JSON =", JSON.stringify(bookingData));
+        // ================================
+        // 呼叫後端
+        // ================================
+
+         try {
+
+             const response = await fetch("/Booking/Create", {
+
+                 method: "POST",
+
+                 headers: {
+                     "Content-Type": "application/json"
+                 },
+
+                 body: JSON.stringify(bookingData),
+             });
+
+             const result = await response.json();
+             console.log("後端回傳：", result);
+
+             // if (!response.ok) {
+             //     console.error("後端完整回傳：", result);
+             //     console.error(
+             //         "ModelState Errors：",
+             //         result.errors
+             //     );
+
+             //     throw new Error(
+             //         result.message || "訂單送出失敗"
+             //     );
+             // }
+             if (!response.ok) {
+                 console.error("ModelState Errors：", result.errors);
+
+                 throw new Error(
+                     result.message || "訂單送出失敗"
+                 );
+             }
+
+             if (result.success) {
+                 console.log("訂單建立成功，ID：", result.bookingId);
+
+                 // 例如導向成功頁
+                 alert("訂單建立成功！");
+                 window.location.href = "/Booking/BookingPage";
+                 // location.reload();
+             }
+
+         }
+         catch (error) {
+             console.error("送出訂單失敗2：", error);
+
+             alert(error.message || "訂單送出失敗，請稍後再試。");
+         }
+
+         finally {
+
+             submitOrderBtn.disabled = false;
+
+             submitOrderSpinner.classList.add("d-none");
+
+             submitBtnText.textContent = "送出訂單";
+         }
     }
 );
 /* 0820 END 送出訂單 ------------------------------------------------------------------------------------------- */
