@@ -370,7 +370,7 @@
                             @foreach (var Car in VehicleMenu)
                             {
                                 <div class="col-12 col-sm-6 col-lg-4 col-xl-4">
-                                    <div class="car-card" tabindex="0" data-car-id="standard" data-car-name="一般轎車"
+                                        <div class="car-card" tabindex="0" data-car-id="standard" data-car-name="@Car.VehicleType"
                                          data-passengers="@Car.MaxPassengers" data-luggage="@Car.MaxLuggage" data-price="@Car.BaseFare">
                                         <!-- 選取狀態 -->
                                         <div class="car-selected-check">

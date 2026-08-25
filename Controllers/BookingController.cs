@@ -104,6 +104,7 @@ namespace FinalProject.Controllers
             trip.OrderNo = "TEST-" + DateTime.Now.ToString("yyyyMMddHHmmss");
             driverschedule.ShiftId = "S2026082501";
             driverschedule.DriverId = "D001";
+            trip.EstimatedDuration = 2;
 
             // 暫時移除這三個驗證錯誤
             ModelState.Remove("Account");
@@ -140,6 +141,10 @@ namespace FinalProject.Controllers
                     errors = errors
                 });
             }
+
+            // 算的
+
+
             // 呼叫你的派車 Function
             var result = await OrderDriver(trip);
 
