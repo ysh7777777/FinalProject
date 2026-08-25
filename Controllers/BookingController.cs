@@ -88,7 +88,7 @@ namespace FinalProject.Controllers
 
         [HttpPost]
         public async Task<IActionResult> Create(
-        [FromBody] Trip trip, DriverShiftSchedule driverschedule)
+        [FromBody] Trip trip)
         {
             /* 測試用
                 // 這裡就收到 JavaScript 傳來的資料了
@@ -101,18 +101,16 @@ namespace FinalProject.Controllers
 
             // 測試用假資料
             trip.Account = "user03";
-            trip.OrderNo = "TEST-" + DateTime.Now.ToString("yyyyMMddHHmmss");
-            driverschedule.ShiftId = "S2026082501";
-            driverschedule.DriverId = "D001";
+            trip.OrderNo = GenerateOrderNumber();
             trip.EstimatedDuration = 2;
 
             // 暫時移除這三個驗證錯誤
             ModelState.Remove("Account");
             ModelState.Remove("AccountNavigation");
             ModelState.Remove("OrderNo");
-            ModelState.Remove("ShiftId");
-            ModelState.Remove("DriverId");
-            ModelState.Remove("Driver");
+            //ModelState.Remove("ShiftId");
+            //ModelState.Remove("DriverId");
+            //ModelState.Remove("Driver");
 
             if (!ModelState.IsValid)
             {
@@ -158,17 +156,6 @@ namespace FinalProject.Controllers
                 });
             }
 
-            var DriverShiftSchedule = new DriverShiftSchedule
-            {
-                ShiftId = driverschedule.ShiftId,
-                DriverId = driverschedule.DriverId,
-                LicensePlate = driverschedule.LicensePlate,
-                ShiftDate = driverschedule.ShiftDate,
-                ShiftStart = driverschedule.ShiftStart,
-                ShiftEnd = driverschedule.ShiftEnd,
-                DriverStatus = driverschedule.DriverStatus,
-                Driver = driverschedule.Driver,
-            };
 
 
 

@@ -1,15 +1,10 @@
 
-1. 選擇乘車時間(id)
-乘車時間 = rideDate + rideHour + rideMinute
-要搭車的   日期     + 小時      + 分鐘
-
-2. 上車地點
-id				    代表什麼
-pickupLocation	    整個	「上車地點」區塊/容器
-pickupCityPanel	    上車－市區(一般市區地址)
-pickupAirportPanel	上車－機場(機場、航廈)
-
-
+- 測試用假資料
+    trip.Account = "user03";
+    trip.OrderNo = "TEST-" + DateTime.Now.ToString("yyyyMMddHHmmss");
+    driverschedule.ShiftId = "S2026082501";
+    driverschedule.DriverId = "D001";
+    trip.EstimatedDuration = 2;
 
 
 
