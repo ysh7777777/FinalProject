@@ -1,25 +1,244 @@
-/* V2 å…±ç”¨å“ç‰Œæ¨£å¼ï¼›Bootstrap è™•ç†æ‰€æœ‰å…ƒä»¶èˆ‡éŸ¿æ‡‰å¼æ ¼ç·šã€‚ */
-.layout-v2 { color: #243447; }
-.client-v2 { background: radial-gradient(circle at 92% 0, rgb(61 150 242 / 18%), transparent 28rem), #f7faff; }
-.driver-v2 { background: radial-gradient(circle at 8% 0, rgb(255 193 7 / 16%), transparent 25rem), #f5f7f9; }
-.client-v2-nav { min-height: 4.75rem; background: linear-gradient(110deg, #18232c, #30495e);border-bottom: 3px solid #ffc107;}
+/* V2 ¦@¥Î«~µP¼Ë¦¡¡FBootstrap ³B²z¤¸¥ó»PÅTÀ³¦¡®æ½u¡C */
+.layout-v2 {
+    color: #243447;
+}
 
-.driver-v2-nav { min-height: 4.75rem; background: linear-gradient(110deg, #18232c, #30495e); border-bottom: 3px solid #ffc107; }
-.layout-v2-logo { width: auto; height: 100px; max-width: 220px; object-fit: contain; filter: drop-shadow(0 .1rem .15rem rgb(0 0 0 / 20%)); }
-.layout-v2 .nav-link { padding: .65rem .85rem; font-weight: 500; border-radius: .5rem; }
-.layout-v2 .nav-link:hover, .layout-v2 .nav-link:focus { color: #fff; background: rgb(255 255 255 / 14%); }
-.client-v2 .btn-light { color: #0755a3; font-weight: 600; border: 0; }
-.driver-v2 .btn-warning { color: #18232c; font-weight: 700; border: 0; }
-.layout-v2-content { min-height: 20rem; }
-.layout-v2-footer { color: #70808d; background: rgb(255 255 255 / 82%); border-top: 1px solid rgb(34 70 104 / 12%); }
-.layout-v2 .dropdown-menu { padding: .45rem; border-radius: .75rem; }
-.layout-v2 .dropdown-item { padding: .55rem .75rem; border-radius: .45rem; }
+.client-v2 {
+    background: radial-gradient(circle at 92% 0, rgb(61 150 242 / 18%), transparent 28rem), #f7faff;
+}
+
+.driver-v2 {
+    background: radial-gradient(circle at 8% 0, rgb(255 193 7 / 16%), transparent 25rem), #f5f7f9;
+}
+
+.client-v2-nav {
+    /*    min-height: 6.5rem;
+    background: #fff;
+    border-bottom: 1px solid #edf0f2;
+    box-shadow: 0 .18rem .7rem rgb(0 0 0 / 7%);*/
+    height: 150px;
+    min-height: 78px;
+    padding: 0;
+    overflow: hidden;
+    background-color: #fff;
+}
+
+.driver-v2-nav {
+    height: 150px;
+    min-height: 78px;
+    padding: 0;
+    overflow: hidden;
+    background-color: #fff;
+}
+
+/* ­×§ï¡G½T«O©T©w¾ÉÄý¦C¥Ã»·Åã¥Ü¦b­¶­±¤º®e¤W¤è¡C */
+.layout-v2-header {
+    position: sticky;
+    top: 0;
+    z-index: 1030;
+    background-color: #fff;
+    border-bottom: 1px solid #edf0f2;
+    box-shadow: 0 .18rem .7rem rgb(0 0 0 / 7%);
+}
+
+.layout-v2 .navbar-brand {
+    margin-right: 0.3rem;
+}
+
+
+
+.layout-v2-logo {
+    width: auto;
+    height: 110%; /* ©ñ¤j¹Ï¤ù¡A´î¤Ö³z©ú¥ÕÃäªº¼vÅT */
+    max-width: none;
+    object-fit: contain;
+}
+
+.client-v2 .layout-v2-logo {
+/*    height: 130px;
+    max-width: 500px;*/
+    height: 150px;
+    width: auto;
+    max-width: none;
+}
+
+.driver-v2 .layout-v2-logo {
+    height: 150px;
+    width: auto;
+    max-width: none;
+}
+
+.layout-v2 .nav-link {
+    padding: .65rem .85rem;
+    font-weight: 500;
+    border-radius: .5rem;
+}
+
+    .layout-v2 .nav-link:hover, .layout-v2 .nav-link:focus {
+        color: #fff;
+        background: rgb(255 255 255 / 14%);
+    }
+
+.client-v2 .nav-link {
+    position: relative;
+    color: #003c68;
+    font-size: 1.05rem;
+    font-weight: 500;
+    border-radius: 0;
+}
+
+    .client-v2 .nav-link:hover,
+    .client-v2 .nav-link:focus {
+        color: #bd3541;
+        background: transparent;
+    }
+
+    .client-v2 .nav-link::after {
+        position: absolute;
+        right: .85rem;
+        bottom: .35rem;
+        left: .85rem;
+        height: 2px;
+        content: "";
+        background: #bd3541;
+        transform: scaleX(0);
+        transition: transform .2s ease;
+    }
+
+    .client-v2 .nav-link:hover::after,
+    .client-v2 .nav-link:focus::after {
+        transform: scaleX(1);
+    }
+
+
+.driver-v2 .nav-link {
+    position: relative;
+    padding: .65rem .85rem;
+    color: #003c68;
+    font-size: 1.05rem;
+    font-weight: 500;
+    border-radius: 0;
+}
+
+    .driver-v2 .nav-link:hover,
+    .driver-v2 .nav-link:focus {
+        color: #bd3541;
+        background-color: transparent;
+    }
+
+    .driver-v2 .nav-link::after {
+        position: absolute;
+        right: .85rem;
+        bottom: .35rem;
+        left: .85rem;
+        height: 2px;
+        content: "";
+        background-color: #bd3541;
+        transform: scaleX(0);
+        transition: transform .2s ease;
+    }
+
+    .driver-v2 .nav-link:hover::after,
+    .driver-v2 .nav-link:focus::after {
+        transform: scaleX(1);
+    }
+
+
+.client-v2 .btn-light {
+    color: #0755a3;
+    font-weight: 600;
+    border: 0;
+}
+
+.driver-v2 .btn-warning {
+    color: #18232c;
+    font-weight: 700;
+    border: 0;
+}
+
+.layout-v2-content {
+    min-height: 20rem;
+}
+
+.layout-v2-footer {
+    color: #70808d;
+    background: rgb(255 255 255 / 82%);
+    border-top: 1px solid rgb(34 70 104 / 12%);
+}
+
+.layout-v2 .dropdown-menu {
+    padding: .45rem;
+    border-radius: .75rem;
+}
+
+.layout-v2 .dropdown-item {
+    padding: .55rem .75rem;
+    border-radius: .45rem;
+}
+
 @media (min-width: 992px) {
     .client-v2 .dropdown:hover > .dropdown-menu {
         display: block;
         margin-top: 0;
     }
 }
-@media (max-width: 991.98px) { .layout-v2 .navbar-nav { padding: .75rem 0 .25rem; } .layout-v2 .nav-link, .layout-v2 .navbar .btn { display: inline-block; margin-bottom: .3rem; } }
-@media (max-width: 575.98px) { .client-v2-nav, .driver-v2-nav { min-height: 4.25rem; } .layout-v2-logo { height: 36px; max-width: 150px; } }
 
+@media (max-width: 991.98px) {
+    .layout-v2 .navbar-nav {
+        padding: .75rem 0 .25rem;
+    }
+
+    .layout-v2 .nav-link, .layout-v2 .navbar .btn {
+        display: inline-block;
+        margin-bottom: .3rem;
+    }
+
+    .client-v2 .navbar-collapse {
+        padding: 0 .5rem .75rem;
+    }
+}
+
+@media (max-width: 575.98px) {
+    .client-v2-nav, .driver-v2-nav {
+        min-height: 4.5rem;
+    }
+
+    .client-v2 .layout-v2-logo, .driver-v2 .layout-v2-logo {
+        height: 52px;
+        max-width: 170px;
+    }
+}
+@media (max-width: 991.98px) {
+    .driver-v2-nav {
+        height: auto;
+        min-height: 78px;
+        overflow: visible;
+    }
+
+    .driver-v2 .navbar-collapse {
+        padding: 0 .75rem .75rem;
+        background-color: #fff;
+    }
+
+    .driver-v2 .navbar-nav {
+        padding: .75rem 0 .25rem;
+    }
+
+    .driver-v2 .nav-link,
+    .driver-v2 .navbar .btn {
+        display: inline-block;
+        margin-bottom: .3rem;
+    }
+}
+
+@media (max-width: 575.98px) {
+    .driver-v2-nav {
+        min-height: 4.5rem;
+    }
+
+    .driver-v2 .layout-v2-logo {
+        width: auto;
+        height: 72px;
+        max-width: 190px;
+    }
+}

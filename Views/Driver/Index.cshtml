@@ -1,6 +1,9 @@
-﻿@{
+﻿@using System.Linq
+@model List<FinalProject.Models.TripOrderDto>
+@{
     ViewData["Title"] = "司機端派車系統";
-    Layout = "Driver_Layout";
+    Layout = null; /* 獨立全螢幕頁面*/
+    /* Layout = "Driver_Layout";  (Member)  */
 }
 
 
@@ -119,17 +122,11 @@
                     color: #ffffff !important;
                 }
 
-            .logo-placeholder {
-                width: 120px;
-                height: 40px;
-                background-color: #e9ecef;
-                border: 1px dashed #6c757d;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                font-size: 12px;
-                color: #495057;
-                border-radius: 6px;
+            .navbar-logo {
+                height: 70px; /* 設定適當的高度 */
+                width: auto; /* 寬度隨比例自動調整 */
+                object-fit: contain;
+                display: block; /* 確保微調時邊界計算精準 */
             }
 
             /* 3. 下方區塊容器 (小卡 + 控制列) */
@@ -203,11 +200,9 @@
     <div class="top-navbar">
         <nav class="navbar navbar-expand-lg navbar-light navbar-custom">
             <div class="container-fluid p-0">
-                <!-- 預留 Logo 區域 -->
-                <a class="navbar-brand me-auto" href="#">
-                    <div class="logo-placeholder">
-                        <span>[ 預留 Logo ]</span>
-                    </div>
+                <!--  Logo 區域 -->
+                <a class="navbar-brand me-auto" href="/Driver">
+                    <img src="~/images/weblogo_driver.png" alt="品牌Logo" class="navbar-logo" />
                 </a>
 
                 <!-- 漢堡選單按鈕 -->
@@ -217,18 +212,19 @@
 
                 <!-- 展開選單內容 -->
                 <div class="collapse navbar-collapse mt-2 mt-lg-0" id="driverNavbar">
-                    <div class="navbar-nav ms-auto gap-2">
+                    <div class="navbar-nav ms-auto d-flex flex-column flex-lg-row gap-2">
+                        <!-- 指向未來訂單 -->
                         <a class="btn btn-outline-primary btn-sm" href="/Driver/FutureOrders">
-                            <i class="bi bi-calendar-event"></i> 未來訂單
+                            <i class="bi bi-calendar-event me-1"></i> 未來訂單
                         </a>
-                        <a class="btn btn-outline-secondary btn-sm" href="/Driver/HistoryOrders">
-                            <i class="bi bi-clock-history"></i> 歷史訂單
+                        <!-- 指向歷史訂單（帶 tab=history 參數） -->
+                        <a class="btn btn-outline-secondary btn-sm" href="/Driver/HistoryOrders?tab=history">
+                            <i class="bi bi-clock-history me-1"></i> 歷史訂單
                         </a>
-                        <form action="/Account/Logout" method="post">
-                            <button class="btn btn-danger btn-sm" type="submit">
-                                <i class="bi bi-box-arrow-right"></i> 登出
-                            </button>
-                        </form>
+                        <!-- 登出按鈕 -->
+                        <a class="btn btn-danger btn-sm" href="/Account/Logout">
+                            <i class="bi bi-box-arrow-right me-1"></i> 登出
+                        </a>
                     </div>
                 </div>
             </div>
@@ -244,49 +240,69 @@
             <div id="orderCarousel" class="carousel slide h-100" data-bs-ride="false" data-bs-interval="false">
                 <div class="carousel-inner h-100">
 
-                    <!-- 卡片 1 (當前訂單) -->
-                    <div class="carousel-item active h-100">
-                        <div class="order-card p-2 d-flex flex-column justify-content-between">
-                            <div class="d-flex justify-content-between align-items-center border-bottom pb-2">
-                                <span class="fw-bold text-primary"><i class="bi bi-car-front-fill"></i> 當前訂單</span>
-                                <span class="badge bg-secondary">訂單編號: ORD-20260811-01</span>
-                            </div>
-                            <div class="row g-1 my-1 text-secondary small">
-                                <div class="col-6"><strong>客戶：</strong><span class="text-dark">陳先生 (0912-345-678)</span></div>
-                                <div class="col-6"><strong>預計抵達：</strong><span class="text-danger fw-bold">14:30</span></div>
-                                <div class="col-12"><strong>目的地：</strong><span class="text-dark">桃園國際機場 第一航廈</span></div>
-                                <div class="col-6"><strong>車資：</strong><span class="text-success fw-bold">1,500 元</span></div>
-                                <div class="col-6">
-                                    <strong>航班：</strong>
-                                    <span class="text-dark">BR-198</span>
-                                    <span class="badge bg-success status-badge" id="flightStatus">準時 (On Time)</span>
-                                </div>
+                    @if (Model == null || !Model.Any())
+                    {
+                        <!-- 當資料庫無待處理訂單時顯示空卡片 -->
+                        <div class="carousel-item active h-100">
+                            <div class="order-card p-3 d-flex flex-column justify-content-center align-items-center h-100">
+                                <i class="bi bi-check-circle text-success fs-2 mb-1"></i>
+                                <span class="fw-bold text-secondary">目前無進行中或待處理訂單</span>
                             </div>
                         </div>
-                    </div>
+                    }
+                    else
+                    {
+                        int index = 0;
+                        @foreach (var order in Model)
+                        {
+                            bool isFirst = (index == 0);
+                            string cardTitle = isFirst ? "當前訂單" : $"下一筆訂單 (#{index + 1})";
+                            string titleColor = isFirst ? "text-primary" : "text-info";
+                            string iconClass = isFirst ? "bi-car-front-fill" : "bi-clock";
 
-                    <!-- 卡片 2 (下筆預約) -->
-                    <div class="carousel-item h-100">
-                        <div class="order-card p-3 d-flex flex-column justify-content-between">
-                            <div class="d-flex justify-content-between align-items-center border-bottom pb-2">
-                                <span class="fw-bold text-info"><i class="bi bi-clock"></i> 下一筆訂單</span>
-                                <span class="badge bg-secondary">訂單編號: ORD-20260811-02</span>
-                            </div>
-                            <div class="row g-2 my-1 text-secondary small">
-                                <div class="col-6"><strong>客戶：</strong><span class="text-dark">林小姐</span></div>
-                                <div class="col-6"><strong>預計抵達：</strong><span class="text-danger fw-bold">18:00</span></div>
-                                <div class="col-12"><strong>目的地：</strong><span class="text-dark">台北君悅酒店</span></div>
-                                <div class="col-6"><strong>車資：</strong><span class="text-success fw-bold">1,200 元</span></div>
-                                <div class="col-6">
-                                    <strong>航班：</strong>
-                                    <span class="text-dark">CI-502</span>
-                                    <span class="badge bg-warning text-dark status-badge">延誤 15 分</span>
+                            <!-- 每一張訂單卡片 (第一張加上 active 類別) -->
+                            <div class="carousel-item h-100 @(isFirst ? "active" : "")">
+                                <div class="order-card p-2 d-flex flex-column justify-content-between h-100">
+                                    <div class="d-flex justify-content-between align-items-center border-bottom pb-2">
+                                        <span class="fw-bold @titleColor">
+                                            <i class="bi @iconClass me-1"></i>@cardTitle
+                                        </span>
+                                        <span class="badge bg-secondary">訂單編號: @order.OrderNo</span>
+                                    </div>
+
+                                    <div class="row g-1 my-1 text-secondary small">
+                                        <div class="col-6">
+                                            <strong>客戶：</strong>
+                                            <span class="text-dark">@order.CustomerName</span>
+                                        </div>
+                                        <div class="col-6">
+                                            <strong>預計出發：</strong>
+                                            <span class="text-danger fw-bold">@order.DepartureTime.ToString("HH:mm")</span>
+                                        </div>
+                                        <div class="col-12">
+                                            <strong>目的地：</strong>
+                                            <span class="text-dark text-truncate d-inline-block" style="max-width: 80%;">@order.Destination</span>
+                                        </div>
+                                        <div class="col-6">
+                                            <strong>車資：</strong>
+                                            <span class="text-success fw-bold">@order.Fare.ToString("N0") 元</span>
+                                        </div>
+                                        <div class="col-6">
+                                            <strong>航班：</strong>
+                                            <span class="text-dark">@order.FlightNumber</span>
+                                            <span class="badge bg-success status-badge">@order.TripStatus</span>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    </div>
+
+                            index++;
+                        }
+                    }
 
                 </div>
+            </div>
+   
 
                 <!-- 手動切換按鈕 -->
                 <button class="carousel-control-prev" type="button" data-bs-target="#orderCarousel" data-bs-slide="prev">
