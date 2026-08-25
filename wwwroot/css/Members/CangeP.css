@@ -173,3 +173,26 @@ body {
 .was-validated .form-input:invalid {
     border-color: #dc3545;
 }
+
+
+/* 外層容器：將連結靠右對齊，並控制上下的邊距 */
+.cancel-wrapper {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 8px;
+    margin-bottom: 16px;
+}
+
+/* 取消修改超連結樣式 */
+.cancel-btn {
+    color: #6c757d;
+    font-size: 14px;
+    text-decoration: none;
+    transition: color 0.2s ease-in-out;
+}
+
+/* 滑鼠懸停 */
+.cancel-btn:hover {
+    color: #343a40;
+    text-decoration: underline;
+}

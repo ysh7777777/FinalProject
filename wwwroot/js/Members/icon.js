@@ -4,7 +4,7 @@
     const togglepassword = document.querySelector('#togglePassword');
     if (togglepassword) {
         togglepassword.addEventListener('click', function () {
-            // 對應 HTML 的 id="passWord"
+            
             const passwordInput = document.querySelector('#passWord');
             const img = this.querySelector('img');
 

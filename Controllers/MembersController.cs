@@ -36,7 +36,7 @@ namespace FinalProject.Controllers
                 Path = "/",                                  // 設定全站通用路徑
                 Expires = DateTimeOffset.UtcNow.AddDays(1),  // 保留 1 天
                 SameSite = SameSiteMode.Lax,
-                Secure = false                               // 開發環境 (http://localhost) 設為 false 才能成功寫入
+                Secure = false                               // 設為 false 才能成功寫入
             };
 
             // 司機端登入 
@@ -180,11 +180,59 @@ namespace FinalProject.Controllers
             });
         }
 
+        // 登出
+        [HttpPost("Logout")]
+        public IActionResult Logout()
+        {
+            // 移除 Cookie
+            Response.Cookies.Delete("Account", new CookieOptions { Path = "/" });
+            Response.Cookies.Delete("Role", new CookieOptions { Path = "/" });
+
+            return Ok(new { success = true, message = "已成功登出" });
+        }
+
         // 修改密碼
         [HttpGet("Change")]
         public IActionResult ChangeP()
         {
             return View();
+        }
+
+        [HttpPost("Change")]
+        public async Task<IActionResult> ChangeP([FromBody] ChangePasswordModel request)
+        {
+            string? account = Request.Cookies["Account"];
+            string? role = Request.Cookies["Role"];
+
+            if (string.IsNullOrEmpty(account))
+            {
+                return Unauthorized(new { success = false, message = "請先登入" });
+            }
+
+            // 對新密碼加密
+            string newHash = BCrypt.Net.BCrypt.HashPassword(request.NewPassword);
+
+            // 找到對應帳號並覆蓋密碼
+            if (role == "passenger") 
+            {
+                var member = await _context.Members.FirstOrDefaultAsync(m => m.Account == account);
+                if (member == null) return NotFound(new { message = "找不到帳號" });
+
+                member.Password = newHash; // 直接修改原本資料庫欄位
+
+            }
+
+            // 儲存變更寫到 DB
+            await _context.SaveChangesAsync();
+
+            return Ok(new { success = true, message = "密碼已成功更新！" });
+        }
+
+
+        // 用於接收前端傳送的新密碼資料
+        public class ChangePasswordModel
+        {
+            public string NewPassword { get; set; } = "";
         }
     }
 }
