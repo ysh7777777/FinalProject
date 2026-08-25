@@ -1,0 +1,154 @@
+﻿<!DOCTYPE html>
+<html lang="zh-Hant-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>會員註冊表單</title>
+    <link href="/lib/bootstrap/dist/css/bootstrap.css" rel="stylesheet">
+    <link href="/css/Members/Register.css" rel="stylesheet">
+</head>
+<body>
+
+    <div class="rg-container">
+        <div class="rg-row">
+            <div class="rg-card">
+                <h2 class="rg-title">會員註冊</h2>
+
+                <form action="/Join" method="POST" class="rg-form" novalidate>
+                    <!-- Id 欄位 -->
+                    <input type="hidden" id="id" name="id">
+
+                    <!-- 帳號 -->
+                    <div class="rg-fg">
+                        <label for="account" class="rg-label">帳號(輸入6位英數)<span class="rg-text-danger">*</span></label>
+                        <input type="text" class="rg-input" id="account" name="account" maxlength="6" pattern="[A-Za-z0-9]{6}" required>
+                        <div class="rg-error-feedback">請輸入帳號(6位英數)</div>
+                    </div>
+
+                    <!-- 姓名 -->
+                    <div class="rg-fg">
+                        <label for="fullname" class="rg-label">姓名(中文或英文)<span class="rg-text-danger">*</span></label>
+                        <input type="text" class="rg-input" id="fullname" name="fullname" maxlength="50" pattern="^[\u4E00-\u9FFF\u3400-\u4DBF a-zA-Z]+$" required>
+                        <div class="rg-error-feedback">請輸入姓名(中文或英文)</div>
+                    </div>
+
+                    <!-- 性別 -->
+                    <div class="rg-fg">
+                        <label class="rg-label">性別 <span class="rg-text-danger">*</span></label>
+                        <div class="rg-gender-options">
+                            <div class="rg-radio-inline">
+                                <input class="rg-radio-input" type="radio" name="gender" id="gender-male" value="Male" required>
+                                <label class="rg-radio-label" for="gender-male">男</label>
+                            </div>
+                            <div class="rg-radio-inline">
+                                <input class="rg-radio-input" type="radio" name="gender" id="gender-female" value="Female" required>
+                                <label class="rg-radio-label" for="gender-female">女</label>
+                            </div>
+                            <div class="rg-radio-inline">
+                                <input class="rg-radio-input" type="radio" name="gender" id="gender-other" value="Other" required>
+                                <label class="rg-radio-label" for="gender-other">其他</label>
+                            </div>
+                        </div>
+                        <div class="rg-error-feedback" id="gender-error">請選擇性別</div>
+                    </div>
+
+                    <!-- 生日 -->
+                    <div class="rg-fg">
+                        <label for="birthday" class="rg-label">生日<span class="rg-text-danger">*</span></label>
+                        <input type="date" class="rg-input" id="birthday" name="birthday" max="9999-12-31" required>
+                        <div class="rg-error-feedback">請選擇生日</div>
+                    </div>
+
+                    <!-- 手機 -->
+                    <div class="rg-fg">
+                        <label for="phone-number" class="rg-label">手機</label>
+                        <div class="rg-phone-group">
+                            <select id="country-code" name="countryCode" class="rg-select">
+                                <option value="">選取國碼</option>
+                                <option value="+886">台灣 (+886)</option>
+                                <option value="+852">香港 (+852)</option>
+                                <option value="+853">澳門 (+853)</option>
+                                <option value="+86">中國 (+86)</option>
+                                <option value="+81">日本 (+81)</option>
+                                <option value="+82">韓國 (+82)</option>
+                                <option value="+1">美國 (+1)</option>
+                                <option value="+1">加拿大 (+1)</option>
+                                <option value="+44">英國 (+44)</option>
+                                <option value="+61">澳洲 (+61)</option>
+                                <option value="+65">新加坡 (+65)</option>
+                                <option value="+60">馬來西亞 (+60)</option>
+                                <option value="+66">泰國 (+66)</option>
+                                <option value="+84">越南 (+84)</option>
+                                <option value="+63">菲律賓 (+63)</option>
+                                <option value="+62">印尼 (+62)</option>
+                                <option value="+95">緬甸 (+95)</option>
+                                <option value="+855">柬埔寨 (+855)</option>
+                                <option value="+33">法國 (+33)</option>
+                                <option value="+49">德國 (+49)</option>
+                                <option value="+39">義大利 (+39)</option>
+                                <option value="+34">西班牙 (+34)</option>
+                                <option value="+31">荷蘭 (+31)</option>
+                                <option value="+41">瑞士 (+41)</option>
+                                <option value="+32">比利時 (+32)</option>
+                                <option value="+351">葡萄牙 (+351)</option>
+                                <option value="+353">愛爾蘭 (+353)</option>
+                                <option value="+46">瑞典 (+46)</option>
+                                <option value="+52">墨西哥 (+52)</option>
+                                <option value="+55">巴西 (+55)</option>
+                                <option value="+64">紐西蘭 (+64)</option>
+                                <option value="+91">印度 (+91)</option>
+                                <option value="+971">阿聯酋 (+971)</option>
+                                <option value="+27">南非 (+27)</option>
+                                <option value="+20">埃及 (+20)</option>
+                            </select>
+                            <input type="tel" class="rg-input" id="phone-number" name="phoneNumber" maxlength="20" pattern="[0-9]*">
+                        </div>
+                    </div>
+
+                    <!-- email -->
+                    <div class="rg-fg">
+                        <label for="email" class="rg-label">email<span class="rg-text-danger">*</span></label>
+                        <input type="email" class="rg-input" id="email" name="email" maxlength="254" required>
+                        <div class="rg-error-feedback">請輸入 email</div>
+                    </div>
+
+                    <!-- 密碼 -->
+                    <div class="rg-fg">
+                        <label for="password" class="rg-label">密碼(區分大小寫)<span class="rg-text-danger">*</span></label>
+                        <div class="rg-password-wrapper">
+                            <input type="password" class="rg-input" id="password" name="password" maxlength="11" pattern="[A-Za-z0-9]{6,11}" required placeholder="請輸入密碼（6~11位英數）">
+                            <span class="rg-icon-right" id="toggle-password">
+                                <img src="~/icon/eye-fill.svg" alt="顯示密碼" class="rg-icon-img">
+                            </span>
+                        </div>
+                        <div class="rg-error-feedback">請輸入密碼（6~11位英數）</div>
+                    </div>
+
+                    <!-- 確認密碼 -->
+                    <div class="rg-fg">
+                        <label for="confirm-password" class="rg-label">確認密碼(區分大小寫)<span class="rg-text-danger">*</span></label>
+                        <div class="rg-password-wrapper">
+                            <input type="password" class="rg-input" id="confirm-password" name="confirmPassword" maxlength="11" pattern="[A-Za-z0-9]{6,11}" required placeholder="請輸入密碼（6~11位英數）">
+                            <span class="rg-icon-right" id="toggle-confirm-password">
+                                <img src="~/icon/eye-fill.svg" alt="顯示密碼" class="rg-icon-img">
+                            </span>
+                        </div>
+                        <div class="rg-error-feedback" id="confirm-password-error">請輸入密碼（6~11位英數）</div>
+                    </div>
+
+                    <!-- 取消註冊 -->
+                    <div class="rg-cancel-wrapper">
+                        <a href="/Login" class="rg-cancel-link">取消註冊</a>
+                    </div>
+
+                    <!-- 提交按鈕 -->
+                    <button type="submit" class="rg-btn">註冊</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    @* <script src="/js/Members/Register.js"></script> *@
+    <script src="/js/Members/icon.js"></script>
+</body>
+</html>

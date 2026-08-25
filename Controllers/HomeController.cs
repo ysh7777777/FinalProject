@@ -1,14 +1,27 @@
 using FinalProject.Models;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
+using Microsoft.EntityFrameworkCore;
 
 namespace FinalProject.Controllers
 {
     public class HomeController : Controller
     {
-        public IActionResult Index()
+        private readonly RideHailingDbContext _context;
+        public HomeController(RideHailingDbContext context)
         {
-            return View();
+            _context = context;
+        }
+
+        public async Task<IActionResult> Index()
+        {
+         List<ProjectImage> heroSlides = await _context.ProjectImages
+        .AsNoTracking()
+        .Where(image => image.ImageTitle.StartsWith("首頁輪播"))
+        .OrderBy(image => image.ImageId)
+        .ToListAsync();
+
+            return View(heroSlides);
         }
 
         public IActionResult Privacy()
