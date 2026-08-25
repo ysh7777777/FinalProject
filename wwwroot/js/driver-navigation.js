@@ -34,6 +34,8 @@ const driverId =
     window.tripData.driverId;
 const tripSignalId =
     `${driverId}|${window.tripData.orderNo}`;
+const driverOnlineStorageKey =
+    `driverOnline:${driverId}`;
 const driverRouteUpdateIntervalMs = 3000;
 const driverRoutePhaseStorageKey =
     `driverRoutePhase:${tripSignalId}`;
@@ -115,7 +117,7 @@ function disableGpsSharing() {
 }
 
 function canScheduleGpsSharing() {
-    return sessionStorage.getItem("driverOnline") === "true" &&
+    return sessionStorage.getItem(driverOnlineStorageKey) === "true" &&
         !window.tripData.isHistory &&
         window.tripData.tripStatus !== "已完成" &&
         sessionStorage.getItem(
@@ -324,7 +326,7 @@ function scheduleDriverConnectionRestart() {
 
             if (
                 sessionStorage.getItem(
-                    "driverOnline"
+                    driverOnlineStorageKey
                 ) !== "true" ||
                 connection.state !==
                 signalR.HubConnectionState.Disconnected
@@ -366,7 +368,7 @@ function scheduleDriverConnectionRestart() {
 async function restoreDriverSignalRState() {
     const shouldBeOnline =
         sessionStorage.getItem(
-            "driverOnline"
+            driverOnlineStorageKey
         ) === "true";
 
     if (
@@ -418,7 +420,7 @@ async function restoreDriverSignalRState() {
 connection.onreconnecting(() => {
     if (
         sessionStorage.getItem(
-            "driverOnline"
+            driverOnlineStorageKey
         ) === "true"
     ) {
         document.getElementById(
@@ -460,7 +462,7 @@ connection.onreconnected(async () => {
 connection.onclose(error => {
     if (
         sessionStorage.getItem(
-            "driverOnline"
+            driverOnlineStorageKey
         ) !== "true"
     ) {
         return;
@@ -817,7 +819,7 @@ demoAutoShareButton.addEventListener(
     "click",
     async function () {
         if (
-            sessionStorage.getItem("driverOnline") !==
+            sessionStorage.getItem(driverOnlineStorageKey) !==
             "true"
         ) {
             alert("請先按下上線，再測試自動分享 GPS");
@@ -858,7 +860,7 @@ gpsShareDemoModeButton.addEventListener(
     "click",
     function () {
         if (
-            sessionStorage.getItem("driverOnline") ===
+            sessionStorage.getItem(driverOnlineStorageKey) ===
             "true"
         ) {
             alert("請先下線，再切換 Demo 模式");
@@ -951,7 +953,7 @@ async function startDriverOnline() {
 
 
     sessionStorage.setItem(
-        "driverOnline",
+        driverOnlineStorageKey,
         "true"
     );
 
@@ -1186,7 +1188,7 @@ async function startDriverOnline() {
             .addEventListener("click", function () {
                 if (
                     sessionStorage.getItem(
-                        "driverOnline"
+                        driverOnlineStorageKey
                     ) !== "true"
                 ) {
                     alert("請先按下上線，再執行測試路線");
@@ -1346,7 +1348,7 @@ async function startDriverOnline() {
 
 
     sessionStorage.setItem(
-        "driverOnline",
+        driverOnlineStorageKey,
         "true"
     );
 
@@ -1575,7 +1577,7 @@ document
     .getElementById("offline-btn")
     .addEventListener("click", async function () {
         sessionStorage.setItem(
-            "driverOnline",
+            driverOnlineStorageKey,
             "false"
         );
 
@@ -1698,7 +1700,7 @@ window.addEventListener(
 
         const wasOnline =
             sessionStorage.getItem(
-                "driverOnline"
+                driverOnlineStorageKey
             ) === "true";
 
         if (wasOnline && !window.tripData.isHistory) {

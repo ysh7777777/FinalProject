@@ -1,6 +1,50 @@
 ﻿@model FinalProject.Models.Trip
 @{
     ViewData["Title"] = "司機導航";
+    Layout = "Driver_Layout";
+    var promotedTripCount =
+        ViewBag.PromotedTripCount is int count ? count : 0;
+}
+
+@if (ViewBag.CanUseOrderDateDemo == true)
+{
+    <div class="card border-info mb-3">
+        <div class="card-body d-flex flex-wrap gap-3 align-items-center justify-content-between">
+            <div>
+                <h6 class="fw-bold mb-1">8/11 訂單狀態 Demo</h6>
+                <div class="small text-muted">
+                    將 D001 在 2026-08-11 的待執行訂單批次轉為行程中。
+                </div>
+                @if (ViewBag.IsOrderDateDemo == true)
+                {
+                    <div class="mt-2">
+                        <span class="badge bg-info text-dark">
+                            Demo 日期：2026-08-11
+                        </span>
+                        <span class="badge @(promotedTripCount > 0 ? "bg-success" : "bg-secondary") ms-1">
+                            本次轉換 @promotedTripCount 筆
+                        </span>
+                        @if (promotedTripCount == 0)
+                        {
+                            <span class="small text-muted ms-1">
+                                目前沒有待執行訂單，可能已完成啟用。
+                            </span>
+                        }
+                    </div>
+                }
+            </div>
+
+            <form asp-controller="DriverNavigation"
+                  asp-action="ActivateOrderDateDemo"
+                  method="post">
+                @Html.AntiForgeryToken()
+                <button type="submit"
+                        class="btn btn-outline-info">
+                    啟用 8/11 待執行訂單
+                </button>
+            </form>
+        </div>
+    </div>
 }
 
 
@@ -260,6 +304,16 @@ else
                 下一頁
             </button>
 
+            @if (ViewBag.IsHistory == true)
+            {
+                <a id="refresh-orders-btn"
+                   asp-controller="DriverNavigation"
+                   asp-action="Navigation"
+                   class="btn btn-success">
+                    重整訂單
+                </a>
+            }
+
             <button id="next-order-btn" 
                     type="button"
                     class="btn btn-outline-primary"
@@ -361,13 +415,16 @@ else
 
 <script>
     window.tripData = {
-        driverId: "@Model?.AssignedDriverId",
+        driverId: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(
+            User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value ?? "")),
 
-        orderNo: "@Model?.OrderNo",
+        orderNo: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(
+            Model?.OrderNo ?? "")),
 
         isHistory: @(ViewBag.IsHistory == true ? "true" : "false"),
 
-        tripStatus: "@Model?.TripStatus",
+        tripStatus: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(
+            Model?.TripStatus ?? "")),
 
         pickupLat: @((Model?.PickupLat ?? 0)
                                 .ToString(System.Globalization.CultureInfo.InvariantCulture)),
@@ -381,7 +438,8 @@ else
         destinationLng: @((Model?.DestinationLng ?? 0)
                                 .ToString(System.Globalization.CultureInfo.InvariantCulture)),
 
-        departureTime: "@(Model?.DepartureTime?.ToString("yyyy-MM-ddTHH:mm:ss") ?? "")"
+        departureTime: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(
+            Model?.DepartureTime?.ToString("yyyy-MM-ddTHH:mm:ss") ?? ""))
     };
 </script>
 }

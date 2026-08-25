@@ -1,16 +1,21 @@
 ﻿using FinalProject.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 
 namespace finalProject.Controllers
 {
+    [Authorize(Roles = "driver")]
     public class DriverNavigationController : Controller
     {
-        private readonly RideHailingDbContext _context;
-
-        // 專題展示模式使用；登入功能合併後只需替換
-        // GetCurrentDriverTrips() 的資料範圍。
+        private const string PendingExecutionStatus = "待執行";
+        private const string InProgressStatus = "行程中";
         private const string DemoDriverId = "D001";
+        private static readonly DateTime DemoBusinessDate =
+            new(2026, 8, 11);
+
+        private readonly RideHailingDbContext _context;
 
         public DriverNavigationController(
             RideHailingDbContext context)
@@ -20,18 +25,70 @@ namespace finalProject.Controllers
 
         private IQueryable<Trip> GetCurrentDriverTrips()
         {
-            // AUTH-INTEGRATION:
-            // 登入功能完成後，改由目前登入者的司機 ID
-            // 過濾資料；展示階段保留 D001，避免頁面被擋住。
+            var currentDriverId = GetCurrentDriverId();
+
             return _context.Trips
                 .Where(t =>
-                    t.AssignedDriverId == DemoDriverId);
+                    t.AssignedDriverId == currentDriverId);
         }
 
-        public IActionResult Navigation()
+        private string GetCurrentDriverId()
         {
+            return User.FindFirstValue(ClaimTypes.NameIdentifier)
+                ?? string.Empty;
+        }
+
+        private async Task<int> PromotePendingTripsAsync(
+            DateTime businessDate)
+        {
+            var dayStart = businessDate.Date;
+            var nextDay = dayStart.AddDays(1);
+
+            var pendingTrips = GetCurrentDriverTrips()
+                .Where(t =>
+                    t.TripStatus == PendingExecutionStatus &&
+                    t.DepartureTime >= dayStart &&
+                    t.DepartureTime < nextDay &&
+                    t.LicensePlate != null);
+
+            return await pendingTrips.ExecuteUpdateAsync(setters =>
+                setters.SetProperty(
+                    t => t.TripStatus,
+                    InProgressStatus));
+        }
+
+        // 既有登入流程會導向 /Driver/Index；在不修改登入檔案的
+        // 前提下，由此端點銜接至正式的司機導航頁。
+        [HttpGet("/Driver", Order = -1)]
+        [HttpGet("/Driver/Index", Order = -1)]
+        public IActionResult DriverIndex()
+        {
+            return RedirectToAction(nameof(Navigation));
+        }
+
+        public async Task<IActionResult> Navigation(
+            bool orderDateDemo = false)
+        {
+            var currentDriverId = GetCurrentDriverId();
+            var isDemoMode =
+                orderDateDemo &&
+                currentDriverId == DemoDriverId;
+            var businessDate = isDemoMode
+                ? DemoBusinessDate
+                : DateTime.Today;
+
+            var promotedTripCount =
+                await PromotePendingTripsAsync(
+                    businessDate);
+
             var today = DateTime.Today;
             var tomorrow = today.AddDays(1);
+
+            ViewBag.CanUseOrderDateDemo =
+                currentDriverId == DemoDriverId;
+            ViewBag.IsOrderDateDemo = isDemoMode;
+            ViewBag.BusinessDate = businessDate;
+            ViewBag.PromotedTripCount = promotedTripCount;
 
             var trip = GetCurrentDriverTrips()
                 .Include(t => t.AccountNavigation)
@@ -67,6 +124,20 @@ namespace finalProject.Controllers
             ViewBag.IsHistory = false;
 
             return View(trip);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult ActivateOrderDateDemo()
+        {
+            if (GetCurrentDriverId() != DemoDriverId)
+            {
+                return Forbid();
+            }
+
+            return RedirectToAction(
+                nameof(Navigation),
+                new { orderDateDemo = true });
         }
 
         [HttpPost]

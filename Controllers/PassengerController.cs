@@ -1,13 +1,15 @@
 ﻿using FinalProject.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 
 namespace finalProject.Controllers
 {
+    [Authorize(Roles = "passenger")]
     public class PassengerController : Controller
     {
         private readonly RideHailingDbContext _context;
-        private const string DemoOrderNo = "T20260811001";
 
         public PassengerController(
             RideHailingDbContext context)
@@ -15,26 +17,53 @@ namespace finalProject.Controllers
             _context = context;
         }
 
-        private IQueryable<Trip> GetCurrentPassengerTrips()
+        private string GetCurrentPassengerAccount()
         {
-            // AUTH-INTEGRATION:
-            // 登入功能完成後，改成依目前登入會員 Account
-            // 過濾訂單；展示階段保留固定測試訂單。
-            return _context.Trips
-                .Where(t => t.OrderNo == DemoOrderNo);
+            return User.FindFirstValue(ClaimTypes.NameIdentifier)
+                ?? string.Empty;
         }
 
-        public IActionResult DriverStatus()
+        public IActionResult DriverStatus(string? orderNo)
         {
-            var trip = GetCurrentPassengerTrips()
+            if (string.IsNullOrWhiteSpace(orderNo))
+            {
+                return BadRequest("缺少訂單編號");
+            }
+
+            var currentPassengerAccount =
+                GetCurrentPassengerAccount();
+
+            if (string.IsNullOrEmpty(currentPassengerAccount))
+            {
+                return Forbid();
+            }
+
+            orderNo = orderNo.Trim();
+
+            var trip = _context.Trips
+                .AsNoTracking()
                 .Include(t => t.AssignedDriver)
                 .Include(t => t.LicensePlateNavigation)
-                .FirstOrDefault();
+                .FirstOrDefault(t =>
+                    t.OrderNo == orderNo &&
+                    t.Account == currentPassengerAccount);
 
             if (trip == null)
             {
                 return NotFound();
             }
+
+            var canTrackDriver =
+                trip.TripStatus == "行程中" &&
+                trip.AssignedDriverId != null &&
+                trip.LicensePlate != null;
+
+            if (!canTrackDriver && trip.TripStatus != "已完成")
+            {
+                return NotFound();
+            }
+
+            ViewBag.CanTrackDriver = canTrackDriver;
 
             return View(trip);
         }
