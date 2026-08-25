@@ -13,11 +13,13 @@
     <link rel="stylesheet" href="/css/layout-v2.css" />
 </head>
 <body class="layout-v2 driver-v2 d-flex flex-column min-vh-100">
-    <header class="shadow-sm">
+    @* 修改：sticky-top 讓導覽列在捲動畫面時固定在最上方 *@
+    <header class="shadow-sm sticky-top layout-v2-header">
         <nav class="navbar navbar-expand-lg navbar-dark driver-v2-nav" aria-label="司機端主選單">
-            <div class="container">
+            @* 修改：Logo 靠齊畫面最左邊 *@
+            <div class="container-fluid ps-0 pe-3 pe-lg-4">
                 <a class="navbar-brand py-0 d-flex align-items-center" href="/" aria-label="機場接送首頁">
-                    <img src="/Images/webLogo_driver.png" class="layout-v2-logo" alt="機場接送司機端" />
+                    <img src="~/Images/LOGO.png" class="layout-v2-logo" alt="機場接送司機端" />
                 </a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#driverV2Menu" aria-controls="driverV2Menu" aria-expanded="false" aria-label="開啟選單"><span class="navbar-toggler-icon"></span></button>
                 <div class="collapse navbar-collapse" id="driverV2Menu">

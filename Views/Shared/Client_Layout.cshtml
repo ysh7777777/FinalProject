@@ -1,5 +1,6 @@
 @{
-    var isAuthenticated = User?.Identity?.IsAuthenticated ?? false;
+  var isAuthenticated = User?.Identity?.IsAuthenticated ?? false;
+    //var isAuthenticated = true;
     // isAuthenticated = true;
     ViewData["Title"] ??= "機場接送";
     var pageClass = ViewData["PageClass"]?.ToString() ?? "";
@@ -16,18 +17,22 @@
     @await RenderSectionAsync("Styles", required: false)
 </head>
 <body class="layout-v2 client-v2 d-flex flex-column min-vh-100 @pageClass">
-    <header class="shadow-sm">
-        <nav class="navbar navbar-expand-lg navbar-dark client-v2-nav" aria-label="乘客端主選單">
-            <div class="container">
+    @* 修改：sticky-top 讓導覽列在捲動畫面時固定在最上方 *@
+    <header class="sticky-top layout-v2-header">
+        <nav class="navbar navbar-expand-lg navbar-light client-v2-nav" aria-label="乘客端主選單">
+            @* 修改：參考圖一，導覽內容使用置中的固定寬度容器 *@
+            <div class="container-xl">
                 <a class="navbar-brand py-0 d-flex align-items-center" href="/" aria-label="機場接送首頁">
-                    <img src="/Images/webLogo_driver.png" class="layout-v2-logo" alt="機場接送" />
+                    <img src="~/Images/LOGO.png" class="layout-v2-logo" alt="萬馬接送" />
                 </a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#clientV2Menu" aria-controls="clientV2Menu" aria-expanded="false" aria-label="開啟選單">
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="collapse navbar-collapse" id="clientV2Menu">
-                    <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-2">
-                        <li class="nav-item"><a class="nav-link" href="/Booking/Create">預訂接送</a></li>
+                    <ul class="navbar-nav ms-lg-auto me-lg-5 align-items-lg-center gap-lg-2">
+                        @* 修改：參考圖一，主要功能改為置中的文字選單 *@
+                        <li class="nav-item"><a class="nav-link" href="/Booking/Create">點我訂車</a></li>
+                        <li class="nav-item"><a class="nav-link" href="/Booking/History">訂單查詢</a></li>
                         @if (isAuthenticated)
                         {
                             <li class="nav-item dropdown">
@@ -43,7 +48,7 @@
                         }
                         else
                         {
-                            <li class="nav-item"><a class="btn btn-light btn-sm px-3" href="/Account/Register">註冊 / 登入</a></li>
+                            <li class="nav-item"><a class="nav-link" href="/Account/Register">登入/註冊</a></li>
                         }
                     </ul>
                 </div>
@@ -80,3 +85,4 @@
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
+
