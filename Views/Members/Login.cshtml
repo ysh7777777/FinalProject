@@ -17,11 +17,11 @@
 
                 <!-- 頂部切換按鈕組 -->
                 <div class="role-toggle-group" role="group" aria-label="Role login toggle button group">
-                    <input type="radio" name="roleRadio" id="passenger-tab" autocomplete="off" onclick="switchRole('Passenger')" checked>
-                    <label class="role-toggle-btn" for="passenger-tab">乘客登入</label>
+                    <input type="radio" name="roleRadio" id="passengerTab" autocomplete="off" )" checked>
+                    <label class="role-toggle-btn" for="passengerTab">乘客登入</label>
 
-                    <input type="radio" name="roleRadio" id="driver-tab" autocomplete="off" onclick="switchRole('Driver')">
-                    <label class="role-toggle-btn" for="driver-tab">司機登入</label>
+                    <input type="radio" name="roleRadio" id="driverTab" autocomplete="off" )">
+                    <label class="role-toggle-btn" for="driverTab">司機登入</label>
                 </div>
 
                 <!-- 登入表單 -->
@@ -51,10 +51,10 @@
                                     <img src="~/icon/key-fill.svg" alt="鑰匙圖示" class="icon-img">
                                 </span>
 
-                                <input type="password" class="form-control-custom input-with-icons-both" id="password" name="password"
+                                <input type="password" class="form-control-custom input-with-icons-both" id="passWord" name="password"
                                        maxlength="11" pattern="[A-Za-z0-9]{6,11}" required placeholder="請輸入密碼（6~11位英數)">
 
-                                <span class="form-icon-right" id="togglepassword">
+                                <span class="form-icon-right" id="togglePassword">
                                     <img src="~/icon/eye-fill.svg" alt="顯示密碼" class="icon-img">
                                 </span>
 
@@ -73,7 +73,7 @@
                                 <a href="/Join" class="btn-action-outline">註冊</a>
                             </div>
                             <div class="button-col">
-                                <button type="submit" class="btn-action-outline">登入</button>
+                                <button type="submit" class="btn-action-outline" id="loginBtn">登入</button>
                             </div>
                         </div>
 
@@ -84,7 +84,7 @@
         </div>
     </div>
 
-    @* <script src="~/js/Members/Login.js"></script> *@
+    <script src="~/js/Members/Login.js"></script>
     <!-- 眼睛點擊 -->
     <script src="~/js/Members/icon.js"></script>
 </body>
