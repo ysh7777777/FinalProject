@@ -60,7 +60,12 @@ namespace FinalProject.Controllers
 
                         schedule.LicensePlateNavigation.MaxLuggage >= trip.LuggageCount &&
 
-                        _context.Trips.Any(existingTrip =>
+                        // 檢查車輛的起始位置是否與訂單的取車地點相符
+                        schedule.LicensePlateNavigation.BaseLocation == trip.PickupLocation &&
+
+                        schedule.LicensePlateNavigation.VehicleType == trip.VehicleType &&
+
+                       !_context.Trips.Any(existingTrip =>
                         // 舊訂單的完整資料
                            existingTrip.DepartureTime.HasValue &&
                            existingTrip.EstimatedDuration.HasValue &&
@@ -74,6 +79,9 @@ namespace FinalProject.Controllers
                            existingTrip.DepartureTime.Value.AddMinutes(-eta) < taskEnd &&
                            existingTrip.DepartureTime.Value.AddMinutes(existingTrip.EstimatedDuration.Value + eta) > taskStart
                         )
+
+
+
                         ).OrderBy(schedule => schedule.DriverId)
                         .FirstOrDefaultAsync();
 
