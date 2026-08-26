@@ -1,599 +1,343 @@
-﻿
+const bookingMapData = {
+    pickupLocation: null,
+    destinationLocation: null,
+    estimatedDistanceKm: null,
+    estimatedDuration: null
+};
 
+window.bookingMapData = bookingMapData;
 
-//宣告經緯度儲存變數
-let pickupLocation = null;
-let destinationLocation = null;
-let estimatedDistanceOriginal = null;
-let stopLocation = null;
 let pickupAutocomplete = null;
 let destinationAutocomplete = null;
-let stopAutocomplete = null;
-let estimatedDistanceAll = null;
-
-//API使用
-async function initAutocomplete() {
-
-    const { PlaceAutocompleteElement } =
-        await google.maps.importLibrary("places");
-
-
-    // =========================
-    // 出發地
-    // =========================
-    pickupAutocomplete =
-        new PlaceAutocompleteElement({
-            includedRegionCodes: ["tw"]
-        });
-
-    pickupAutocomplete.placeholder =
-        "請輸入出發地、飯店、景點或路名";
-
-    document
-        .getElementById("pickup-autocomplete-container")
-        .appendChild(pickupAutocomplete);
-
-
-    pickupAutocomplete.addEventListener("gmp-select", async (event) => {
-
-        const prediction =
-            event.placePrediction;
-
-        const place =
-            prediction.toPlace();
-
-        await place.fetchFields({
-            fields: [
-                "id",
-                "formattedAddress",
-                "location",
-                "types"
-            ]
-        });
-        // console.log("出發地類型：", place.types);
-        //檢查使用者輸入的地點是否過於廣泛
-        const invalidTypes = [
-            "administrative_area_level_1",
-            "administrative_area_level_2",
-            "locality"
-        ];
-
-        const isTooBroad =
-            place.types?.some(type => invalidTypes.includes(type));
-
-        if (isTooBroad) {
-            alert("請選擇更詳細的地址、飯店、景點、車站或機場");
-            return;
-        }
-
-        if (!place.location) {
-            console.error("找不到出發地座標");
-            return;
-        }
-
-        const address =
-            place.formattedAddress;
-
-        const lat =
-            place.location.lat();
-
-        const lng =
-            place.location.lng();
-
-
-
-        const placeId =
-            place.id;
-        //儲存出發地經緯度
-
-       
-        pickupLocation = {
-            lat: lat,
-            lng: lng,
-            placeId: placeId,
-            address: address
-        };
-     
-
-        // console.log("出發地：", {
-        //     address,
-        //     lat,
-        //     lng,
-        //     placeId
-        // });
-
-        document.getElementById(
-            "pickup-address"
-        ).textContent = address ?? "";
-
-        document.getElementById(
-            "pickup-lat"
-        ).textContent = lat;
-
-        document.getElementById(
-            "pickup-lng"
-        ).textContent = lng;
-
-        document.getElementById(
-            "pickup-place-id"
-        ).textContent = placeId ?? "";
-    });
-    // =========================
-    // 停靠點
-    // =========================
-
-    stopAutocomplete =
-        new PlaceAutocompleteElement({
-            includedRegionCodes: ["tw"]
-        });
-
-    stopAutocomplete.placeholder =
-        "請輸入停靠地點、飯店、景點或路名";
-
-    document
-        .getElementById("stop-autocomplete-container")
-        .appendChild(stopAutocomplete);
-
-
-    stopAutocomplete.addEventListener("gmp-select", async (event) => {
-
-        const prediction =
-            event.placePrediction;
-
-        const place =
-            prediction.toPlace();
-
-        await place.fetchFields({
-            fields: [
-                "id",
-                "formattedAddress",
-                "location",
-                "types"
-            ]
-        });
-
-        // 和出發地、目的地一樣的行政區驗證
-        const invalidTypes = [
-            "administrative_area_level_1",
-            "administrative_area_level_2",
-            "locality"
-        ];
-
-        const isTooBroad =
-            place.types?.some(type =>
-                invalidTypes.includes(type)
-            );
-
-        if (isTooBroad) {
-            alert("請選擇更詳細的地址、飯店、景點、車站或機場");
-            return;
-        }
-
-        if (!place.location) {
-            console.error("找不到停靠點座標");
-            return;
-        }
-
-        const address =
-            place.formattedAddress;
-
-        const lat =
-            place.location.lat();
-
-        const lng =
-            place.location.lng();
-
-        const placeId =
-            place.id;
-
-
-        // 儲存停靠點資料
-        stopLocation = {
-            lat: lat,
-            lng: lng,
-            placeId: placeId,
-            address: address
-        };
-
-
-
-        // console.log("停靠點：", {
-        //     address,
-        //     lat,
-        //     lng,
-        //     placeId
-        // });
-
-
-        document.getElementById(
-            "stop-address"
-        ).textContent = address ?? "";
-
-        document.getElementById(
-            "stop-lat"
-        ).textContent = lat;
-
-        document.getElementById(
-            "stop-lng"
-        ).textContent = lng;
-
-        document.getElementById(
-            "stop-place-id"
-        ).textContent = placeId ?? "";
-
-       estimatedDistanceAll=await calculateRoute(stopLocation);
-    });
-
-    // =========================
-    // 目的地
-    // =========================
-
-    destinationAutocomplete =
-        new PlaceAutocompleteElement({
-            includedRegionCodes: ["tw"]
-        });
-
-    destinationAutocomplete.placeholder =
-        "請輸入目的地、飯店、景點或路名";
-
-    document
-        .getElementById("destination-autocomplete-container")
-        .appendChild(destinationAutocomplete);
-
-
-    destinationAutocomplete.addEventListener("gmp-select", async (event) => {
-
-        const prediction =
-            event.placePrediction;
-
-        const place =
-            prediction.toPlace();
-
-        await place.fetchFields({
-            fields: [
-                "id",
-                "formattedAddress",
-                "location",
-                "types"
-            ]
-        });
-
-        //檢查使用者輸入的地點是否過於廣泛
-        const invalidTypes = [
-            "administrative_area_level_1",
-            "administrative_area_level_2",
-            "locality"
-        ];
-
-        const isTooBroad =
-            place.types?.some(type => invalidTypes.includes(type));
-
-        if (isTooBroad) {
-            alert("請選擇更詳細的地址、飯店、景點、車站或機場");
-            return;
-        }
-
-        if (!place.location) {
-            console.error("找不到目的地座標");
-            return;
-        }
-
-        const address =
-            place.formattedAddress;
-
-        const lat =
-            place.location.lat();
-
-        const lng =
-            place.location.lng();
-
-        const placeId =
-            place.id;
-        //儲存目的地經緯度
-        destinationLocation = {
-            lat: lat,
-            lng: lng,
-            placeId: placeId,
-            address: address
-        };
-
-      
-        estimatedDistanceOriginal =
-            await calculateRoute();
-        if (stopLocation == null) { estimatedDistanceAll = await calculateRoute() }
-       
-
-
-        // console.log("原始距離：", estimatedDistanceOriginal)
-
-
-        //使用者選擇目的地後，使用計算路線方法
-
-        // console.log("目的地：", {
-        //     address,
-        //     lat,
-        //     lng,
-        //     placeId
-        // });
-        
-
-        document.getElementById(
-            "destination-address"
-        ).textContent = address ?? "";
-
-        document.getElementById(
-            "destination-lat"
-        ).textContent = lat;
-
-        document.getElementById(
-            "destination-lng"
-        ).textContent = lng;
-
-        document.getElementById(
-            "destination-place-id"
-        ).textContent = placeId ?? "";
-
-        // =========================
-        // 就放在這裡
-        // =========================
-        setInterval(() => {
-
-            if (
-                pickupAutocomplete &&
-                (pickupAutocomplete.value ?? "").trim() === ""
-            ) {
-                pickupLocation = null;
-
-                document.getElementById("pickup-address").textContent = "";
-                document.getElementById("pickup-lat").textContent = "";
-                document.getElementById("pickup-lng").textContent = "";
-                document.getElementById("pickup-place-id").textContent = "";
-
-                estimatedDistanceOriginal = null;
-                estimatedDistanceAll = null;
-
-                document.getElementById("estimated-distance").textContent = "";
-                document.getElementById("estimated-duration").textContent = "";
-            }
-
-
-            if (
-                destinationAutocomplete &&
-                (destinationAutocomplete.value ?? "").trim() === ""
-            ) {
-                destinationLocation = null;
-
-                document.getElementById("destination-address").textContent = "";
-                document.getElementById("destination-lat").textContent = "";
-                document.getElementById("destination-lng").textContent = "";
-                document.getElementById("destination-place-id").textContent = "";
-
-                estimatedDistanceOriginal = null;
-                estimatedDistanceAll = null;
-
-                document.getElementById("estimated-distance").textContent = "";
-                document.getElementById("estimated-duration").textContent = "";
-            }
-
-
-            if (
-                stopAutocomplete &&
-                (stopAutocomplete.value ?? "").trim() === ""
-            ) {
-                stopLocation = null;
-
-                document.getElementById("stop-address").textContent = "";
-                document.getElementById("stop-lat").textContent = "";
-                document.getElementById("stop-lng").textContent = "";
-                document.getElementById("stop-place-id").textContent = "";
-            }
-
-        }, 200);
-    });
+let selectedPickupValue = "";
+let selectedDestinationValue = "";
+let routeRequestVersion = 0;
+
+const invalidPlaceTypes = [
+    "administrative_area_level_1",
+    "administrative_area_level_2",
+    "locality"
+];
+
+const airportTerminalSearchText = {
+    "桃園國際機場": {
+        "第一航廈 T1": "桃園市大園區航站南路15號 第一航廈",
+        "第二航廈 T2": "桃園市大園區航站南路9號 第二航廈"
+    },
+    "臺北松山機場": {
+        "國內線航廈": "台北市松山區敦化北路340之9號 國內線航廈",
+        "國際線航廈": "台北市松山區敦化北路340之9號 國際線航廈"
+    },
+    "臺中國際機場": {
+        "國際航廈": "台中市沙鹿區中航路一段168號 國際航廈",
+        "國內航廈": "台中市沙鹿區中航路一段168號 國內航廈"
+    },
+    "高雄國際機場": {
+        "國際航廈": "高雄市小港區中山四路2號 國際航廈",
+        "國內航廈": "高雄市小港區中山四路2號 國內航廈"
+    }
+};
+
+function setBookingAddress(inputId, address) {
+    const input = document.getElementById(inputId);
+    input.value = address;
+    input.dispatchEvent(new Event("input"));
 }
-//計算距離方法
-async function calculateRoute(stop = null) {
 
-    // console.log("1. calculateRoute 被呼叫", {
-    //     pickupLocation,
-    //     destinationLocation,
-    //     stop
-    // });
+function resetRouteMetrics() {
+    bookingMapData.estimatedDistanceKm = null;
+    bookingMapData.estimatedDuration = null;
+    routeRequestVersion += 1;
+}
 
-    if (!pickupLocation || !destinationLocation) {
-        // console.log("2. 起點或終點尚未完成");
+function resetPickupSelection() {
+    bookingMapData.pickupLocation = null;
+    selectedPickupValue = "";
+    resetRouteMetrics();
+    setBookingAddress("pickupAddress", "");
+}
+
+function resetDestinationSelection() {
+    bookingMapData.destinationLocation = null;
+    selectedDestinationValue = "";
+    resetRouteMetrics();
+    setBookingAddress("dropoffAddress", "");
+}
+
+function isPlaceTooBroad(place) {
+    return place.types?.some(type =>
+        invalidPlaceTypes.includes(type)
+    );
+}
+
+async function getSelectedPlace(event) {
+    const place = event.placePrediction.toPlace();
+
+    await place.fetchFields({
+        fields: [
+            "formattedAddress",
+            "location",
+            "types"
+        ]
+    });
+
+    if (isPlaceTooBroad(place)) {
+        alert("請選擇更詳細的地址、飯店、景點、車站或機場");
+        return null;
+    }
+
+    if (!place.location || !place.formattedAddress) {
+        console.error("選擇的地點缺少地址或座標");
+        return null;
+    }
+
+    return {
+        address: place.formattedAddress,
+        lat: place.location.lat(),
+        lng: place.location.lng()
+    };
+}
+
+async function findBookingPlaceByText(textQuery) {
+    const { Place } = await google.maps.importLibrary("places");
+    const { places } = await Place.searchByText({
+        textQuery,
+        fields: [
+            "formattedAddress",
+            "location"
+        ],
+        language: "zh-TW",
+        region: "tw",
+        maxResultCount: 1
+    });
+
+    const place = places?.[0];
+    if (!place?.location) {
+        throw new Error(`找不到地點：${textQuery}`);
+    }
+
+    return {
+        address: place.formattedAddress || textQuery,
+        lat: place.location.lat(),
+        lng: place.location.lng()
+    };
+}
+
+async function applyBookingLocation(location, placeData) {
+    if (location === "pickup") {
+        bookingMapData.pickupLocation = placeData;
+        setBookingAddress("pickupAddress", placeData.address);
+    }
+    else if (location === "dropoff") {
+        bookingMapData.destinationLocation = placeData;
+        setBookingAddress("dropoffAddress", placeData.address);
+    }
+    else {
+        throw new Error(`不支援的地點類型：${location}`);
+    }
+
+    await calculateBookingRoute();
+}
+
+async function selectSavedBookingAddress(location, savedAddress) {
+    const latitude = Number(savedAddress.lat);
+    const longitude = Number(savedAddress.lng);
+    const hasCoordinates =
+        savedAddress.lat !== "" &&
+        savedAddress.lng !== "" &&
+        Number.isFinite(latitude) &&
+        Number.isFinite(longitude);
+
+    const resolvedLocation = hasCoordinates
+        ? {
+            address: savedAddress.address,
+            lat: latitude,
+            lng: longitude
+        }
+        : await findBookingPlaceByText(savedAddress.address);
+
+    // 常用地址以資料表 address_text 作為訂單地址；缺座標時才由 Places 補座標。
+    resolvedLocation.address = savedAddress.address;
+    await applyBookingLocation(location, resolvedLocation);
+}
+
+async function selectAirportBookingLocation(location, airport, terminal) {
+    const searchText =
+        airportTerminalSearchText[airport]?.[terminal] ??
+        `${airport} ${terminal} 台灣`;
+    const resolvedLocation = await findBookingPlaceByText(
+        searchText
+    );
+
+    // Trip 沒有獨立航廈欄位，因此把航廈與 API 完整地址一併保存。
+    resolvedLocation.address =
+        `${airport} ${terminal}｜${resolvedLocation.address}`;
+    await applyBookingLocation(location, resolvedLocation);
+}
+
+function clearBookingLocation(location) {
+    if (location === "pickup") {
+        resetPickupSelection();
+        if (pickupAutocomplete) {
+            pickupAutocomplete.value = "";
+        }
+    }
+    else if (location === "dropoff") {
+        resetDestinationSelection();
+        if (destinationAutocomplete) {
+            destinationAutocomplete.value = "";
+        }
+    }
+}
+
+async function calculateBookingRoute() {
+    if (
+        !bookingMapData.pickupLocation ||
+        !bookingMapData.destinationLocation
+    ) {
+        resetRouteMetrics();
         return;
     }
 
-    const { Route } =
-        await google.maps.importLibrary("routes");
+    resetRouteMetrics();
+    const currentRequestVersion = routeRequestVersion;
+    const pickupLocation = bookingMapData.pickupLocation;
+    const destinationLocation = bookingMapData.destinationLocation;
+    updateSummary();
 
     try {
+        const { Route } =
+            await google.maps.importLibrary("routes");
 
-        const request = {
-            origin: pickupLocation,
-            destination: destinationLocation,
+        const result = await Route.computeRoutes({
+            origin: {
+                lat: pickupLocation.lat,
+                lng: pickupLocation.lng
+            },
+            destination: {
+                lat: destinationLocation.lat,
+                lng: destinationLocation.lng
+            },
             travelMode: "DRIVING",
-
             fields: [
                 "distanceMeters",
                 "durationMillis"
             ]
-        };
-
-        if (stop) {
-            request.intermediates = [
-                {
-                    location: {
-                        lat: stop.lat,
-                        lng: stop.lng
-                    }
-                }
-            ];
-        }
-
-        // console.log("3. 準備送出的 request", request);
-
-        const result =
-            await Route.computeRoutes(request);
-
-        // console.log("4. Routes API 回傳", result);
+        });
 
         if (!result.routes || result.routes.length === 0) {
-            console.error("找不到可用路線");
+            throw new Error("找不到可用路線");
+        }
+
+        if (currentRequestVersion !== routeRequestVersion) {
             return;
         }
 
         const route = result.routes[0];
+        if (
+            !Number.isFinite(route.distanceMeters) ||
+            !Number.isFinite(route.durationMillis)
+        ) {
+            throw new Error("路線缺少里程或時間資料");
+        }
 
-        const distanceKm =
-            route.distanceMeters / 1000;
-
-        const durationMinutes =
-            Math.ceil(
-                route.durationMillis / 1000 / 60
-            );
-
-            
-
-        // console.log(
-        //     stop ? "含停靠點路線：" : "原始路線：",
-        //     {
-        //         distanceKm,
-        //         durationMinutes
-        //     }
-        // );
-
-
-
-        document.getElementById(
-            "estimated-distance"
-        ).textContent =
-            distanceKm.toFixed(2);
-
-        document.getElementById(
-            "estimated-duration"
-        ).textContent =
-            durationMinutes;
-
-        return {
-            "distance":distanceKm, "Time":durationMinutes
-        };
+        bookingMapData.estimatedDistanceKm = Number(
+            (route.distanceMeters / 1000).toFixed(2)
+        );
+        bookingMapData.estimatedDuration = Math.ceil(
+            route.durationMillis / 1000 / 60
+        );
+        updateSummary();
     }
     catch (error) {
+        console.error("計算路線失敗：", error);
 
-        console.error(
-            "計算路線失敗：",
-            error
-        );
-    }
-}
-
-
-// 停靠點切換按鈕
-const toggleStopBtn =
-    document.getElementById("toggle-stop-btn");
-
-const stopSection =
-    document.getElementById("stop-section");
-
-const stopDataSection =
-    document.getElementById("stop-data-section");
-
-// 重置停靠點資料
-async function resetStop() {
-
-    stopLocation = null;
-
-    stopSection.style.display = "none";
-    stopDataSection.style.display = "none";
-
-    toggleStopBtn.textContent =
-        "＋ 新增停靠點";
-
-    if (stopAutocomplete) {
-        stopAutocomplete.value = "";
-    }
-
-    document.getElementById("stop-address").textContent = "";
-    document.getElementById("stop-lat").textContent = "";
-    document.getElementById("stop-lng").textContent = "";
-    document.getElementById("stop-place-id").textContent = "";
-}
-toggleStopBtn.addEventListener("click", async function () {
-
-    const isHidden =
-        stopSection.style.display === "none";
-
-    if (isHidden) {
-        if (!pickupLocation || !destinationLocation) {
-            alert("請先完成出發地與目的地");
+        if (currentRequestVersion !== routeRequestVersion) {
             return;
         }
 
-        // 開啟停靠點
-        stopSection.style.display = "block";
-        stopDataSection.style.display = "block";
-        alert("加入停靠點以後將自動鎖定出發地與目的地，若想變更請移除停靠點再進行變更")
-        //解除鎖定出發點與目的地；解除清空按鈕
-        pickupAutocomplete.disabled = true;
-        destinationAutocomplete.disabled = true;
-        pickupAutocomplete.noClearButton = true;
-        destinationAutocomplete.noClearButton = true;
-        
-
-
-        toggleStopBtn.textContent =
-            "－ 移除停靠點";
+        resetRouteMetrics();
+        updateSummary();
     }
-    else {
-
-        // 關閉停靠點
-        stopSection.style.display = "none";
-        stopDataSection.style.display = "none";
-        await resetStop();
-        //解除鎖定出發點與目的地；解除清空按鈕
-        pickupAutocomplete.disabled = false;
-        destinationAutocomplete.disabled = false;
-        pickupAutocomplete.noClearButton = false;
-        destinationAutocomplete.noClearButton = false;
-
-        toggleStopBtn.textContent =
-            "＋ 新增停靠點";
-
-        // 清除停靠點資料
-        stopLocation = null;
-
-        // 回到原始：出發地 → 目的地
-        await calculateRoute();
-        if (stopLocation == null) { estimatedDistanceAll = await calculateRoute() }
-    }
-});
-// 停靠點切換按鈕
-
-
-function logData()
-{
-    //出發地資料
-    console.log("出發地:",pickupLocation);
-    //目的地資料
-    console.log("目的地:",destinationLocation);
-    //停靠點資料
-    console.log("停靠點:",stopLocation)
-    //原始預估距離
-    console.log("原始距離:", estimatedDistanceOriginal)
-    //含停靠點距離及時間
-    console.log("含停靠距離及時間", estimatedDistanceAll)
-    //
-
-    
 }
 
-function TempData() {
-    //出發地資料
-    console.log("出發地:", pickupLocation);
+async function initAutocomplete() {
+    const { PlaceAutocompleteElement } =
+        await google.maps.importLibrary("places");
 
+    pickupAutocomplete = new PlaceAutocompleteElement({
+        includedRegionCodes: ["tw"]
+    });
+    pickupAutocomplete.placeholder =
+        "請輸入出發地、飯店、景點或路名";
+    pickupAutocomplete.style.width = "100%";
+
+    destinationAutocomplete = new PlaceAutocompleteElement({
+        includedRegionCodes: ["tw"]
+    });
+    destinationAutocomplete.placeholder =
+        "請輸入目的地、飯店、景點或路名";
+    destinationAutocomplete.style.width = "100%";
+
+    document
+        .getElementById("pickup-autocomplete-container")
+        .appendChild(pickupAutocomplete);
+    document
+        .getElementById("destination-autocomplete-container")
+        .appendChild(destinationAutocomplete);
+
+    pickupAutocomplete.addEventListener(
+        "gmp-select",
+        async event => {
+            const location = await getSelectedPlace(event);
+
+            if (!location) {
+                resetPickupSelection();
+                return;
+            }
+
+            selectedPickupValue =
+                (pickupAutocomplete.value ?? "").trim();
+            await applyBookingLocation("pickup", location);
+        }
+    );
+
+    destinationAutocomplete.addEventListener(
+        "gmp-select",
+        async event => {
+            const location = await getSelectedPlace(event);
+
+            if (!location) {
+                resetDestinationSelection();
+                return;
+            }
+
+            selectedDestinationValue =
+                (destinationAutocomplete.value ?? "").trim();
+            await applyBookingLocation("dropoff", location);
+        }
+    );
+
+    pickupAutocomplete.addEventListener("input", () => {
+        const currentValue =
+            (pickupAutocomplete.value ?? "").trim();
+
+        if (currentValue !== selectedPickupValue) {
+            resetPickupSelection();
+        }
+    });
+
+    destinationAutocomplete.addEventListener("input", () => {
+        const currentValue =
+            (destinationAutocomplete.value ?? "").trim();
+
+        if (currentValue !== selectedDestinationValue) {
+            resetDestinationSelection();
+        }
+    });
 }
-
 
 window.initAutocomplete = initAutocomplete;
+window.clearBookingLocation = clearBookingLocation;
+window.selectSavedBookingAddress = selectSavedBookingAddress;
+window.selectAirportBookingLocation = selectAirportBookingLocation;

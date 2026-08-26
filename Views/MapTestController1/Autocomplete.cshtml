@@ -1,0 +1,162 @@
+﻿@{
+    ViewData["Title"] = "Google 地址搜尋測試";
+}
+
+<div class="container mt-5">
+
+    <h2>Google 地址搜尋測試</h2>
+
+
+    <!-- 出發地 -->
+    <div class="mb-4">
+        <label class="form-label">出發地</label>
+
+        <div id="pickup-autocomplete-container"></div>
+    </div>
+
+    <!-- 停靠點功能 -->
+    <div class="mb-4">
+
+       
+
+        <!-- 預設隱藏 -->
+        <div id="stop-section"
+             class="mt-3"
+             style="display: none;">
+
+            <label class="form-label">停靠點</label>
+
+            <div id="stop-autocomplete-container"></div>
+
+        </div>
+        <button type="button"
+                id="toggle-stop-btn"
+                class="btn btn-outline-primary">
+            ＋ 新增停靠點
+        </button>
+
+    </div>
+   
+    <!-- 目的地 -->
+    <div class="mb-4">
+        <label class="form-label">目的地</label>
+
+        <div id="destination-autocomplete-container"></div>
+    </div>
+
+    <hr />
+
+
+
+    <h4>出發地資料</h4>
+
+    <div class="mb-4">
+        <p>
+            <strong>完整地址：</strong>
+            <span id="pickup-address"></span>
+        </p>
+
+        <p>
+            <strong>Latitude：</strong>
+            <span id="pickup-lat"></span>
+        </p>
+
+        <p>
+            <strong>Longitude：</strong>
+            <span id="pickup-lng"></span>
+        </p>
+
+        <p>
+            <strong>Place ID：</strong>
+            <span id="pickup-place-id"></span>
+        </p>
+    </div>
+
+    <!-- 停靠點資料 -->
+    <div id="stop-data-section"
+         style="display: none;">
+
+        <hr />
+
+        <h4>停靠點資料</h4>
+
+        <div class="mb-4">
+            <p>
+                <strong>完整地址：</strong>
+                <span id="stop-address"></span>
+            </p>
+
+            <p>
+                <strong>Latitude：</strong>
+                <span id="stop-lat"></span>
+            </p>
+
+            <p>
+                <strong>Longitude：</strong>
+                <span id="stop-lng"></span>
+            </p>
+
+            <p>
+                <strong>Place ID：</strong>
+                <span id="stop-place-id"></span>
+            </p>
+        </div>
+
+    </div>
+  
+
+    <hr />
+
+    <h4>目的地資料</h4>
+
+    <div>
+        <p>
+            <strong>完整地址：</strong>
+            <span id="destination-address"></span>
+        </p>
+
+        <p>
+            <strong>Latitude：</strong>
+            <span id="destination-lat"></span>
+        </p>
+
+        <p>
+            <strong>Longitude：</strong>
+            <span id="destination-lng"></span>
+        </p>
+
+        <p>
+            <strong>Place ID：</strong>
+            <span id="destination-place-id"></span>
+        </p>
+    </div>
+
+    <hr />
+
+    <h4>行程預估</h4>
+
+    <div>
+        <p>
+            <strong>預估里程：</strong>
+            <span id="estimated-distance"></span>
+            km
+        </p>
+    </div>
+
+    <p>
+        <strong>預估時間：</strong>
+        <span id="estimated-duration"></span>
+        分鐘
+    </p>
+
+    <button onclick=logData()>傳送logData</button>
+
+</div>
+
+<script src="~/js/place-autocomplete.js"></script>
+
+<script async
+        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAk5HVk6NmgjgNL9vu5m2HRjvcbghlyMn4&libraries=places&callback=initAutocomplete">
+</script>
+
+

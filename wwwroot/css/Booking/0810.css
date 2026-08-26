@@ -85,6 +85,17 @@
              box-shadow: var(--shadow-hover);
          }
 
+         /* Places 建議清單需超出搭乘地點卡片顯示。 */
+         .booking-card.location-card {
+             position: relative;
+             overflow: visible;
+             z-index: 2;
+         }
+
+         .booking-card.location-card:focus-within {
+             z-index: 20;
+         }
+
          .booking-card-header {
              padding: 18px 22px;
              border-bottom: 1px solid #e9ecef;
