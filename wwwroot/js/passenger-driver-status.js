@@ -463,6 +463,11 @@ function initPassengerMap() {
             }
         );
 
+    window.updateTripFareDisplay(
+        window.passengerTripData,
+        "passenger-trip-fare"
+    );
+
     // =========================
     // F5 後恢復司機最後位置
     // =========================

@@ -806,6 +806,11 @@ function initDriverMap() {
             }
         );
 
+    window.updateTripFareDisplay(
+        window.tripData,
+        "driver-trip-fare"
+    );
+
 }
 
 // Demo：驗證共用排程會在 5 秒後自動啟用 GPS 分享

@@ -2,9 +2,6 @@
 
 @{
     ViewData["Title"] = "司機狀態";
-    var fare =
-            (Model?.LicensePlateNavigation?.BaseFare ?? 0)
-            + (Model?.EstimatedDuration ?? 0) * 20;
     var canTrackDriver = ViewBag.CanTrackDriver == true;
     var isCompleted = Model?.TripStatus == "已完成";
 }
@@ -102,9 +99,7 @@
                 <div class="col-md-6">
 
                     <strong>車資：</strong>
-                    <span>
-                        @fare 元
-                    </span>
+                    <span id="passenger-trip-fare">計算中...</span>
 
                 </div>
 
@@ -201,27 +196,23 @@
     </div>
 
 </div>
-@if (canTrackDriver)
-{
-    <script>
-        window.passengerTripData = {
-            orderNo: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(
-                Model?.OrderNo ?? "")),
-            driverId: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(
-                Model?.AssignedDriverId ?? "")),
-            pickupLat: @((Model?.PickupLat ?? 0).ToString(System.Globalization.CultureInfo.InvariantCulture)),
-            pickupLng: @((Model?.PickupLng ?? 0).ToString(System.Globalization.CultureInfo.InvariantCulture)),
-            destinationLat: @((Model?.DestinationLat ?? 0).ToString(System.Globalization.CultureInfo.InvariantCulture)),
-            destinationLng: @((Model?.DestinationLng ?? 0).ToString(System.Globalization.CultureInfo.InvariantCulture))
-        };
-    </script>
-}
+<script>
+    window.passengerTripData = {
+        orderNo: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(
+            Model?.OrderNo ?? "")),
+        driverId: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(
+            Model?.AssignedDriverId ?? "")),
+        pickupLat: @((Model?.PickupLat ?? 0).ToString(System.Globalization.CultureInfo.InvariantCulture)),
+        pickupLng: @((Model?.PickupLng ?? 0).ToString(System.Globalization.CultureInfo.InvariantCulture)),
+        destinationLat: @((Model?.DestinationLat ?? 0).ToString(System.Globalization.CultureInfo.InvariantCulture)),
+        destinationLng: @((Model?.DestinationLng ?? 0).ToString(System.Globalization.CultureInfo.InvariantCulture)),
+        baseFare: @(Model?.LicensePlateNavigation?.BaseFare ?? 0)
+    };
+</script>
 
 @section Scripts {
+    <script src="~/js/trip-fare.js"></script>
 
-
-
-   
     @if (canTrackDriver)
     {
         <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/8.0.7/signalr.min.js"></script>
@@ -231,7 +222,19 @@
                 src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAk5HVk6NmgjgNL9vu5m2HRjvcbghlyMn4&callback=initPassengerMap">
         </script>
     }
+    else
+    {
+        <script>
+            window.initPassengerFare = function () {
+                window.updateTripFareDisplay(
+                    window.passengerTripData,
+                    "passenger-trip-fare"
+                );
+            };
+        </script>
 
-    
-
+        <script async
+                src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAk5HVk6NmgjgNL9vu5m2HRjvcbghlyMn4&callback=initPassengerFare">
+        </script>
+    }
 }

@@ -51,10 +51,6 @@
 
 
 @{
-    var fare =
-        (Model?.LicensePlateNavigation?.BaseFare ?? 0)
-        + (Model?.EstimatedDuration ?? 0) * 20;
-
     var hasTrip = ViewBag.HasTrip == true && Model != null;
 }
 
@@ -162,7 +158,7 @@ else
 
                     <div class="col-md-6">
                         <strong>車資：</strong>
-                        @fare 元
+                        <span id="driver-trip-fare">計算中...</span>
                     </div>
 
                    
@@ -438,10 +434,14 @@ else
         destinationLng: @((Model?.DestinationLng ?? 0)
                                 .ToString(System.Globalization.CultureInfo.InvariantCulture)),
 
+        baseFare: @(Model?.LicensePlateNavigation?.BaseFare ?? 0),
+
         departureTime: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(
             Model?.DepartureTime?.ToString("yyyy-MM-ddTHH:mm:ss") ?? ""))
     };
 </script>
+
+
 }
 
 @section Scripts {
@@ -449,6 +449,7 @@ else
     {
         <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/8.0.7/signalr.min.js"></script>
 
+        <script src="~/js/trip-fare.js"></script>
         <script src="~/js/driver-navigation.js"></script>
 
         <script async
