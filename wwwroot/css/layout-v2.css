@@ -19,7 +19,7 @@
     height: 150px;
     min-height: 78px;
     padding: 0;
-    overflow: hidden;
+    overflow: visible;
     background-color: #fff;
 }
 
@@ -198,9 +198,16 @@
     }
 }
 
-@media (max-width: 575.98px) {
-    .client-v2-nav, .driver-v2-nav {
-        min-height: 4.5rem;
+@media (max-width: 991.98px) {
+    .client-v2-nav {
+        height: auto;
+        min-height: 78px;
+        overflow: visible;
+    }
+
+    .client-v2 .navbar-collapse {
+        padding: 0 .75rem .75rem;
+        background-color: #fff;
     }
 
     .client-v2 .layout-v2-logo, .driver-v2 .layout-v2-logo {
