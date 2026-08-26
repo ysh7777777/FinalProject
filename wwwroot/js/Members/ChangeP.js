@@ -28,7 +28,7 @@
             })
         });
 
-        // 🛑 處理 Auth 驗證失敗 (401 / 403)
+        // 處理 Auth 驗證失敗
         if (response.status === 401 || response.status === 403) {
             alert('登入已逾期或尚未登入，請先登入會員！');
             location.href = '/Login';
@@ -45,6 +45,6 @@
             alert(result.message || '修改失敗，請確認原密碼是否正確');
         }
     } catch (error) {
-        console.error('❌ 發送請求時發生錯誤:', error);
+        console.error('發送請求時發生錯誤:', error);
     }
 }

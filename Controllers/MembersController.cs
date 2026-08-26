@@ -287,7 +287,7 @@ namespace FinalProject.Controllers
                 return BadRequest(new { success = false, message = "輸入格式不正確，欄位不可留空" });
             }
 
-            // 2. 從 Cookie Claims 中精準撈出當前「已登入」使用者的帳號（Account）與角色（Role）
+            // 從 Cookie Claims 中撈出當前「已登入」使用者的帳號（Account）與角色（Role）
             var userAccount = User.FindFirstValue(ClaimTypes.NameIdentifier);
             var userRole = User.FindFirstValue(ClaimTypes.Role);
 
@@ -317,27 +317,10 @@ namespace FinalProject.Controllers
             }
             else if (userRole == "driver")
             {
-                // 依照 Cookie 的帳號去資料庫精準搜尋該筆司機
-                var driver = await _context.Drivers.FirstOrDefaultAsync(d => d.DriverId == userAccount);
-                if (driver == null)
-                {
-                    return NotFound(new { success = false, message = "找不到該司機人員資料" });
-                }
 
-                // 🔑 比對司機的原密碼（兼顧舊明文相容性）
-                bool isOldPasswordValid = VerifyPassword(dto.OldPassword, driver.Password, allowLegacyPlainText: true, out _);
-                if (!isOldPasswordValid)
-                {
-                    return BadRequest(new { success = false, message = "原密碼輸入錯誤，請重新確認！" });
-                }
-
-                // 更新司機的新密碼
-                driver.Password = BCrypt.Net.BCrypt.HashPassword(dto.NewPassword);
-            }
-            else
-            {
                 return BadRequest(new { success = false, message = "無效的使用者權限角色" });
             }
+
 
             // 將變更儲存到 SQL 資料庫中
             await _context.SaveChangesAsync();
