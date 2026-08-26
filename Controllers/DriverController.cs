@@ -20,15 +20,15 @@ namespace FinalProject.Controllers
         // 1. 地圖主頁 (Index.cshtml)
         public IActionResult Index()
         {
-            List<TripOrderDto> activeTrips = GetActiveTripOrders();
+            List<Trip> activeTrips = GetActiveTripOrders();
             return View(activeTrips); // 將當前行程傳給 View
         }
 
         // 私有方法：取得司機當前進行中或下一筆待出發的訂單
-        private List<TripOrderDto> GetActiveTripOrders()
+        private List<Trip> GetActiveTripOrders()
         {
             string currentDriverId = "DRV001"; // 當前司機編號
-            var activeTrips = new List<TripOrderDto>();
+            var activeTrips = new List<Trip>();
 
             using (SqlConnection conn = new SqlConnection(_connectionString))
             {
@@ -39,10 +39,8 @@ namespace FinalProject.Controllers
                 t.departure_time,
                 t.pickup_location,
                 t.destination,
-                ISNULL(t.flight_number, '無') AS flight_number,
                 t.passenger_count,
                 t.luggage_count,
-                ISNULL(t.fare, 0) AS fare,
                 ISNULL(t.estimated_duration, 0) AS estimated_duration,
                 t.trip_status
             FROM trip t
@@ -60,17 +58,18 @@ namespace FinalProject.Controllers
                     {
                         if (reader.Read())
                         {
-                            var trip = new TripOrderDto
+                            var trip = new Trip
                             {
+
                                 OrderNo = reader["order_no"]?.ToString() ?? string.Empty,
-                                CustomerName = reader["customer_name"]?.ToString() ?? string.Empty,
+                                Account = reader["account"]?.ToString() ?? string.Empty,
                                 DepartureTime = reader["departure_time"] != DBNull.Value ? Convert.ToDateTime(reader["departure_time"]) : DateTime.MinValue,
                                 PickupLocation = reader["pickup_location"]?.ToString() ?? string.Empty,
                                 Destination = reader["destination"]?.ToString() ?? string.Empty,
-                                FlightNumber = reader["flight_number"]?.ToString() ?? "無",
+                                //FlightNumber = reader["flight_number"]?.ToString() ?? "無",
                                 PassengerCount = reader["passenger_count"] != DBNull.Value ? Convert.ToByte(reader["passenger_count"]) : (byte)0,
                                 LuggageCount = reader["luggage_count"] != DBNull.Value ? Convert.ToByte(reader["luggage_count"]) : (byte)0,
-                                Fare = reader["fare"] != DBNull.Value ? Convert.ToInt32(reader["fare"]) : 0,
+                                //Fare = reader["fare"] != DBNull.Value ? Convert.ToInt32(reader["fare"]) : 0,
                                 EstimatedDuration = reader["estimated_duration"] != DBNull.Value ? Convert.ToInt32(reader["estimated_duration"]) : 0,
                                 TripStatus = reader["trip_status"]?.ToString() ?? string.Empty
                             };
@@ -116,10 +115,8 @@ namespace FinalProject.Controllers
                         t.departure_time,
                         t.pickup_location,
                         t.destination,
-                        ISNULL(t.flight_number, '無') AS flight_number,
                         t.passenger_count,
                         t.luggage_count,
-                        ISNULL(t.fare, 0) AS fare,
                         ISNULL(t.estimated_duration, 0) AS estimated_duration,
                         t.trip_status
                     FROM trip t
@@ -136,17 +133,17 @@ namespace FinalProject.Controllers
                     {
                         while (reader.Read())
                         {
-                            var item = new TripOrderDto
+                            var item = new Trip
                             {
                                 OrderNo = reader["order_no"]?.ToString() ?? string.Empty,
-                                CustomerName = reader["customer_name"]?.ToString() ?? string.Empty,
+                                Account = reader["account"]?.ToString() ?? string.Empty,
                                 DepartureTime = reader["departure_time"] != DBNull.Value ? Convert.ToDateTime(reader["departure_time"]) : DateTime.MinValue,
                                 PickupLocation = reader["pickup_location"]?.ToString() ?? string.Empty,
                                 Destination = reader["destination"]?.ToString() ?? string.Empty,
-                                FlightNumber = reader["flight_number"]?.ToString() ?? "無",
+                                //FlightNumber = reader["flight_number"]?.ToString() ?? "無",
                                 PassengerCount = reader["passenger_count"] != DBNull.Value ? Convert.ToByte(reader["passenger_count"]) : (byte)0,
                                 LuggageCount = reader["luggage_count"] != DBNull.Value ? Convert.ToByte(reader["luggage_count"]) : (byte)0,
-                                Fare = reader["fare"] != DBNull.Value ? Convert.ToInt32(reader["fare"]) : 0,
+                                //Fare = reader["fare"] != DBNull.Value ? Convert.ToInt32(reader["fare"]) : 0,
                                 EstimatedDuration = reader["estimated_duration"] != DBNull.Value ? Convert.ToInt32(reader["estimated_duration"]) : 0,
                                 TripStatus = reader["trip_status"]?.ToString() ?? string.Empty
                             };

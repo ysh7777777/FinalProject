@@ -3,6 +3,17 @@ using System.Collections.Generic;
 
 namespace FinalProject.Models;
 
+public class OrdersViewModel
+{
+    public List<Trip>
+    FutureOrders
+    { get; set; } = new List<Trip>
+    ();
+    public List<Trip>
+    HistoryOrders
+    { get; set; } = new List<Trip>
+    ();
+}
 public partial class Trip
 {
     public string OrderNo { get; set; } = null!;
