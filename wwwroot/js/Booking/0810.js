@@ -86,36 +86,126 @@ initializeCitySelect("dropoffCity");
 /* =========================================================
    功能：縣市 → 行政區
 ========================================================== */
+// function bindDistrictSelect(citySelectId, districtSelectId) {
+//     const citySelect = document.getElementById(citySelectId);
+//     const districtSelect = document.getElementById(districtSelectId);
+//     citySelect.addEventListener("change", function () {
+//         const city = this.value;
+//         districtSelect.innerHTML = "";
+//         if (!city) {
+//             districtSelect.disabled = true;
+//             const option = document.createElement("option");
+//             option.value = "";
+//             option.textContent = "請先選擇縣市";
+//             districtSelect.appendChild(option);
+//             updateSummary();
+//             return;
+//         }
+//         districtSelect.disabled = false;
+//         const firstOption = document.createElement("option");
+//         firstOption.value = "";
+//         firstOption.textContent = "請選擇行政區";
+//         districtSelect.appendChild(firstOption);
+//         taiwanDistricts[city].forEach(district => {
+//             const option = document.createElement("option");
+//             option.value = district;
+//             option.textContent = district;
+//             districtSelect.appendChild(option);
+//         });
+//         updateSummary();
+//     });
+//     districtSelect.addEventListener("change", updateSummary);
+// }
+
+/* =========================================================
+   功能：縣市 → 行政區
+========================================================== */
 function bindDistrictSelect(citySelectId, districtSelectId) {
     const citySelect = document.getElementById(citySelectId);
     const districtSelect = document.getElementById(districtSelectId);
+
+    const location = citySelectId.replace("City", "");
+
     citySelect.addEventListener("change", function () {
         const city = this.value;
+
+        // 使用城市/行政區模式時，清除常用地址
+        const favoriteSelect = document.getElementById(`${location}Favorite`);
+        if (favoriteSelect) {
+            favoriteSelect.value = "";
+        }
+
         districtSelect.innerHTML = "";
+
         if (!city) {
             districtSelect.disabled = true;
+
             const option = document.createElement("option");
             option.value = "";
             option.textContent = "請先選擇縣市";
             districtSelect.appendChild(option);
+
+            // 城市取消後，地址也清空
+            document.getElementById(`${location}Address`).value = "";
+
             updateSummary();
             return;
         }
+
         districtSelect.disabled = false;
+
         const firstOption = document.createElement("option");
         firstOption.value = "";
         firstOption.textContent = "請選擇行政區";
         districtSelect.appendChild(firstOption);
+
         taiwanDistricts[city].forEach(district => {
             const option = document.createElement("option");
             option.value = district;
             option.textContent = district;
             districtSelect.appendChild(option);
         });
+
+        // 城市改變時，先把 Address 改成城市
+        document.getElementById(`${location}Address`).value = city;
+
         updateSummary();
     });
-    districtSelect.addEventListener("change", updateSummary);
+
+    districtSelect.addEventListener("change", function () {
+        const city = citySelect.value;
+        const district = this.value;
+        const addressInput = document.getElementById(`${location}Address`);
+
+        // 選擇行政區後，自動填入「縣市＋行政區」
+        if (city && district) {
+            addressInput.value = `${city}${district}`;
+        } else if (city) {
+            addressInput.value = city;
+        } else {
+            addressInput.value = "";
+        }
+
+        // 城市/行政區模式 → 清除常用地址
+        const favoriteSelect = document.getElementById(`${location}Favorite`);
+        if (favoriteSelect) {
+            favoriteSelect.value = "";
+        }
+
+        updateSummary();
+    });
 }
+
+
+
+
+
+
+
+
+
+
+
 bindDistrictSelect("pickupCity", "pickupDistrict");
 bindDistrictSelect("dropoffCity", "dropoffDistrict");
 /* =========================================================
@@ -200,29 +290,130 @@ function setupLocationSwitch(locationName) {
 }
 setupLocationSwitch("pickup");
 setupLocationSwitch("dropoff");
+
+
+/* =========================================================
+   功能：切換為地址輸入模式
+   - 清除城市
+   - 清除行政區
+   - 清除常用地址選擇
+========================================================== */
+function switchToAddressMode(location) {
+    const citySelect = document.getElementById(`${location}City`);
+    const districtSelect = document.getElementById(`${location}District`);
+    const favoriteSelect = document.getElementById(`${location}Favorite`);
+
+    if (citySelect) {
+        citySelect.value = "";
+    }
+
+    if (districtSelect) {
+        districtSelect.innerHTML = "";
+
+        const option = document.createElement("option");
+        option.value = "";
+        option.textContent = "請先選擇縣市";
+        districtSelect.appendChild(option);
+
+        districtSelect.disabled = true;
+    }
+
+    if (favoriteSelect) {
+        favoriteSelect.value = "";
+    }
+}
+
+
+
+/* =========================================================
+   功能：清除城市／行政區選擇
+========================================================== */
+function clearCityDistrict(location) {
+    const citySelect = document.getElementById(`${location}City`);
+    const districtSelect = document.getElementById(`${location}District`);
+
+    // 清除縣市
+    citySelect.value = "";
+
+    // 重設行政區
+    districtSelect.innerHTML = "";
+
+    const option = document.createElement("option");
+    option.value = "";
+    option.textContent = "請先選擇縣市";
+    districtSelect.appendChild(option);
+
+    districtSelect.value = "";
+    districtSelect.disabled = true;
+}
+
+
+
+
+
+
+
+
+
+
+
+
 /* =========================================================
    常用地址 → 地址欄
+========================================================== */
+// document
+//     .getElementById("pickupFavorite")
+//     .addEventListener("change", function () {
+//         if (this.value) {
+//             document
+//                 .getElementById("pickupAddress")
+//                 .value = this.value;
+//         }
+//         updateSummary();
+//     });
+// document
+//     .getElementById("dropoffFavorite")
+//     .addEventListener("change", function () {
+//         if (this.value) {
+//             document
+//                 .getElementById("dropoffAddress")
+//                 .value = this.value;
+//         }
+//         updateSummary();
+//     });
+
+/* =========================================================
+常用地址 → 地址欄
+選擇常用地址時，清除城市／行政區
 ========================================================== */
 document
     .getElementById("pickupFavorite")
     .addEventListener("change", function () {
         if (this.value) {
+            clearCityDistrict("pickup");
+
             document
                 .getElementById("pickupAddress")
                 .value = this.value;
         }
+
         updateSummary();
     });
+
 document
     .getElementById("dropoffFavorite")
     .addEventListener("change", function () {
         if (this.value) {
+            clearCityDistrict("dropoff");
+
             document
                 .getElementById("dropoffAddress")
                 .value = this.value;
         }
+
         updateSummary();
     });
+
 /* =========================================================
    地址輸入
 ========================================================== */
@@ -246,40 +437,79 @@ function getLocationType(location) {
 /* =========================================================
    功能：取得地點文字
 ========================================================== */
+// function getLocationText(location) {
+//     const type = getLocationType(location);
+//     if (type === "city") {
+//         const city = document.getElementById(
+//             `${location}City`
+//         ).value;
+//         const district = document.getElementById(
+//             `${location}District`
+//         ).value;
+//         const address = document.getElementById(
+//             `${location}Address`
+//         ).value.trim();
+//         const parts = [
+//             city,
+//             district,
+//             address
+//         ].filter(Boolean);
+//         return parts.length
+//             ? parts.join("")
+//             : "尚未選擇";
+//     }
+//     const airport = document.getElementById(
+//         `${location}Airport`
+//     ).value;
+//     const terminal = document.getElementById(
+//         `${location}Terminal`
+//     ).value;
+//     if (!airport) {
+//         return "尚未選擇";
+//     }
+//     return terminal
+//         ? `${airport}｜${terminal}`
+//         : airport;
+// }
+
+/* =========================================================
+   功能：取得地點文字
+========================================================== */
+/* =========================================================
+   功能：取得地點文字
+========================================================== */
 function getLocationText(location) {
     const type = getLocationType(location);
+
     if (type === "city") {
-        const city = document.getElementById(
-            `${location}City`
-        ).value;
-        const district = document.getElementById(
-            `${location}District`
-        ).value;
         const address = document.getElementById(
             `${location}Address`
         ).value.trim();
-        const parts = [
-            city,
-            district,
-            address
-        ].filter(Boolean);
-        return parts.length
-            ? parts.join("")
-            : "尚未選擇";
+
+        return address || "尚未選擇";
     }
+
     const airport = document.getElementById(
         `${location}Airport`
     ).value;
+
     const terminal = document.getElementById(
         `${location}Terminal`
     ).value;
+
     if (!airport) {
         return "尚未選擇";
     }
+
     return terminal
         ? `${airport}｜${terminal}`
         : airport;
 }
+
+
+
+
+
 /* =========================================================
    上下車互換
 ========================================================== */
