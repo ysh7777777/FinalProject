@@ -1,0 +1,220 @@
+﻿@model FinalProject.Models.OrdersViewModel
+@{
+    ViewData["Title"] = "行程訂單管理";
+    Layout = null;
+    string activeTab = ViewBag.ActiveTab as string ?? "future";
+}
+
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>@ViewData["Title"]</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            padding-bottom: 20px;
+        }
+
+        /* 頂部導覽列 */
+        .top-header {
+            background-color: #ffffff;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        /* 切換 Tab 頁籤樣式 */
+        .nav-pills .nav-link {
+            color: #6c757d;
+            font-weight: 600;
+            border-radius: 8px;
+            padding: 10px 0;
+            transition: all 0.2s ease;
+        }
+
+        .nav-pills .nav-link.active {
+            background-color: #0d6efd;
+            color: #ffffff;
+            box-shadow: 0 4px 10px rgba(13, 110, 253, 0.25);
+        }
+
+        /* 橫條訂單卡片樣式 */
+        .order-strip-card {
+            background-color: #ffffff;
+            border-radius: 12px;
+            border: 1px solid rgba(0,0,0,0.08);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+            transition: transform 0.15s ease, box-shadow 0.15s ease;
+        }
+
+        .order-strip-card:active {
+            transform: scale(0.99);
+        }
+
+        /* 欄位標籤圖示樣式 */
+        .info-label {
+            color: #6c757d;
+            font-size: 0.85rem;
+        }
+
+        .info-value {
+            color: #212529;
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 1. 頂部導覽列 (帶有返回按鈕與切換頁籤) -->
+    <div class="top-header p-3 mb-3">
+        <div class="container max-width-md">
+            <div class="d-flex align-items-center mb-3">
+                <!-- 返回地圖按鈕 -->
+                <a href="/Driver" class="btn btn-outline-secondary btn-sm me-3">
+                    <i class="bi bi-chevron-left"></i> 回地圖
+                </a>
+                <h5 class="mb-0 fw-bold">行程訂單管理</h5>
+            </div>
+
+            <!-- 切換頁籤 (未來訂單 / 歷史訂單) -->
+            <ul class="nav nav-pills nav-justified bg-light p-1 rounded-3" id="orderTabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="future-tab" data-bs-toggle="tab" data-bs-target="#future-orders" type="button" role="tab">
+                        <i class="bi bi-calendar-check me-1"></i> 未來訂單
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="history-tab" data-bs-toggle="tab" data-bs-target="#history-orders" type="button" role="tab">
+                        <i class="bi bi-clock-history me-1"></i> 歷史訂單
+                    </button>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- 2. 訂單內容清單區塊 -->
+    <div class="container max-width-md">
+        <div class="tab-content" id="orderTabsContent">
+
+            <!-- ==================== 未來訂單清單 ==================== -->
+            <div class="tab-pane fade @(activeTab == "future" ? "show active" : "")" id="future-orders" role="tabpanel">
+                @if (Model == null || !Model.FutureOrders.Any())
+                {
+                    <div class="text-center text-muted my-5">目前無未來預約訂單</div>
+                }
+                else
+                {
+                    @foreach (var item in Model.FutureOrders)
+                    {
+                        <div class="order-strip-card p-3 mb-3">
+                            <div class="d-flex justify-content-between align-items-center border-bottom pb-2 mb-2">
+                                <span class="badge bg-primary fs-6">@item.OrderNo</span>
+                                <span class="text-danger fw-bold">
+                                    <i class="bi bi-clock-fill me-1"></i>@item.DepartureTime.ToString("yyyy/MM/dd HH:mm")
+                                </span>
+                            </div>
+
+                            <div class="row g-2">
+                                <div class="col-6">
+                                    <span class="info-label"><i class="bi bi-person"></i> 客戶姓名：</span>
+                                    <span class="info-value">@item.CustomerName</span>
+                                </div>
+                                <div class="col-6">
+                                    <span class="info-label"><i class="bi bi-currency-dollar"></i> 費用：</span>
+                                    <span class="info-value text-success fw-bold">@item.Fare.ToString("N0") 元</span>
+                                </div>
+                                <div class="col-12">
+                                    <span class="info-label"><i class="bi bi-geo-alt"></i> 出發地：</span>
+                                    <span class="info-value">@item.PickupLocation</span>
+                                </div>
+                                <div class="col-12">
+                                    <span class="info-label"><i class="bi bi-pin-map-fill text-danger"></i> 目的地：</span>
+                                    <span class="info-value">@item.Destination</span>
+                                </div>
+                                <div class="col-4">
+                                    <span class="info-label"><i class="bi bi-airplane"></i> 航班：</span>
+                                    <span class="info-value">@item.FlightNumber</span>
+                                </div>
+                                <div class="col-4">
+                                    <span class="info-label"><i class="bi bi-people"></i> 人數：</span>
+                                    <span class="info-value">@item.PassengerCount 人</span>
+                                </div>
+                                <div class="col-4">
+                                    <span class="info-label"><i class="bi bi-luggage"></i> 行李：</span>
+                                    <span class="info-value">@item.LuggageCount 件</span>
+                                </div>
+                                <div class="col-12 border-top pt-2 mt-2 d-flex justify-content-between align-items-center">
+                                    <span class="info-label">
+                                        <i class="bi bi-hourglass-split"></i> 預計行程時間：<strong class="text-dark">@item.EstimatedDuration 分鐘</strong>
+                                    </span>
+                                    <a href="/Driver" class="btn btn-outline-primary btn-sm px-3">進入導航</a>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                }
+            </div>
+
+
+            <!-- ==================== 歷史訂單清單 ==================== -->
+         <div class="tab-pane fade @(activeTab == "history" ? "show active" : "")" id="history-orders" role="tabpanel">
+         @if (Model == null || !Model.HistoryOrders.Any())
+         {
+        <div class="text-center text-muted my-5">目前無歷史訂單紀錄</div>
+        }
+         else
+        {
+        @foreach (var item in Model.HistoryOrders)
+        {
+            <div class="order-strip-card p-3 mb-3 opacity-75">
+                <div class="d-flex justify-content-between align-items-center border-bottom pb-2 mb-2">
+                    <span class="badge bg-secondary fs-6">@item.OrderNo</span>
+                    <span class="text-muted"><i class="bi bi-check-circle-fill text-success me-1"></i>@item.TripStatus (@item.DepartureTime.ToString("yyyy/MM/dd HH:mm"))</span>
+                </div>
+
+                <div class="row g-2">
+                    <div class="col-6"><span class="info-label"><i class="bi bi-person"></i> 客戶姓名：</span><span class="info-value">@item.CustomerName</span></div>
+                    <div class="col-6"><span class="info-label"><i class="bi bi-currency-dollar"></i> 費用：</span><span class="info-value text-dark fw-bold">@item.Fare.ToString("N0") 元</span></div>
+                    <div class="col-12"><span class="info-label"><i class="bi bi-geo-alt"></i> 出發地：</span><span class="info-value">@item.PickupLocation</span></div>
+                    <div class="col-12"><span class="info-label"><i class="bi bi-pin-map-fill"></i> 目的地：</span><span class="info-value">@item.Destination</span></div>
+                    <div class="col-4"><span class="info-label"><i class="bi bi-airplane"></i> 航班：</span><span class="info-value">@item.FlightNumber</span></div>
+                    <div class="col-4"><span class="info-label"><i class="bi bi-people"></i> 人數：</span><span class="info-value">@item.PassengerCount 人</span></div>
+                    <div class="col-4"><span class="info-label"><i class="bi bi-luggage"></i> 行李：</span><span class="info-value">@item.LuggageCount 件</span></div>
+                </div>
+            </div>
+         }
+    }
+</div>
+
+            </div>
+
+        </div>
+   
+
+    <!-- Bootstrap 5 JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        // 判斷網址傳參來決定預設開啟「未來」或「歷史」頁籤
+        document.addEventListener("DOMContentLoaded", function () {
+            const urlParams = new URLSearchParams(window.location.search);
+            const tabParam = urlParams.get('tab');
+
+            if (tabParam === 'history') {
+                const historyTab = new bootstrap.Tab(document.getElementById('history-tab'));
+                historyTab.show();
+            }
+        });
+    </script>
+</body>
+</html>

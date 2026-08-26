@@ -1,0 +1,94 @@
+@{
+    ViewData["Title"] = "登入";
+    Layout = "Client_Layout";
+}
+
+<link href="~/css/Members/Login.css" rel="stylesheet">
+
+<div class="login-body">
+    <div class="login-container">
+        <div class="login-row">
+            <div class="login-card">
+                <div class="role-toggle-group" role="group" aria-label="登入角色切換">
+                    <input type="radio" name="roleRadio" id="passengerTab" value="passenger" autocomplete="off" checked>
+                    <label class="role-toggle-btn" for="passengerTab">乘客登入</label>
+
+                    <input type="radio" name="roleRadio" id="driverTab" value="driver" autocomplete="off">
+                    <label class="role-toggle-btn" for="driverTab">司機登入</label>
+                </div>
+
+                <form id="loginForm" action="/Login" method="post" class="needs-validation" novalidate>
+                    @Html.AntiForgeryToken()
+
+                    <div class="form-content-wrapper">
+                        <div class="fg-item">
+                            <label for="account" class="formLabel-title">
+                                帳號<span class="required-star">*</span>
+                            </label>
+                            <div class="input-relative-container">
+                                <span class="form-icon-left">
+                                    <img src="~/icon/person-fill.svg" alt="帳號圖示" class="icon-img">
+                                </span>
+                                <input type="text"
+                                       class="form-control-custom input-with-icon-left"
+                                       id="account"
+                                       name="account"
+                                       maxlength="6"
+                                       pattern="[A-Za-z0-9]{6}"
+                                       placeholder="輸入6位英數"
+                                       autocomplete="username"
+                                       required>
+                                <div class="invalid-feedback-custom" id="accountValidationMessage">請輸入帳號（6 位英數）</div>
+                            </div>
+                        </div>
+
+                        <div class="fg-item-small">
+                            <label for="passWord" class="formLabel-title">
+                                密碼（區分大小寫）<span class="text-danger">*</span>
+                            </label>
+                            <div class="input-relative-container">
+                                <span class="form-icon-left">
+                                    <img src="~/icon/key-fill.svg" alt="鑰匙圖示" class="icon-img">
+                                </span>
+
+                                <input type="password"
+                                       class="form-control-custom input-with-icons-both"
+                                       id="passWord"
+                                       name="password"
+                                       maxlength="11"
+                                       pattern="[A-Za-z0-9]{6,11}"
+                                       autocomplete="current-password"
+                                       required
+                                       placeholder="請輸入密碼（6～11 位英數）">
+
+                                <span class="form-icon-right" id="togglePassword">
+                                    <img src="~/icon/eye-fill.svg" alt="顯示密碼" class="icon-img">
+                                </span>
+
+                                <div class="invalid-feedback-custom">請輸入密碼（6～11 位英數）</div>
+                            </div>
+                        </div>
+
+                        <div class="forgot-password-wrapper">
+                            <a href="/Change" class="forgot-password-link">修改密碼</a>
+                        </div>
+
+                        <div class="button-row">
+                            <div class="button-col">
+                                <a href="/Join" class="btn-action-outline">註冊</a>
+                            </div>
+                            <div class="button-col">
+                                <button type="submit" class="btn-action-outline" id="loginBtn">登入</button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/Members/Login.js"></script>
+    <script src="~/js/Members/icon.js"></script>
+}

@@ -1,0 +1,249 @@
+﻿@charset "UTF-8";
+
+/* 全域基礎設定 */
+body {
+    background-color: #f8f9fa;
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+/* 容器與置中排版 */
+.rg-container {
+    width: 100%;
+    padding-right: 15px;
+    padding-left: 15px;
+    margin-right: auto;
+    margin-left: auto;
+    margin-top: 3rem;
+}
+
+.rg-row {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+/* 表單卡片樣式 */
+.rg-container .rg-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    word-wrap: break-word;
+    background-color: #fff;
+    background-clip: border-box;
+    border: 1px solid rgba(0, 0, 0, .125);
+    border-radius: .375rem;
+    padding: 2.5rem;
+    width: 100%;
+    max-width: 600px;
+    box-sizing: border-box;
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+}
+
+/* 標題 */
+.rg-container .rg-title {
+    margin-top: 0;
+    margin-bottom: 2rem;
+    text-align: center;
+    font-size: 24px;
+    font-weight: 500;
+    line-height: 1.2;
+    color: #333;
+}
+
+/* 表單群組與間距 */
+.rg-fg {
+    margin-bottom: 1.25rem;
+    width: 100%;
+}
+
+.rg-fg-confirm {
+    margin-bottom: .5rem;
+}
+
+/* 標籤樣式 */
+.rg-label {
+    display: block;
+    font-size: 16px;
+    margin-top: 12px;
+    margin-bottom: 12px;
+}
+
+.rg-text-danger {
+    color: #dc3545;
+}
+
+/* 通用輸入框 */
+.rg-container .rg-card input.rg-input,
+.rg-container .rg-card select.rg-select,
+.rg-container .rg-card input[type="text"],
+.rg-container .rg-card input[type="password"],
+.rg-container .rg-card input[type="email"],
+.rg-container .rg-card input[type="date"] {
+    display: block;
+    width: 100%;
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 1.5;
+    color: #212529;
+    background-color: #fff;
+    border: 1px solid #ced4da;
+    border-radius: .4rem;
+    padding: .5rem .75rem;
+    box-sizing: border-box;
+    transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
+    outline: none;
+}
+
+    /* Focus 效果 */
+.rg-container .rg-card input.rg-input:focus,
+.rg-container .rg-card select.rg-select:focus {
+    border-color: #86b7fe;
+    outline: 0;
+    box-shadow: 0 0 0 .25rem rgba(13, 110, 253, 0.25);
+}
+
+/* 密碼包裝容器 */
+.rg-password-wrapper {
+    position: relative;
+    width: 100%;
+    display: block;
+}
+
+.rg-password-wrapper .rg-input {
+    padding-right: 2.5rem;
+}
+
+.rg-icon-right {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    z-index: 10;
+    background: transparent;
+    border: none;
+    padding: 0;
+    margin: 0;
+    opacity: 0.5;
+}
+
+.rg-icon-img {
+    width: 20px;
+    height: 20px;
+}
+
+/* 手機與國碼組合 */
+.rg-phone-group {
+    display: flex;
+    width: 100%;
+}
+
+.rg-container .rg-card .rg-phone-group select.rg-select {
+    width: 160px;
+    flex-shrink: 0;
+}
+
+.rg-container .rg-card .rg-phone-group input.rg-input {
+    flex: 1;
+    width: auto;
+}
+
+/* 性別單選鈕 */
+.rg-gender-options {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    padding-top: 0.25rem;
+}
+
+.rg-radio-inline {
+    display: inline-flex;
+    align-items: center;
+}
+
+.rg-container .rg-card input.rg-radio-input {
+    display: inline-block;
+    width: 1.2em;
+    height: 1.2em;
+    margin: 0 .5rem 0 0;
+    cursor: pointer;
+    box-shadow: none;
+}
+
+.rg-radio-label {
+    font-size: 16px;
+    cursor: pointer;
+    margin: 0;
+}
+
+/* 取消連結 */
+.rg-cancel-wrapper {
+    text-align: left;
+    margin-bottom: 1.5rem;
+    margin-top: 0.5rem;
+}
+
+.rg-cancel-link {
+    color: #0d6efd;
+    font-size: 16px;
+    text-decoration: none;
+}
+
+.rg-cancel-link:hover {
+    text-decoration: underline;
+}
+
+/* 註冊按鈕 */
+.rg-container .rg-card .rg-btn {
+    display: block;
+    font-weight: 400;
+    line-height: 1.5;
+    color: #fff;
+    text-align: center;
+    text-decoration: none;
+    cursor: pointer;
+    background-color: #0d6efd;
+    border: 1px solid #0d6efd;
+    padding: .7rem .75rem;
+    font-size: 18px;
+    border-radius: .375rem;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.rg-container .rg-card .rg-btn:hover {
+    background-color: #0b5ed7;
+}
+
+/* 錯誤訊息隱藏與驗證觸發 */
+.rg-error-feedback {
+    display: none;
+    width: 100%;
+    margin-top: .25rem;
+    font-size: 14px;
+    color: #dc3545;
+}
+
+/* 驗證失敗時：顯示紅字 */
+.was-validated input:invalid ~ .rg-error-feedback,
+.was-validated select:invalid ~ .rg-error-feedback,
+.was-validated .rg-password-wrapper:has(input:invalid) ~ .rg-error-feedback,
+.was-validated .rg-gender-options:has(input:invalid) ~ .rg-error-feedback {
+    display: block;
+}
+
+/* 驗證失敗時：框線紅框 */
+.rg-container .was-validated input:invalid,
+.rg-container .was-validated select:invalid {
+    border: 2px solid #dc3545;
+}
+
+/* 點擊無效輸入框時：光暈加強 */
+.rg-container .was-validated input:invalid:focus,
+.rg-container .was-validated select:invalid:focus {
+    border-color: #dc3545;
+    box-shadow: 0 0 0 0.25rem rgba(220, 53, 69, 0.25);
+}

@@ -1,0 +1,270 @@
+﻿/* 登入 */
+
+/* 頁面基礎樣式 */
+.login-body {
+    background-color: #f8f9fa;
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+.login-container {
+    width: 100%;
+    padding-right: 15px;
+    padding-left: 15px;
+    margin-right: auto;
+    margin-left: auto;
+    margin-top: 3rem;
+    margin-bottom: 3rem;
+}
+
+/*卡片: 外層容器*/
+@media (min-width: 768px) {
+    .login-container {
+        max-width: 720px;
+    }
+}
+
+/* 卡片與排版 */
+.login-row {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.login-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    word-wrap: break-word;
+    background-color: #fff;
+    background-clip: padding-box;
+    border: 1px solid rgba(0, 0, 0, 0.12);
+    border-radius: 0.5rem;
+    padding: 0;
+    box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+    flex: 0 0 auto;
+    width: 100%;
+}
+
+/*卡片*/
+@media (min-width: 768px) {
+    .login-card {
+        width: 500px;
+    }
+}
+
+/* 頂部切換按鈕組 */
+.role-toggle-group {
+    position: relative;
+    display: inline-flex;
+    vertical-align: middle;
+    width: 100%;
+    background-color: #fff;
+    margin-bottom: 1.5rem;
+}
+
+.role-toggle-group input[type="radio"] {
+    position: absolute;
+    pointer-events: none;
+    display: none;
+}
+
+.role-toggle-btn {
+    display: inline-block;
+    font-weight: 700;
+    line-height: 1.5;
+    color: #0d6efd;
+    text-align: center;
+    text-decoration: none;
+    vertical-align: middle;
+    cursor: pointer;
+    user-select: none;
+    background-color: transparent;
+    border: 1px solid #0d6efd;
+    padding: 0.5rem 0.75rem;
+    font-size: 1rem;
+    border-radius: 0;
+    width: 50%;
+    box-sizing: border-box;
+    transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out;
+}
+
+.role-toggle-btn:first-of-type {
+    border-left: none;
+    border-top: none;
+    border-bottom: 1px solid #0d6efd;
+}
+
+.role-toggle-btn:last-of-type {
+    border-right: none;
+    border-top: none;
+    border-bottom: 1px solid #0d6efd;
+}
+
+/* Radio 選取後的樣式模擬 */
+.role-toggle-group input[type="radio"]:checked + .role-toggle-btn {
+    color: #fff;
+    background-color: #0d6efd;
+    border-bottom-color: #0d6efd;
+}
+
+/* 表單內縮與間距容器 */
+.form-content-wrapper {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+}
+
+.fg-item {
+    margin-bottom: 1.5rem;
+}
+
+.fg-item-small {
+    margin-bottom: 1rem;
+}
+
+.formLabel-title {
+    display: inline-block;
+    margin-bottom: 0.5rem;
+}
+
+.required-star {
+    color: #dc3545;
+}
+
+/* 輸入框基礎樣式與圖示精準定位 */
+.input-relative-container {
+    position: relative;
+}
+
+.form-icon-left, .form-icon-right {
+    position: absolute;
+    top: 11px;
+    z-index: 5;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+}
+
+.form-icon-left {
+    left: 1rem;
+}
+
+.form-icon-right {
+    right: 0.75rem;
+    cursor: pointer;
+}
+
+.icon-img {
+    width: 18px;
+    height: 18px;
+    opacity: 0.5;
+}
+
+.form-control-custom {
+    display: block;
+    width: 100%;
+    padding: 0.375rem 0.75rem;
+    font-size: 1rem;
+    font-weight: 400;
+    line-height: 1.5;
+    color: #212529;
+    background-color: #fff;
+    background-clip: padding-box;
+    border: 1px solid #ced4da;
+    border-radius: 0.375rem;
+    box-sizing: border-box;
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.form-control-custom:focus {
+    color: #212529;
+    background-color: #fff;
+    border-color: #86b7fe;
+    outline: 0;
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+}
+
+.input-with-icon-left {
+    padding-left: 2.5rem !important;
+}
+
+.input-with-icons-both {
+    padding-left: 2.5rem !important;
+    padding-right: 2.5rem !important;
+}
+
+/* 錯誤驗證隱藏提示  */
+.invalid-feedback-custom {
+    display: none;
+    width: 100%;
+    margin-top: 0.25rem;
+    font-size: 0.875rem;
+    color: #dc3545;
+}
+
+/* 當表單驗證不通過時顯示*/
+.was-validated .form-control-custom:invalid ~ .invalid-feedback-custom {
+    display: block;
+}
+
+/* 修改密碼連結*/
+.forgot-password-wrapper {
+    text-align: right;
+    margin-bottom: 1.5rem;
+}
+
+.forgot-password-link {
+    color: #6c757d;
+    font-size: 0.875rem;
+    text-decoration: none;
+}
+
+.forgot-password-link:hover {
+    text-decoration: underline !important;
+}
+
+/* 註冊、登入雙按鈕排版 */
+.button-row {
+    display: flex;
+    flex-wrap: wrap;
+    margin-right: -0.5rem;
+    margin-left: -0.5rem;
+    padding-bottom: 3rem;
+}
+
+.button-col {
+    flex: 0 0 auto;
+    width: 50%;
+    padding-right: 0.5rem;
+    padding-left: 0.5rem;
+    box-sizing: border-box;
+}
+
+.btn-action-outline {
+    display: block;
+    width: 100%;
+    font-weight: 700;
+    line-height: 1.5;
+    color: #0d6efd;
+    text-align: center;
+    text-decoration: none;
+    vertical-align: middle;
+    cursor: pointer;
+    user-select: none;
+    background-color: transparent;
+    border: 1px solid #0d6efd;
+    padding: 0.5rem 0.75rem;
+    font-size: 1rem;
+    border-radius: 0.375rem;
+    box-sizing: border-box;
+    transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out;
+}
+
+.btn-action-outline:hover {
+    color: #fff;
+    background-color: #0d6efd;
+    border-color: #0d6efd;
+}

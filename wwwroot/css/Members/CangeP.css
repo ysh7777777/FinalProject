@@ -1,0 +1,198 @@
+﻿@charset "UTF-8";
+
+/* 全域基礎設定 */
+body {
+    background-color: #f8f9fa;
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+/* 容器與置中排版 */
+.register-container {
+    width: 100%;
+    padding-right: 15px;
+    padding-left: 15px;
+    margin-right: auto;
+    margin-left: auto;
+    margin-top: 3rem;
+    box-sizing: border-box;
+}
+
+.register-row {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+/* 表單卡片樣式  */
+.register-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    word-wrap: break-word;
+    background-color: #fff;
+    background-clip: border-box;
+    border: 1px solid rgba(0,0,0,.125);
+    border-radius: .375rem;
+    padding: 1.5rem;
+    box-shadow: 0 .125rem .25rem rgba(0,0,0,.075);
+    width: 100%;
+    max-width: 500px;
+    box-sizing: border-box;
+}
+
+/* 標題  */
+.register-title {
+    margin-top: 0;
+    margin-bottom: 1.5rem;
+    text-align: center;
+    font-size: calc(1.325rem + .9vw);
+    font-weight: 500;
+    line-height: 1.2;
+}
+
+/* 表單群組與間距 */
+.fg {
+    margin-bottom: 1rem;
+}
+
+.fg-confirm-password {
+    margin-bottom: 1.5rem;
+}
+
+/* 標籤 */
+.form-label {
+    display: inline-block;
+    margin-bottom: .5rem;
+    font-size: 1rem;
+}
+
+/* 必填紅色星星 */
+.text-danger {
+    color: #dc3545;
+}
+
+/* 輸入框樣式  */
+.form-input {
+    display: block;
+    width: 100%;
+    padding: .375rem .75rem;
+    font-size: 1rem;
+    font-weight: 400;
+    line-height: 1.5;
+    color: #212529;
+    background-color: #fff;
+    background-clip: padding-box;
+    border: 1px solid #ced4da;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    border-radius: .375rem;
+    transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
+    box-sizing: border-box;
+}
+
+.form-input:focus {
+    color: #212529;
+    background-color: #fff;
+    border-color: #86b7fe;
+    outline: 0;
+    box-shadow: 0 0 0 .25rem rgba(13,110,253,.25);
+}
+
+
+/* 密碼框與眼睛定位 */
+.password-wrapper {
+    position: relative;
+}
+
+.password-wrapper .form-input {
+    padding-right: 2.5rem;
+
+}
+
+.password-toggle-btn {
+    position: absolute;
+    right: 12px;
+    top: 50%; 
+    transform: translateY(-50%);
+    cursor: pointer;
+    z-index: 5;
+    background: transparent;
+    border: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    align-items: center;
+}
+
+.password-toggle-btn img {
+    width: 18px;
+    height: 18px;
+    opacity: 0.5;
+}
+
+/* 提交按鈕  */
+.submit-btn {
+    display: inline-block;
+    font-weight: 400;
+    line-height: 1.5;
+    color: #fff;
+    text-align: center;
+    text-decoration: none;
+    vertical-align: middle;
+    cursor: pointer;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    user-select: none;
+    background-color: #0d6efd;
+    border: 1px solid #0d6efd;
+    padding: .375rem .75rem;
+    font-size: 1rem;
+    border-radius: .375rem;
+    width: 100%;
+    transition: color .15s ease-in-out, background-color .15s ease-in-out, border-color .15s ease-in-out;
+}
+
+/* 驗證錯誤訊息提示預設隱藏 */
+.error-feedback {
+    display: none;
+    width: 100%;
+    margin-top: .25rem;
+    font-size: .875em;
+    color: #dc3545;
+}
+
+/* 當表單被驗證失敗 */
+.was-validated .form-input:invalid ~ .error-feedback {
+    display: block;
+}
+
+.was-validated .form-input:invalid {
+    border-color: #dc3545;
+}
+
+
+/* 外層容器：將連結靠右對齊，並控制上下的邊距 */
+.cancel-wrapper {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 8px;
+    margin-bottom: 16px;
+}
+
+/* 取消修改超連結樣式 */
+.cancel-btn {
+    color: #6c757d;
+    font-size: 14px;
+    text-decoration: none;
+    transition: color 0.2s ease-in-out;
+}
+
+/* 滑鼠懸停 */
+.cancel-btn:hover {
+    color: #343a40;
+    text-decoration: underline;
+}
