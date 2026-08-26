@@ -1,6 +1,7 @@
 using FinalProject.Models;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
@@ -276,37 +277,80 @@ namespace FinalProject.Controllers
         }
 
         [HttpPost("Change")]
-        public async Task<IActionResult> ChangeP([FromBody] ChangePasswordModel request)
+        [Authorize]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ChangeP([FromBody] ChangePasswordDto dto)
         {
-            string? account = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            string? role = User.FindFirstValue(ClaimTypes.Role);
-
-            if (string.IsNullOrEmpty(account))
+            // 後端模型結構驗證
+            if (!ModelState.IsValid)
             {
-                return Unauthorized(new { success = false, message = "請先登入" });
+                return BadRequest(new { success = false, message = "輸入格式不正確，欄位不可留空" });
             }
 
-            string newHash = BCrypt.Net.BCrypt.HashPassword(request.NewPassword);
+            // 2. 從 Cookie Claims 中精準撈出當前「已登入」使用者的帳號（Account）與角色（Role）
+            var userAccount = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var userRole = User.FindFirstValue(ClaimTypes.Role);
 
-            if (role == "passenger")
+            if (string.IsNullOrEmpty(userAccount))
             {
-                var member = await _context.Members.FirstOrDefaultAsync(m => m.Account == account);
+                return Unauthorized(new { success = false, message = "登入已逾期，請重新登入" });
+            }
+
+            // 根據角色判定，抓取對應的資料庫資料表（乘客或司機）
+            if (userRole == "passenger")
+            {
+                // 依照 Cookie 的帳號去資料庫精準搜尋該筆乘客
+                var member = await _context.Members.FirstOrDefaultAsync(m => m.Account == userAccount);
                 if (member == null)
                 {
-                    return NotFound(new { message = "找不到帳號" });
+                    return NotFound(new { success = false, message = "找不到該乘客會員資料" });
                 }
 
-                member.Password = newHash;
+                // 利用 BCrypt 比對使用者輸入的「原密碼」是否與資料庫雜湊密碼相符
+                if (!VerifyPassword(dto.OldPassword, member.Password, allowLegacyPlainText: false, out _))
+                {
+                    return BadRequest(new { success = false, message = "原密碼輸入錯誤，請重新確認！" });
+                }
+
+                // 驗證通過，將新密碼進行 BCrypt 雜湊加密，並更新資料庫欄位
+                member.Password = BCrypt.Net.BCrypt.HashPassword(dto.NewPassword);
+            }
+            else if (userRole == "driver")
+            {
+                // 依照 Cookie 的帳號去資料庫精準搜尋該筆司機
+                var driver = await _context.Drivers.FirstOrDefaultAsync(d => d.DriverId == userAccount);
+                if (driver == null)
+                {
+                    return NotFound(new { success = false, message = "找不到該司機人員資料" });
+                }
+
+                // 🔑 比對司機的原密碼（兼顧舊明文相容性）
+                bool isOldPasswordValid = VerifyPassword(dto.OldPassword, driver.Password, allowLegacyPlainText: true, out _);
+                if (!isOldPasswordValid)
+                {
+                    return BadRequest(new { success = false, message = "原密碼輸入錯誤，請重新確認！" });
+                }
+
+                // 更新司機的新密碼
+                driver.Password = BCrypt.Net.BCrypt.HashPassword(dto.NewPassword);
+            }
+            else
+            {
+                return BadRequest(new { success = false, message = "無效的使用者權限角色" });
             }
 
+            // 將變更儲存到 SQL 資料庫中
             await _context.SaveChangesAsync();
 
-            return Ok(new { success = true, message = "密碼已成功更新！" });
-        }
+            // 抹除 Cookie 登入憑證
+            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            Response.Cookies.Delete("Account", new CookieOptions { Path = "/" });
+            Response.Cookies.Delete("Role", new CookieOptions { Path = "/" });
 
-        public class ChangePasswordModel
-        {
-            public string NewPassword { get; set; } = "";
+            // 回傳成功 JSON
+            return Ok(new { success = true, message = "密碼修改成功，請使用新密碼重新登入！" });
         }
-    }
 }
+}
+
+

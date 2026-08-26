@@ -210,21 +210,6 @@
     display: block;
 }
 
-/* 修改密碼連結*/
-.forgot-password-wrapper {
-    text-align: right;
-    margin-bottom: 1.5rem;
-}
-
-.forgot-password-link {
-    color: #6c757d;
-    font-size: 0.875rem;
-    text-decoration: none;
-}
-
-.forgot-password-link:hover {
-    text-decoration: underline !important;
-}
 
 /* 註冊、登入雙按鈕排版 */
 .button-row {
@@ -233,6 +218,7 @@
     margin-right: -0.5rem;
     margin-left: -0.5rem;
     padding-bottom: 3rem;
+    margin-top: 2rem;
 }
 
 .button-col {

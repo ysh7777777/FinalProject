@@ -14,7 +14,22 @@
         <div class="register-row">
             <div class="register-card">
                 <h2 class="register-title">修改密碼</h2>
-                <form action="/Change" method="get" class="register-form" novalidate>
+                <form action="/Change" id="changePasswordForm" method="post" onsubmit="handleChangePassword(event)" class="register-form" novalidate>
+                    
+                    @Html.AntiForgeryToken()
+                    
+                    <!-- 舊密碼 (原密碼) -->
+                    <div class="fg fg-old-password">
+                        <label for="oldPassword" class="form-label">原密碼<span class="text-danger">*</span></label>
+                        <div class="password-wrapper">
+                            <input type="password" class="form-input" id="oldPassword" name="OldPassword" required placeholder="請輸入當前密碼">
+                            <button type="button" class="password-toggle-btn" id="toggleOldPassword">
+                                <img src="~/icon/eye-fill.svg" alt="顯示密碼">
+                            </button>
+                            <div class="error-feedback">請輸入原密碼</div>
+                        </div>
+                    </div>
+                    
                     <!-- 密碼 -->
                     <div class="fg">
                         <label for="password" class="form-label">新密碼(區分大小寫)<span class="text-danger">*</span></label>
