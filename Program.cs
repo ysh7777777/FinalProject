@@ -22,7 +22,7 @@ builder.Services
         options.Cookie.SameSite = SameSiteMode.Lax;
         options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
         options.ExpireTimeSpan = TimeSpan.FromDays(1);
-        options.SlidingExpiration = true;
+        options.SlidingExpiration = false;
     });
 
 
