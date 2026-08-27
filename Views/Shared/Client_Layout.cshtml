@@ -2,6 +2,11 @@
     var isAuthenticated =
          User?.Identity?.IsAuthenticated ?? false;
 
+    if (isAuthenticated && User!.IsInRole("driver"))
+    {
+        Context.Response.Redirect("/Driver/Index");
+    }
+
     var displayName =
         User?.FindFirst(
             System.Security.Claims.ClaimTypes.GivenName
