@@ -1,7 +1,317 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+﻿@model List<FinalProject.Models.ProjectImage>
+@{
+    ViewData["Title"] = "首頁";
+    ViewData["PageClass"] = "home-index";
+    Layout = "~/Views/Shared/Client_Layout.cshtml";
+    var heroSlides =
+       Model ?? new List<FinalProject.Models.ProjectImage>();
+}
+@section Styles {
+    <link rel="stylesheet"
+          href="~/css/Home/StyleSheet.css"
+          asp-append-version="true" />
 }
 
+    <!-- Header 請使用你原本的 Layout -->
+
+@if (heroSlides.Count == 0)
+{
+    <div class="container py-5">
+        <div class="alert alert-info mb-0" role="status">
+            目前沒有可顯示的首頁輪播圖片。
+        </div>
+    </div>
+}
+else
+{
+    <section class="hero" aria-label="首頁圖片輪播">
+        <div id="heroCarousel"
+             class="carousel slide carousel-fade"
+             data-bs-ride="carousel"
+             data-bs-interval="5000"
+             data-bs-pause="hover"
+             data-bs-touch="true">
+
+            @* 修改 4：使用迴圈產生下方指示點 *@
+            <div class="carousel-indicators mb-4">
+                @for (var i = 0; i < heroSlides.Count; i++)
+                {
+                    <button type="button"
+                            data-bs-target="#heroCarousel"
+                            data-bs-slide-to="@i"
+                            class="@(i == 0 ? "active" : "")"
+                            aria-current="@(i == 0 ? "true" : "false")"
+                            aria-label="顯示第 @(i + 1) 張">
+                    </button>
+                }
+            </div>
+
+            @* 修改 5：使用迴圈產生輪播圖片 *@
+            <div class="carousel-inner">
+                @for (var i = 0; i < heroSlides.Count; i++)
+                {
+                    ProjectImage slide = heroSlides[i];
+
+                    @* 修改 1：移除標題前面的「首頁輪播｜」 *@
+                    string displayTitle = slide.ImageTitle ?? "機場接送";
+
+                    int separatorIndex = displayTitle.IndexOf('｜');
+
+                    if (separatorIndex >= 0)
+                    {
+                        displayTitle = displayTitle.Substring(separatorIndex + 1);
+                    }
+
+                    @* 修改 2：依照輪播順序設定不同按鈕文字 *@
+                    string buttonText = i switch
+                    {
+                        0 => "立即預約接送",
+                        1 => "查看詳細車輛",
+                        2 => "貼心服務",
+                        _ => "了解更多"
+                    };
+
+                    @* 修改 3：依照輪播順序設定按鈕連結 *@
+                    string buttonLink = i switch
+                    {
+                        0 => "/Booking/Create",
+                        1 => "#fleet",
+                        2 => "#services",
+                        _ => "#"
+                    };
+
+                    <div class="carousel-item @(i == 0 ? "active" : "")">
+
+                        @* 修改 4：alt 改用移除前綴後的標題 *@
+                        <img src="@Url.Content(slide.ImageUrl ?? "")"
+                             class="d-block w-100 hero-image"
+                             alt="@displayTitle" />
+
+                        <div class="hero-overlay"></div>
+
+                        <div class="container hero-caption">
+                            <p class="eyebrow">
+                                WAN MA AIRPORT TRANSFER
+                            </p>
+
+                            @* 修改 5：畫面不再顯示「首頁輪播」 *@
+                            <h1>@displayTitle</h1>
+
+                            <p class="hero-lead">
+                                @slide.Description
+                            </p>
+
+                            @* 修改 6：使用每張輪播對應的按鈕文字和連結 *@
+                            <a class="btn btn-light rounded-pill px-4 py-3 fw-bold"
+                               href="@buttonLink">
+                                @buttonText
+                            </a>
+                        </div>
+                    </div>
+                }
+            </div>
+
+            <button class="carousel-control-prev"
+                    type="button"
+                    data-bs-target="#heroCarousel"
+                    data-bs-slide="prev">
+
+                <span class="carousel-control-prev-icon"
+                      aria-hidden="true"></span>
+
+                <span class="visually-hidden">上一張</span>
+            </button>
+
+            <button class="carousel-control-next"
+                    type="button"
+                    data-bs-target="#heroCarousel"
+                    data-bs-slide="next">
+
+                <span class="carousel-control-next-icon"
+                      aria-hidden="true"></span>
+
+                <span class="visually-hidden">下一張</span>
+            </button>
+        </div>
+    </section>
+}
+
+        <section class="story">
+            <div class="container story-content">
+                <p class="eyebrow">365 DAYS · 24 HOURS</p>
+                <h2>接機不只是接送，更是旅程安心的開始</h2>
+                <p class="story-lead">
+                    從預約、出發到抵達，我們細心掌握每一段行程。無論是獨自旅行、家庭出遊，
+                    或多人商務移動，都能享有準時、舒適且貼心的專車服務。
+                </p>
+                <ul class="story-points">
+                    <li>專業駕駛</li>
+                    <li>專車直達</li>
+                    <li>行李安心</li>
+                    <li>全天候預約</li>
+                </ul>
+            </div>
+        </section>
+        @* 大圖後 *@
+        <section class="section fleet" id="fleet">
+            <div class="container">
+                <p class="eyebrow section-eyebrow">OUR FLEET</p>
+                <h2 class="section-title">最適合你的移動座駕都在這裡</h2>
+                <p class="section-intro">
+                    依照同行人數與行李需求，選擇最舒適的車型。
+                </p>
+
+                <div class="row g-4 mt-4">
+                    <div class="col-12 col-md-6 col-lg-4">
+                        <article class="vehicle-card h-100">
+                            <div class="vehicle-image">
+                                <img src="~/Images/Car/五人座轎車.jpeg"
+                                     alt="五人座轎車"
+                                     loading="lazy" />
+                            </div>
+                            <div class="vehicle-body">
+                                <p class="vehicle-capacity">最多 4 位乘客</p>
+                                <h3>五人座轎車</h3>
+                                <p class="vehicle-description">
+                                    舒適靈巧，適合個人、雙人旅程或輕量行李。
+                                </p>
+                            </div>
+                        </article>
+                    </div>
+
+                    <div class="col-12 col-md-6 col-lg-4">
+                        <article class="vehicle-card h-100">
+                            <div class="vehicle-image">
+                                <img src="~/Images/Car/五人座休旅車.png"
+                                     alt="五人座休旅車"
+                                     loading="lazy" />
+                            </div>
+                            <div class="vehicle-body">
+                                <p class="vehicle-capacity">最多 4 位乘客</p>
+                                <h3>五人座休旅車</h3>
+                                <p class="vehicle-description">
+                                    乘坐空間寬敞，行李較多也能從容安排。
+                                </p>
+                            </div>
+                        </article>
+                    </div>
+
+                    <div class="col-12 col-md-6 col-lg-4">
+                        <article class="vehicle-card h-100">
+                            <div class="vehicle-image">
+                                <img src="~/Images/Car/九人座廂型車.png"
+                                     alt="九人座廂型車"
+                                     loading="lazy" />
+                            </div>
+                            <div class="vehicle-body">
+                                <p class="vehicle-capacity">最多 8 位乘客</p>
+                                <h3>九人座廂型車</h3>
+                                <p class="vehicle-description">
+                                    多人同行首選，全家旅遊或商務移動更輕鬆。
+                                </p>
+                            </div>
+                        </article>
+                    </div>
+
+                    <div class="col-12 col-md-6 col-lg-4">
+                        <article class="vehicle-card h-100">
+                            <div class="vehicle-image">
+                                <img src="~/Images/Car/賓士九人座廂型車.jpg"
+                                     alt="賓士九人座"
+                                     loading="lazy" />
+                            </div>
+                            <div class="vehicle-body">
+                                <p class="vehicle-capacity">最多 8 位乘客</p>
+                                <h3>賓士九人座</h3>
+                                <p class="vehicle-description">
+                                    質感商務接待，兼顧寬敞空間與乘坐舒適度。
+                                </p>
+                            </div>
+                        </article>
+                    </div>
+
+                    <div class="col-12 col-md-6 col-lg-4">
+                        <article class="vehicle-card h-100">
+                            <div class="vehicle-image">
+                                <img src="~/Images/Car/阿法.jpg"
+                                     alt="阿法"
+                                     loading="lazy" />
+                            </div>
+                            <div class="vehicle-body">
+                                <p class="vehicle-capacity">尊榮舒適乘坐</p>
+                                <h3>阿法</h3>
+                                <p class="vehicle-description">
+                                    高質感舒適座艙，適合家庭或重要賓客接送。
+                                </p>
+                            </div>
+                        </article>
+                    </div>
+
+                    <div class="col-12 col-md-6 col-lg-4">
+                        <article class="vehicle-card h-100">
+                            <div class="vehicle-image">
+                                <img src="~/Images/Car/大T.png"
+                                     alt="大T保母車"
+                                     loading="lazy" />
+                            </div>
+                            <div class="vehicle-body">
+                                <p class="vehicle-capacity">多人與大件行李</p>
+                                <h3>大T保母車</h3>
+                                <p class="vehicle-description">
+                                    大空間團體接送，適合多人同行與大量行李。
+                                </p>
+                            </div>
+                        </article>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="section" id="services">
+            <div class="container">
+                <p class="eyebrow section-eyebrow">THOUGHTFUL SERVICE</p>
+                <h2 class="section-title">多一點貼心，少一點旅途負擔</h2>
+
+                <div class="row g-4 mt-4">
+                    <div class="col-12 col-lg-4">
+                        <article class="service-card service-stops h-100">
+                            <div class="service-content">
+                                <span class="service-number">01</span>
+                                <h3>彈性增加停靠點</h3>
+                                <p>途中需接送親友或短暫停靠，可依行程新增最多三個停靠點。</p>
+                                <span class="service-link">順路安排，更有彈性</span>
+                            </div>
+                        </article>
+                    </div>
+
+                    <div class="col-12 col-lg-4">
+                        <article class="service-card service-seat h-100">
+                            <div class="service-content">
+                                <span class="service-number">02</span>
+                                <h3>嬰兒座椅選配</h3>
+                                <p>親子出行提前預約合適座椅，讓孩子在車內也能舒適乘坐。</p>
+                                <span class="service-link">安心防護，照顧同行</span>
+                            </div>
+                        </article>
+                    </div>
+
+                    <div class="col-12 col-lg-4">
+                        <article class="service-card service-flight h-100">
+                            <div class="service-content">
+                                <span class="service-number">03</span>
+                                <h3>航班狀態追蹤</h3>
+                                <p>掌握航班抵達資訊，遇到提前或延誤也能彈性調整接送時間。</p>
+                                <span class="service-link">即時掌握，準時等候</span>
+                            </div>
+                        </article>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    <!-- Footer 請使用你原本的 Layout -->
+
+<!-- 前端查登入資料的測試(Member新增) -->
 <div class="text-center">
     <h1 class="display-4">Welcome</h1>
     <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
