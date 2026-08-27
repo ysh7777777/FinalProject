@@ -1,9 +1,9 @@
 ﻿@using System.Linq
-@model List<FinalProject.Models.TripOrderDto>
+@model List<FinalProject.Models.Trip>
 @{
     ViewData["Title"] = "司機端派車系統";
-    Layout = null; /* 獨立全螢幕頁面*/
-    /* Layout = "Driver_Layout";  (Member)  */
+    // Layout = null; /* 獨立全螢幕頁面*/
+    Layout = "Driver_Layout";  
 }
 
 
@@ -273,25 +273,25 @@
                                     <div class="row g-1 my-1 text-secondary small">
                                         <div class="col-6">
                                             <strong>客戶：</strong>
-                                            <span class="text-dark">@order.CustomerName</span>
+                                            <span class="text-dark">@order.Account</span>
                                         </div>
                                         <div class="col-6">
                                             <strong>預計出發：</strong>
-                                            <span class="text-danger fw-bold">@order.DepartureTime.ToString("HH:mm")</span>
+                                            <span class="text-danger fw-bold">@order.DepartureTime?.ToString("HH:mm")</span>
                                         </div>
                                         <div class="col-12">
                                             <strong>目的地：</strong>
                                             <span class="text-dark text-truncate d-inline-block" style="max-width: 80%;">@order.Destination</span>
                                         </div>
-                                        <div class="col-6">
+                                        @* <div class="col-6">
                                             <strong>車資：</strong>
                                             <span class="text-success fw-bold">@order.Fare.ToString("N0") 元</span>
-                                        </div>
-                                        <div class="col-6">
+                                        </div> *@
+                                        @* <div class="col-6">
                                             <strong>航班：</strong>
                                             <span class="text-dark">@order.FlightNumber</span>
                                             <span class="badge bg-success status-badge">@order.TripStatus</span>
-                                        </div>
+                                        </div> *@
                                     </div>
                                 </div>
                             </div>
@@ -333,7 +333,6 @@
         </div>
 
     </div>
-</div>
 
 @section Scripts {
     <!-- Leaflet JS -->
