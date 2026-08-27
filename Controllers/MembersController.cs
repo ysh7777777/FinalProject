@@ -113,7 +113,7 @@ namespace FinalProject.Controllers
                 account = driver.DriverId,
                 role = "driver",
                 message = "司機端登入成功！",
-                redirectUrl = Url.Action("Index", "Driver")
+                redirectUrl = Url.Action("ClientHistory", "Driver")
             });
         }
 
@@ -149,7 +149,7 @@ namespace FinalProject.Controllers
                 message = "乘客端登入成功！",
                 account = member.Account,
                 role = "passenger",
-                redirectUrl = Url.Action("Index", "Home")
+                redirectUrl = Url.Action("ClientHistory", "Home")
             });
         }
 
@@ -181,8 +181,8 @@ namespace FinalProject.Controllers
         private IActionResult RedirectToRoleIndex(string? role)
         {
             return role == "driver"
-                ? RedirectToAction("Index", "Driver")
-                : RedirectToAction("Index", "Home");
+                ? RedirectToAction("ClientHistory", "Driver")
+                : RedirectToAction("ClientHistory", "Home");
         }
 
         private static bool VerifyPassword(

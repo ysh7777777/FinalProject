@@ -1,0 +1,962 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+
+    <!-- Bootstrap 5.3.3 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+
+    <!-- 自訂 CSS -->
+    <link rel="stylesheet" href="~/css/ClientHistory/ClientHistory.css">
+</head>
+
+<body>
+    <div class="container order-page">
+        <!-- =========================
+             訂單狀態切換
+        ========================== -->
+        <div class="row g-2 order-tabs">
+            <div class="col-4">
+                <button class="order-tab active" type="button" data-status="processing">
+                    <i class="bi bi-hourglass-split"></i>
+                    <span>進行中/待執行</span>
+                </button>
+            </div>
+            <div class="col-4">
+                <button class="order-tab" type="button" data-status="completed">
+                    <i class="bi bi-check-circle"></i>
+                    <span>已完成</span>
+                </button>
+            </div>
+            <div class="col-4">
+                <button class="order-tab" type="button" data-status="cancelled">
+                    <i class="bi bi-x-circle"></i>
+                    <span>已取消</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- =========================
+             訂單列表
+        ========================== -->
+        <div id="orderList">
+            <!-- ==========================================
+                 訂單 1
+            =========================================== -->
+            <div class="order-card" data-order-status="processing">
+                <div class="row g-3 align-items-center">
+                    <!-- =========================
+                         左側：狀態 + 交通工具
+                    ========================== -->
+                    <div class="col-4 col-sm-2 col-md-2">
+                        <div class="order-icon-area">
+                            <span class="status-badge status-processing">進行中</span>
+                            <div class="transport-icon">
+                                <i class="bi bi-house-door-fill"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- =========================
+                         中間：訂單資訊
+                    ========================== -->
+                    <div class="col-8 col-sm-6 col-md-7">
+                        <div class="order-info">
+                            <!-- 訂單編號 -->
+                            <div class="order-number">
+                                <span class="info-label">訂單編號</span>
+                                <strong>R-342827955</strong>
+                            </div>
+
+                            <!-- 出發時間 -->
+                            <div class="departure-time">
+                                <i class="bi bi-clock"></i>
+                                <span>7 / 25 (日) 18：30</span>
+                            </div>
+
+                            <!-- 出發 / 到達 -->
+                            <div class="route">
+                                <div class="route-item">
+                                    <div class="route-title">
+                                        <i class="bi bi-geo-alt-fill"></i>
+                                        出發
+                                    </div>
+                                    <div class="route-address">桃園國際機場 T2</div>
+                                </div>
+
+                                <div class="route-item">
+                                    <div class="route-title">
+                                        <i class="bi bi-geo-alt"></i>
+                                        到達
+                                    </div>
+                                    <div class="route-address">台中市 南屯區...</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- =========================
+                         右側：操作按鈕
+                    ========================== -->
+                    <div class="col-12 col-sm-4 col-md-3">
+                        <div class="order-actions">
+                            <button class="btn btn-cancel" type="button" onclick="cancelOrder('R-342827955')">
+                                <i class="bi bi-x-circle"></i>
+                                取消訂單
+                            </button>
+                            <button class="btn btn-driver" type="button" onclick="showDriverStatus('R-342827955')">
+                                <i class="bi bi-person-badge"></i>
+                                司機狀態
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- =========================
+                     分隔線
+                ========================== -->
+                <div class="order-divider"></div>
+
+                <!-- =========================
+                     展開按鈕
+                ========================== -->
+                <button class="expand-button" type="button" onclick="toggleOrder(this)" aria-label="展開訂單詳細資訊">
+                    <i class="bi bi-chevron-down"></i>
+                </button>
+
+
+                <div class="order-extra">
+                    <!-- =========================
+                     訂單摘要
+                ========================== -->
+                    <div class="row g-2 order-detail">
+                        <!-- 車牌 / 車型 -->
+                        <div class="col-6 col-md-3">
+                            <div class="detail-item">
+                                <div class="detail-title">
+                                    <i class="bi bi-car-front"></i>
+                                    車牌 / 車型
+                                </div>
+                                <div class="detail-content">
+                                    ER-57825
+                                    <br>
+                                    白色 賓士九人座
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 人數 / 行李 -->
+                        <div class="col-6 col-md-3">
+                            <div class="detail-item">
+                                <div class="detail-title">
+                                    <i class="bi bi-people"></i>
+                                    人數 / 行李
+                                </div>
+                                <div class="detail-content">
+                                    5 人
+                                    <br>
+                                    6 行李
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 費用 -->
+                        <div class="col-6 col-md-3">
+                            <div class="detail-item">
+                                <div class="detail-title">
+                                    <i class="bi bi-currency-dollar"></i>
+                                    費用
+                                </div>
+                                <div class="detail-content price">NT$ 30,000</div>
+                            </div>
+                        </div>
+
+                        <!-- 行程時間 -->
+                        <div class="col-6 col-md-3">
+                            <div class="detail-item">
+                                <div class="detail-title">
+                                    <i class="bi bi-hourglass-split"></i>
+                                    預計行程時間
+                                </div>
+                                <div class="detail-content">120 分鐘</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- =========================  額外資訊 - 註解 ========================== -->
+                    <!--
+                    <div class="row g-3 extra-content">
+                        <div class="col-12 col-md-6">
+                            <div class="extra-item">
+                                <div class="extra-title">
+                                    <i class="bi bi-person"></i>
+                                    乘客資訊
+                                </div>
+                                <div>王小明　0912-345-678</div>
+                            </div>
+                        </div>
+
+                        <div class="col-12 col-md-6">
+                            <div class="extra-item">
+                                <div class="extra-title">
+                                    <i class="bi bi-chat-left-text"></i>
+                                    備註
+                                </div>
+                                <div>請司機提前 10 分鐘抵達。</div>
+                            </div>
+                        </div>
+                    </div>
+                    -->
+
+                </div>
+            </div>
+
+            <!-- ==========================================
+     訂單 2
+=========================================== -->
+            <div class="order-card" data-order-status="pending">
+                <div class="row g-3 align-items-center">
+                    <!-- =========================
+             左側：狀態 + 交通工具
+        ========================== -->
+                    <div class="col-4 col-sm-2 col-md-2">
+                        <div class="order-icon-area">
+                            <span class="status-badge status-pending">待執行</span>
+                            <div class="transport-icon">
+                                <i class="bi bi-airplane-fill"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- =========================
+             中間：訂單資訊
+        ========================== -->
+                    <div class="col-8 col-sm-6 col-md-7">
+                        <div class="order-info">
+                            <!-- 訂單編號 -->
+                            <div class="order-number">
+                                <span class="info-label">訂單編號</span>
+                                <strong>C-229856734</strong>
+                            </div>
+
+                            <!-- 出發時間 -->
+                            <div class="departure-time">
+                                <i class="bi bi-clock"></i>
+                                <span>7 / 30 (日) 18：30</span>
+                            </div>
+
+                            <!-- 出發 / 到達 -->
+                            <div class="route">
+                                <div class="route-item">
+                                    <div class="route-title">
+                                        <i class="bi bi-geo-alt-fill"></i>
+                                        出發
+                                    </div>
+                                    <div class="route-address">台中市 南屯區...</div>
+                                </div>
+
+                                <div class="route-item">
+                                    <div class="route-title">
+                                        <i class="bi bi-geo-alt"></i>
+                                        到達
+                                    </div>
+                                    <div class="route-address">桃園國際機場 T2</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- =========================
+             右側：操作按鈕
+        ========================== -->
+                    <div class="col-12 col-sm-4 col-md-3">
+                        <div class="order-actions">
+                            <button class="btn btn-cancel" type="button" onclick="cancelOrder('C-229856734')">
+                                <i class="bi bi-x-circle"></i>
+                                取消訂單
+                            </button>
+
+                            <button class="btn btn-driver" type="button" onclick="showDriverStatus('C-229856734')">
+                                <i class="bi bi-person-badge"></i>
+                                司機狀態
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- =========================
+         分隔線
+    ========================== -->
+                <div class="order-divider"></div>
+
+                <!-- =========================
+         展開按鈕
+    ========================== -->
+                <button class="expand-button" type="button" onclick="toggleOrder(this)" aria-label="展開訂單詳細資訊">
+                    <i class="bi bi-chevron-down"></i>
+                </button>
+
+                <div class="order-extra">
+                    <!-- =========================
+             訂單摘要
+        ========================== -->
+                    <div class="row g-2 order-detail">
+                        <!-- 車牌 / 車型 -->
+                        <div class="col-6 col-md-3">
+                            <div class="detail-item">
+                                <div class="detail-title">
+                                    <i class="bi bi-car-front"></i>
+                                    車牌 / 車型
+                                </div>
+                                <div class="detail-content">
+                                    ER-78236
+                                    <br>
+                                    黑色 Toyota 九人座
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 人數 / 行李 -->
+                        <div class="col-6 col-md-3">
+                            <div class="detail-item">
+                                <div class="detail-title">
+                                    <i class="bi bi-people"></i>
+                                    人數 / 行李
+                                </div>
+                                <div class="detail-content">
+                                    4 人
+                                    <br>
+                                    4 行李
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 費用 -->
+                        <div class="col-6 col-md-3">
+                            <div class="detail-item">
+                                <div class="detail-title">
+                                    <i class="bi bi-currency-dollar"></i>
+                                    費用
+                                </div>
+                                <div class="detail-content price">NT$ 25,000</div>
+                            </div>
+                        </div>
+
+                        <!-- 行程時間 -->
+                        <div class="col-6 col-md-3">
+                            <div class="detail-item">
+                                <div class="detail-title">
+                                    <i class="bi bi-hourglass-split"></i>
+                                    預計行程時間
+                                </div>
+                                <div class="detail-content">110 分鐘</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- =========================  額外資訊 - 註解 ========================== -->
+                    <!--
+                    <div class="row g-3 extra-content">
+                        <div class="col-12 col-md-6">
+                            <div class="extra-item">
+                                <div class="extra-title">
+                                    <i class="bi bi-person"></i>
+                                    乘客資訊
+                                </div>
+                                <div>陳小華　0922-456-789</div>
+                            </div>
+                        </div>
+
+                        <div class="col-12 col-md-6">
+                            <div class="extra-item">
+                                <div class="extra-title">
+                                    <i class="bi bi-airplane"></i>
+                                    航班資訊
+                                </div>
+                                <div>BR-123</div>
+                            </div>
+                        </div>
+                    </div>
+                    -->
+                </div>
+            </div>
+
+            <!-- ==========================================
+     訂單 3
+=========================================== -->
+            <div class="order-card" data-order-status="pending">
+                <div class="row g-3 align-items-center">
+                    <!-- =========================
+             左側：狀態 + 交通工具
+        ========================== -->
+                    <div class="col-4 col-sm-2 col-md-2">
+                        <div class="order-icon-area">
+                            <span class="status-badge status-pending">待執行</span>
+                            <div class="transport-icon">
+                                <i class="bi bi-house-door-fill"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- =========================
+             中間：訂單資訊
+        ========================== -->
+                    <div class="col-8 col-sm-6 col-md-7">
+                        <div class="order-info">
+                            <!-- 訂單編號 -->
+                            <div class="order-number">
+                                <span class="info-label">訂單編號</span>
+                                <strong>D-983586930</strong>
+                            </div>
+
+                            <!-- 出發時間 -->
+                            <div class="departure-time">
+                                <i class="bi bi-clock"></i>
+                                <span>8 / 15 (日) 18：30</span>
+                            </div>
+
+                            <!-- 出發 / 到達 -->
+                            <div class="route">
+                                <div class="route-item">
+                                    <div class="route-title">
+                                        <i class="bi bi-geo-alt-fill"></i>
+                                        出發
+                                    </div>
+                                    <div class="route-address">桃園國際機場 T2</div>
+                                </div>
+
+                                <div class="route-item">
+                                    <div class="route-title">
+                                        <i class="bi bi-geo-alt"></i>
+                                        到達
+                                    </div>
+                                    <div class="route-address">台中市 南屯區...</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- =========================
+             右側：操作按鈕
+        ========================== -->
+                    <div class="col-12 col-sm-4 col-md-3">
+                        <div class="order-actions">
+                            <button class="btn btn-cancel" type="button" onclick="cancelOrder('D-983586930')">
+                                <i class="bi bi-x-circle"></i>
+                                取消訂單
+                            </button>
+
+                            <button class="btn btn-driver disabled" type="button">
+                                <i class="bi bi-person-badge"></i>
+                                司機狀態
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- =========================
+         分隔線
+    ========================== -->
+                <div class="order-divider"></div>
+
+                <!-- =========================
+         展開按鈕
+    ========================== -->
+                <button class="expand-button" type="button" onclick="toggleOrder(this)" aria-label="展開訂單詳細資訊">
+                    <i class="bi bi-chevron-down"></i>
+                </button>
+
+                <div class="order-extra">
+                    <!-- =========================
+             訂單摘要
+        ========================== -->
+                    <div class="row g-2 order-detail">
+                        <!-- 車牌 / 車型 -->
+                        <div class="col-6 col-md-3">
+                            <div class="detail-item">
+                                <div class="detail-title">
+                                    <i class="bi bi-car-front"></i>
+                                    車牌 / 車型
+                                </div>
+                                <div class="detail-content">
+                                    尚未指派
+                                    <br>
+                                    賓士九人座
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 人數 / 行李 -->
+                        <div class="col-6 col-md-3">
+                            <div class="detail-item">
+                                <div class="detail-title">
+                                    <i class="bi bi-people"></i>
+                                    人數 / 行李
+                                </div>
+                                <div class="detail-content">
+                                    6 人
+                                    <br>
+                                    5 行李
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 費用 -->
+                        <div class="col-6 col-md-3">
+                            <div class="detail-item">
+                                <div class="detail-title">
+                                    <i class="bi bi-currency-dollar"></i>
+                                    費用
+                                </div>
+                                <div class="detail-content price">NT$ 28,000</div>
+                            </div>
+                        </div>
+
+                        <!-- 行程時間 -->
+                        <div class="col-6 col-md-3">
+                            <div class="detail-item">
+                                <div class="detail-title">
+                                    <i class="bi bi-hourglass-split"></i>
+                                    預計行程時間
+                                </div>
+                                <div class="detail-content">125 分鐘</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- =========================  額外資訊 - 註解 ========================== -->
+                    <!--
+                    <div class="row g-3 extra-content">
+                        <div class="col-12 col-md-6">
+                            <div class="extra-item">
+                                <div class="extra-title">
+                                    <i class="bi bi-person"></i>
+                                    乘客資訊
+                                </div>
+                                <div>林先生　0933-567-890</div>
+                            </div>
+                        </div>
+
+                        <div class="col-12 col-md-6">
+                            <div class="extra-item">
+                                <div class="extra-title">
+                                    <i class="bi bi-chat-left-text"></i>
+                                    備註
+                                </div>
+                                <div>尚未指派司機。</div>
+                            </div>
+                        </div>
+                    </div>
+                    -->
+                </div>
+            </div>
+
+            <!-- ==========================================
+     訂單 4
+=========================================== -->
+            <div class="order-card" data-order-status="completed">
+                <div class="row g-3 align-items-center">
+                    <!-- =========================
+             左側：狀態 + 交通工具
+        ========================== -->
+                    <div class="col-4 col-sm-2 col-md-2">
+                        <div class="order-icon-area">
+                            <span class="status-badge status-completed">已完成</span>
+                            <div class="transport-icon">
+                                <i class="bi bi-house-door-fill"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- =========================
+             中間：訂單資訊
+        ========================== -->
+                    <div class="col-8 col-sm-6 col-md-7">
+                        <div class="order-info">
+                            <!-- 訂單編號 -->
+                            <div class="order-number">
+                                <span class="info-label">訂單編號</span>
+                                <strong>U-492344269</strong>
+                            </div>
+
+                            <!-- 出發時間 -->
+                            <div class="departure-time">
+                                <i class="bi bi-clock"></i>
+                                <span>6 / 15 (日) 18：30</span>
+                            </div>
+
+                            <!-- 出發 / 到達 -->
+                            <div class="route">
+                                <div class="route-item">
+                                    <div class="route-title">
+                                        <i class="bi bi-geo-alt-fill"></i>
+                                        出發
+                                    </div>
+                                    <div class="route-address">桃園國際機場 T2</div>
+                                </div>
+
+                                <div class="route-item">
+                                    <div class="route-title">
+                                        <i class="bi bi-geo-alt"></i>
+                                        到達
+                                    </div>
+                                    <div class="route-address">台中市 南屯區...</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- =========================
+             右側：操作按鈕
+        ========================== -->
+                    <div class="col-12 col-sm-4 col-md-3">
+                        <div class="order-actions">
+                            <button class="btn btn-cancel disabled" type="button">
+                                <i class="bi bi-x-circle"></i>
+                                取消訂單
+                            </button>
+
+                            <button class="btn btn-driver disabled" type="button">
+                                <i class="bi bi-person-badge"></i>
+                                司機狀態
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- =========================
+         分隔線
+    ========================== -->
+                <div class="order-divider"></div>
+
+                <!-- =========================
+         展開按鈕
+    ========================== -->
+                <button class="expand-button" type="button" onclick="toggleOrder(this)" aria-label="展開訂單詳細資訊">
+                    <i class="bi bi-chevron-down"></i>
+                </button>
+
+                <div class="order-extra">
+                    <!-- =========================
+             訂單摘要
+        ========================== -->
+                    <div class="row g-2 order-detail">
+                        <!-- 車牌 / 車型 -->
+                        <div class="col-6 col-md-3">
+                            <div class="detail-item">
+                                <div class="detail-title">
+                                    <i class="bi bi-car-front"></i>
+                                    車牌 / 車型
+                                </div>
+                                <div class="detail-content">
+                                    ER-52186
+                                    <br>
+                                    白色 Toyota 九人座
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 人數 / 行李 -->
+                        <div class="col-6 col-md-3">
+                            <div class="detail-item">
+                                <div class="detail-title">
+                                    <i class="bi bi-people"></i>
+                                    人數 / 行李
+                                </div>
+                                <div class="detail-content">
+                                    3 人
+                                    <br>
+                                    3 行李
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 費用 -->
+                        <div class="col-6 col-md-3">
+                            <div class="detail-item">
+                                <div class="detail-title">
+                                    <i class="bi bi-currency-dollar"></i>
+                                    費用
+                                </div>
+                                <div class="detail-content price">NT$ 18,000</div>
+                            </div>
+                        </div>
+
+                        <!-- 行程時間 -->
+                        <div class="col-6 col-md-3">
+                            <div class="detail-item">
+                                <div class="detail-title">
+                                    <i class="bi bi-hourglass-split"></i>
+                                    預計行程時間
+                                </div>
+                                <div class="detail-content">100 分鐘</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- =========================  額外資訊 - 註解 ========================== -->
+                    <!--
+                    <div class="row g-3 extra-content">
+                        <div class="col-12 col-md-6">
+                            <div class="extra-item">
+                                <div class="extra-title">
+                                    <i class="bi bi-person"></i>
+                                    乘客資訊
+                                </div>
+                                <div>張小姐　0944-678-901</div>
+                            </div>
+                        </div>
+
+                        <div class="col-12 col-md-6">
+                            <div class="extra-item">
+                                <div class="extra-title">
+                                    <i class="bi bi-check-circle"></i>
+                                    訂單狀態
+                                </div>
+                                <div>此訂單已完成。</div>
+                            </div>
+                        </div>
+                    </div>
+                    -->
+                </div>
+            </div>
+
+            <!-- ==========================================
+     訂單 5
+=========================================== -->
+            <div class="order-card" data-order-status="cancelled">
+                <div class="row g-3 align-items-center">
+                    <!-- =========================
+             左側：狀態 + 交通工具
+        ========================== -->
+                    <div class="col-4 col-sm-2 col-md-2">
+                        <div class="order-icon-area">
+                            <span class="status-badge status-cancelled">已取消</span>
+                            <div class="transport-icon">
+                                <i class="bi bi-house-door-fill"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- =========================
+             中間：訂單資訊
+        ========================== -->
+                    <div class="col-8 col-sm-6 col-md-7">
+                        <div class="order-info">
+                            <!-- 訂單編號 -->
+                            <div class="order-number">
+                                <span class="info-label">訂單編號</span>
+                                <strong>A-442636223</strong>
+                            </div>
+
+                            <!-- 出發時間 -->
+                            <div class="departure-time">
+                                <i class="bi bi-clock"></i>
+                                <span>9 / 15 (日) 18：30</span>
+                            </div>
+
+                            <!-- 出發 / 到達 -->
+                            <div class="route">
+                                <div class="route-item">
+                                    <div class="route-title">
+                                        <i class="bi bi-geo-alt-fill"></i>
+                                        出發
+                                    </div>
+                                    <div class="route-address">桃園國際機場 T2</div>
+                                </div>
+
+                                <div class="route-item">
+                                    <div class="route-title">
+                                        <i class="bi bi-geo-alt"></i>
+                                        到達
+                                    </div>
+                                    <div class="route-address">台中市 南屯區...</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- =========================
+             右側：操作按鈕
+        ========================== -->
+                    <div class="col-12 col-sm-4 col-md-3">
+                        <div class="order-actions">
+                            <button class="btn btn-cancel disabled" type="button">
+                                <i class="bi bi-x-circle"></i>
+                                取消訂單
+                            </button>
+
+                            <button class="btn btn-driver disabled" type="button">
+                                <i class="bi bi-person-badge"></i>
+                                司機狀態
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- =========================
+         分隔線
+    ========================== -->
+                <div class="order-divider"></div>
+
+                <!-- =========================
+         展開按鈕
+    ========================== -->
+                <button class="expand-button" type="button" onclick="toggleOrder(this)" aria-label="展開訂單詳細資訊">
+                    <i class="bi bi-chevron-down"></i>
+                </button>
+
+                <div class="order-extra">
+                    <!-- =========================
+             訂單摘要
+        ========================== -->
+                    <div class="row g-2 order-detail">
+                        <!-- 車牌 / 車型 -->
+                        <div class="col-6 col-md-3">
+                            <div class="detail-item">
+                                <div class="detail-title">
+                                    <i class="bi bi-car-front"></i>
+                                    車牌 / 車型
+                                </div>
+                                <div class="detail-content">
+                                    ER-63217
+                                    <br>
+                                    黑色 賓士九人座
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 人數 / 行李 -->
+                        <div class="col-6 col-md-3">
+                            <div class="detail-item">
+                                <div class="detail-title">
+                                    <i class="bi bi-people"></i>
+                                    人數 / 行李
+                                </div>
+                                <div class="detail-content">
+                                    2 人
+                                    <br>
+                                    2 行李
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 費用 -->
+                        <div class="col-6 col-md-3">
+                            <div class="detail-item">
+                                <div class="detail-title">
+                                    <i class="bi bi-currency-dollar"></i>
+                                    費用
+                                </div>
+                                <div class="detail-content price">NT$ 15,000</div>
+                            </div>
+                        </div>
+
+                        <!-- 行程時間 -->
+                        <div class="col-6 col-md-3">
+                            <div class="detail-item">
+                                <div class="detail-title">
+                                    <i class="bi bi-hourglass-split"></i>
+                                    預計行程時間
+                                </div>
+                                <div class="detail-content">90 分鐘</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- =========================  額外資訊 - 註解 ========================== -->
+                    <!--
+                    <div class="row g-3 extra-content">
+                        <div class="col-12 col-md-6">
+                            <div class="extra-item">
+                                <div class="extra-title">
+                                    <i class="bi bi-person"></i>
+                                    乘客資訊
+                                </div>
+                                <div>李先生　0955-789-012</div>
+                            </div>
+                        </div>
+
+                        <div class="col-12 col-md-6">
+                            <div class="extra-item">
+                                <div class="extra-title">
+                                    <i class="bi bi-x-circle"></i>
+                                    取消原因
+                                </div>
+                                <div>使用者取消訂單。</div>
+                            </div>
+                        </div>
+                    </div>
+                     -->
+                </div>
+            </div>
+
+            <!-- ========================= 司機狀態 Modal - 註解 ========================== -->
+            <!--
+            <div class="modal fade" id="driverStatusModal" tabindex="-1">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content custom-modal">
+                        <div class="modal-header">
+                            <h5 class="modal-title">
+                                <i class="bi bi-person-badge"></i>
+                                司機狀態
+                            </h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+
+                        <div class="modal-body">
+                            <div class="driver-status">
+                                <div class="driver-status-icon">
+                                    <i class="bi bi-car-front-fill"></i>
+                                </div>
+
+                                <div>
+                                    <h5>司機前往中</h5>
+                                    <p class="mb-0 text-secondary">
+                                        司機目前正在前往接送地點。
+                                    </p>
+                                </div>
+                            </div>
+
+                            <hr>
+
+                            <div class="driver-info">
+                                <div>
+                                    <span>司機</span>
+                                    <strong>王先生</strong>
+                                </div>
+                                <div>
+                                    <span>車牌</span>
+                                    <strong>ER-57825</strong>
+                                </div>
+                                <div>
+                                    <span>車型</span>
+                                    <strong>白色 賓士九人座</strong>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-primary" data-bs-dismiss="modal">
+                                關閉
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            -->
+            <!-- Bootstrap JS -->
+            <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+            <!-- ======================= JS ======================== -->
+            <script src="~/js/ClientHistory/ClientHistory.js"></script>
+        </body>
+
+    </html>
+

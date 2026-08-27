@@ -1,0 +1,963 @@
+/* =========================================================
+   基本設定
+========================================================= */
+
+:root {
+    --primary-color: #123b63;
+    --primary-dark: #0b2947;
+    --primary-light: #eaf2f9;
+
+    --text-color: #263238;
+    --text-secondary: #64748b;
+
+    --border-color: #dbe3eb;
+
+    --success-color: #198754;
+    --danger-color: #dc3545;
+    --warning-color: #ffc107;
+
+    --card-radius: 12px;
+
+    --shadow:
+        0 4px 15px rgba(18, 59, 99, 0.08);
+
+    --shadow-hover:
+        0 10px 25px rgba(18, 59, 99, 0.15);
+}
+
+
+/* =========================================================
+   Body
+========================================================= */
+
+body {
+    background-color: #ffffff;
+
+    color: var(--text-color);
+
+    font-family:
+        "Microsoft JhengHei",
+        "Noto Sans TC",
+        Arial,
+        sans-serif;
+}
+
+
+/* =========================================================
+   頁面
+========================================================= */
+
+.order-page {
+    max-width: 1100px;
+
+    margin: 0 auto;
+
+    padding-top: 30px;
+    padding-bottom: 60px;
+}
+
+
+/* =========================================================
+   上方 Tab
+========================================================= */
+
+.order-tabs {
+    margin-bottom: 24px;
+}
+
+
+.order-tab {
+    width: 100%;
+
+    min-height: 52px;
+
+    border: 1px solid var(--border-color);
+
+    border-radius: var(--card-radius);
+
+    background-color: #ffffff;
+
+    color: var(--primary-color);
+
+    font-size: 18px;
+
+    font-weight: 600;
+
+    transition:
+        all 0.25s ease;
+}
+
+
+.order-tab i {
+    margin-right: 6px;
+}
+
+
+.order-tab:hover {
+    background-color: var(--primary-light);
+
+    border-color: var(--primary-color);
+
+    transform: translateY(-2px);
+
+    box-shadow:
+        0 5px 12px rgba(18, 59, 99, 0.10);
+}
+
+
+.order-tab.active {
+    background-color: var(--primary-color);
+
+    border-color: var(--primary-color);
+
+    color: #ffffff;
+
+    box-shadow:
+        0 5px 15px rgba(18, 59, 99, 0.20);
+}
+
+
+/* =========================================================
+   訂單卡片
+========================================================= */
+
+.order-card {
+    position: relative;
+
+    margin-bottom: 16px;
+
+    /* padding: 20px; */
+    padding: 20px 20px 50px;
+    background-color: #ffffff;
+
+    border: 1px solid var(--border-color);
+
+    border-radius: var(--card-radius);
+
+    box-shadow: var(--shadow);
+
+    transition:
+        transform 0.25s ease,
+        box-shadow 0.25s ease,
+        border-color 0.25s ease;
+}
+
+
+.order-card:hover {
+    transform: translateY(-3px);
+
+    border-color: #b9c9d8;
+
+    box-shadow: var(--shadow-hover);
+}
+
+
+/* =========================================================
+   左側圖示區
+========================================================= */
+
+.order-icon-area {
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: center;
+
+    justify-content: center;
+
+    gap: 12px;
+}
+
+
+.transport-icon {
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    width: 60px;
+    height: 60px;
+
+    border-radius: 50%;
+
+    background-color: var(--primary-light);
+
+    color: var(--primary-color);
+
+    font-size: 32px;
+
+    transition:
+        transform 0.25s ease,
+        background-color 0.25s ease;
+}
+
+
+.order-card:hover .transport-icon {
+    transform: scale(1.08);
+
+    background-color: #dceaf6;
+}
+
+
+/* =========================================================
+   Status Badge
+========================================================= */
+
+.status-badge {
+    display: inline-flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    min-width: 64px;
+
+    padding: 5px 10px;
+
+    border-radius: 20px;
+
+    font-size: 13px;
+
+    font-weight: 600;
+
+    white-space: nowrap;
+}
+
+
+/* 進行中 */
+
+.status-processing {
+    background-color: #e8f1ff;
+
+    color: #0d6efd;
+}
+
+
+/* 待執行 */
+
+.status-pending {
+    background-color: #eef1f4;
+
+    color: #52606d;
+}
+
+
+/* 已完成 */
+
+.status-completed {
+    background-color: #e7f6ee;
+
+    color: #198754;
+}
+
+
+/* 已取消 */
+
+.status-cancelled {
+    background-color: #fdecec;
+
+    color: #dc3545;
+}
+
+
+/* =========================================================
+   訂單資訊
+========================================================= */
+
+.order-info {
+    min-width: 0;
+}
+
+
+.order-number {
+    display: flex;
+
+    align-items: center;
+
+    flex-wrap: wrap;
+
+    gap: 8px;
+
+    margin-bottom: 10px;
+
+    font-size: 16px;
+}
+
+
+.info-label {
+    color: var(--text-secondary);
+
+    font-weight: 500;
+}
+
+
+.order-number strong {
+    color: var(--primary-color);
+
+    font-weight: 700;
+}
+
+
+/* =========================================================
+   出發時間
+========================================================= */
+
+.departure-time {
+    display: flex;
+
+    align-items: center;
+
+    gap: 8px;
+
+    margin-bottom: 14px;
+
+    color: var(--text-color);
+
+    font-size: 17px;
+
+    font-weight: 600;
+}
+
+
+.departure-time i {
+    color: var(--primary-color);
+
+    font-size: 18px;
+}
+
+
+/* =========================================================
+   出發 / 到達
+========================================================= */
+
+.route {
+    display: grid;
+
+    grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+
+    gap: 16px;
+}
+
+
+.route-item {
+    min-width: 0;
+}
+
+
+.route-title {
+    margin-bottom: 4px;
+
+    color: var(--text-secondary);
+
+    font-size: 14px;
+
+    font-weight: 600;
+}
+
+
+.route-title i {
+    margin-right: 4px;
+
+    color: var(--primary-color);
+}
+
+
+.route-address {
+    overflow: hidden;
+
+    color: var(--text-color);
+
+    font-size: 16px;
+
+    font-weight: 500;
+
+    text-overflow: ellipsis;
+
+    white-space: nowrap;
+}
+
+
+/* =========================================================
+   右側操作按鈕
+========================================================= */
+
+.order-actions {
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 10px;
+}
+
+
+.order-actions .btn {
+    width: 100%;
+
+    min-height: 44px;
+
+    border-radius: 8px;
+
+    font-size: 16px;
+
+    font-weight: 600;
+
+    transition:
+        all 0.2s ease;
+}
+
+
+.order-actions .btn:hover:not(.disabled) {
+    transform: translateY(-2px);
+
+    box-shadow:
+        0 5px 12px rgba(0, 0, 0, 0.12);
+}
+
+
+/* 取消訂單 */
+
+.btn-cancel {
+    background-color: #ffffff;
+
+    border: 1px solid var(--danger-color);
+
+    color: var(--danger-color);
+}
+
+
+.btn-cancel:hover {
+    background-color: var(--danger-color);
+
+    border-color: var(--danger-color);
+
+    color: #ffffff;
+}
+
+
+/* 司機狀態 */
+
+.btn-driver {
+    background-color: var(--primary-color);
+
+    border: 1px solid var(--primary-color);
+
+    color: #ffffff;
+}
+
+
+.btn-driver:hover {
+    background-color: var(--primary-dark);
+
+    border-color: var(--primary-dark);
+
+    color: #ffffff;
+}
+
+
+/* disabled */
+
+.btn-driver.disabled,
+.btn-cancel.disabled {
+    background-color: #f1f3f5;
+
+    border-color: #d5dbe0;
+
+    color: #9aa3ab;
+
+    opacity: 1;
+
+    cursor: not-allowed;
+}
+
+
+/* =========================================================
+   分隔線
+========================================================= */
+
+.order-divider {
+    margin: 18px 0;
+
+    border-top: 1px dashed #c5d0da;
+}
+
+
+/* =========================================================
+   訂單詳細資訊
+========================================================= */
+
+.order-detail {
+    margin-right: 35px;
+}
+
+
+.detail-item {
+    height: 100%;
+
+    min-height: 100px;
+
+    padding: 16px;
+
+    background-color: #f8fafc;
+
+    border: 1px solid #e3eaf0;
+
+    border-radius: 10px;
+
+    text-align: center;
+
+    transition:
+        background-color 0.2s ease,
+        border-color 0.2s ease,
+        transform 0.2s ease;
+}
+
+
+.detail-item:hover {
+    background-color: var(--primary-light);
+
+    border-color: #c6d8e8;
+
+    transform: translateY(-2px);
+}
+
+
+.detail-title {
+    margin-bottom: 10px;
+
+    color: var(--text-secondary);
+
+    font-size: 14px;
+
+    font-weight: 600;
+}
+
+
+.detail-title i {
+    margin-right: 5px;
+
+    color: var(--primary-color);
+}
+
+
+.detail-content {
+    color: var(--text-color);
+
+    font-size: 16px;
+
+    font-weight: 600;
+
+    line-height: 1.6;
+}
+
+
+.detail-content.price {
+    color: var(--primary-color);
+
+    font-size: 18px;
+}
+
+
+/* =========================================================
+   展開按鈕
+========================================================= */
+
+.expand-button {
+    position: absolute;
+
+    right: 14px;
+
+    bottom: 14px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    width: 30px;
+    height: 30px;
+
+    padding: 0;
+
+    border: none;
+
+    border-radius: 50%;
+
+    background-color: #eef3f7;
+
+    color: var(--primary-color);
+
+    font-size: 18px;
+
+    cursor: pointer;
+
+    transition:
+        all 0.25s ease;
+}
+
+
+.expand-button:hover {
+    background-color: var(--primary-color);
+
+    color: #ffffff;
+
+    transform: translateY(-2px);
+}
+
+
+/* =========================================================
+   展開資訊
+========================================================= */
+
+.order-extra {
+    max-height: 0;
+
+    overflow: hidden;
+
+    transition:
+        max-height 0.35s ease;
+}
+
+
+.extra-content {
+    margin-top: 16px;
+
+    padding-top: 16px;
+
+    /* border-top: 1px solid var(--border-color); */
+}
+
+
+.extra-item {
+    height: 100%;
+
+    padding: 15px;
+
+    background-color: #f8fafc;
+
+    border-radius: 10px;
+
+    border: 1px solid #e3eaf0;
+}
+
+
+.extra-title {
+    margin-bottom: 8px;
+
+    color: var(--primary-color);
+
+    font-weight: 700;
+}
+
+
+.extra-title i {
+    margin-right: 5px;
+}
+
+
+/* =========================================================
+   Modal
+========================================================= */
+
+.custom-modal {
+    border: none;
+
+    border-radius: var(--card-radius);
+
+    box-shadow:
+        0 15px 40px rgba(0, 0, 0, 0.18);
+
+    overflow: hidden;
+}
+
+
+.custom-modal .modal-header {
+    padding: 18px 20px;
+
+    background-color: #ffffff;
+
+    border-bottom: 1px solid var(--border-color);
+}
+
+
+.custom-modal .modal-title {
+    color: var(--primary-color);
+
+    font-weight: 700;
+}
+
+
+.custom-modal .modal-body {
+    padding: 24px 20px;
+}
+
+
+.custom-modal .modal-footer {
+    padding: 15px 20px;
+
+    border-top: 1px solid var(--border-color);
+}
+
+
+/* =========================================================
+   司機資訊
+========================================================= */
+
+.driver-status {
+    display: flex;
+
+    align-items: center;
+
+    gap: 15px;
+}
+
+
+.driver-status-icon {
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    flex-shrink: 0;
+
+    width: 55px;
+    height: 55px;
+
+    border-radius: 50%;
+
+    background-color: var(--primary-light);
+
+    color: var(--primary-color);
+
+    font-size: 26px;
+}
+
+
+.driver-info {
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 12px;
+}
+
+
+.driver-info div {
+    display: flex;
+
+    justify-content: space-between;
+
+    gap: 20px;
+
+    padding-bottom: 10px;
+
+    border-bottom: 1px solid #edf0f2;
+}
+
+
+/* =========================================================
+   Tablet
+========================================================= */
+
+@media (max-width: 991.98px) {
+
+    .order-page {
+        max-width: 95%;
+    }
+
+
+    .order-card {
+        padding: 18px;
+    }
+
+
+    .order-actions .btn {
+        font-size: 15px;
+    }
+
+}
+
+
+/* =========================================================
+   Mobile
+========================================================= */
+
+@media (max-width: 767.98px) {
+
+    .order-page {
+        max-width: 100%;
+
+        padding-top: 15px;
+
+        padding-left: 12px;
+        padding-right: 12px;
+    }
+
+
+    .order-tabs {
+        margin-bottom: 16px;
+    }
+
+
+    .order-tab {
+        min-height: 48px;
+
+        font-size: 14px;
+    }
+
+
+    .order-tab i {
+        display: none;
+    }
+
+
+    .order-card {
+        padding: 15px;
+
+        margin-bottom: 14px;
+    }
+
+
+    .order-icon-area {
+        gap: 8px;
+    }
+
+
+    .transport-icon {
+        width: 48px;
+        height: 48px;
+
+        font-size: 25px;
+    }
+
+
+    .status-badge {
+        min-width: 58px;
+
+        padding: 4px 7px;
+
+        font-size: 12px;
+    }
+
+
+    .order-number {
+        font-size: 14px;
+    }
+
+
+    .departure-time {
+        font-size: 15px;
+    }
+
+
+    .route {
+        gap: 10px;
+    }
+
+
+    .route-title {
+        font-size: 13px;
+    }
+
+
+    .route-address {
+        font-size: 14px;
+    }
+
+
+    .order-actions {
+        display: grid;
+
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+
+        gap: 8px;
+
+        margin-top: 5px;
+    }
+
+
+    .order-actions .btn {
+        min-height: 42px;
+
+        font-size: 14px;
+    }
+
+
+    .order-detail {
+        margin-right: 25px;
+    }
+
+
+    .detail-item {
+        min-height: 90px;
+
+        padding: 12px 8px;
+    }
+
+
+    .detail-title {
+        font-size: 13px;
+    }
+
+
+    .detail-content {
+        font-size: 14px;
+    }
+
+
+    .detail-content.price {
+        font-size: 16px;
+    }
+
+
+    .expand-button {
+        right: 8px;
+
+        bottom: 12px;
+    }
+
+}
+
+
+/* =========================================================
+   小手機
+========================================================= */
+
+@media (max-width: 400px) {
+
+    .order-card {
+        padding: 12px;
+    }
+
+
+    .order-number {
+        display: block;
+    }
+
+
+    .order-number strong {
+        display: block;
+
+        margin-top: 3px;
+    }
+
+
+    .route {
+        grid-template-columns: 1fr;
+    }
+
+
+    .order-actions {
+        grid-template-columns: 1fr;
+    }
+
+
+    .order-detail {
+        margin-right: 0;
+    }
+
+}

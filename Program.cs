@@ -48,7 +48,7 @@ app.MapControllerRoute(
     name: "default",
     //pattern: "{controller=Booking}/{action=BookingPage}/{id?}")
     //pattern: "{controller=Members}/{action=Login}/{id?}")
-    pattern: "{controller=Home}/{action=Index}/{id?}")
+    pattern: "{controller=ClientHistory}/{action=ClientHistory}/{id?}")
     .WithStaticAssets();
 
 
