@@ -16,7 +16,8 @@ CREATE TABLE member (
     full_name NVARCHAR(50) NOT NULL,     -- 會員姓名 (必填)
     gender NVARCHAR(10),                 -- 性別
     email NVARCHAR(254) NOT NULL,        -- 電子郵件 (必填)
-    phone_number VARCHAR(20) NOT NULL    -- 聯絡電話 (必填)
+    phone_number VARCHAR(20) NOT NULL,    -- 聯絡電話 (必填)
+    birthday DATE NOT NULL               --生日(必填)
 );
 
 -- 2. 會員常用地址表 (MemberSavedAddress)
