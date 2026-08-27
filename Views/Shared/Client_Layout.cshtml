@@ -1,17 +1,26 @@
 @{
-  var isAuthenticated = User?.Identity?.IsAuthenticated ?? false;
-    //var isAuthenticated = true;
-    // isAuthenticated = true;
+    var isAuthenticated =
+         User?.Identity?.IsAuthenticated ?? false;
 
-    var displayName = User
-      .FindFirst(System.Security.Claims.ClaimTypes.GivenName)
-      ?.Value
-      ?? User?.Identity?.Name
-      ?? "";
+    var displayName =
+        User?.FindFirst(
+            System.Security.Claims.ClaimTypes.GivenName
+        )?.Value
+        ?? User?.Identity?.Name
+        ?? "";
+
+    var isPassenger =
+        isAuthenticated &&
+        User!.IsInRole("passenger");
 
     ViewData["Title"] ??= "機場接送";
-    var pageClass = ViewData["PageClass"]?.ToString() ?? "";
-    var isHomePage = pageClass == "home-index";
+
+    var pageClass =
+        ViewData["PageClass"]?.ToString()
+        ?? "";
+
+    var isHomePage =
+        pageClass == "home-index";
 
 }
 <!DOCTYPE html>
