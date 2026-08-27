@@ -41,7 +41,54 @@ namespace FinalProject.Controllers
             return $"ORD{date}{random}";
         }
 
-        // 派車邏輯
+
+        /* 派車邏輯 - 舊
+        public async Task<FindDriverCar> OrderDriver(Trip trip)
+        {
+            if (trip.DepartureTime is not DateTime departureTime) { return null; }
+            if (trip.EstimatedDuration is not int estimatedDuration) { return null; }
+            int eta = 30; DateTime taskStart = departureTime.AddMinutes(-eta); DateTime taskEnd = departureTime.AddMinutes(estimatedDuration + eta);
+
+            var Find = await _context.DriverShiftSchedules
+                        .AsNoTracking()
+                        .Include(schedule => schedule.LicensePlateNavigation)
+                        .Where(schedule =>
+                        schedule.ShiftDate.HasValue &&
+                        schedule.ShiftStart.HasValue &&
+                        schedule.ShiftEnd.HasValue &&
+
+                        schedule.ShiftDate.Value == DateOnly.FromDateTime(taskStart) &&
+                        schedule.ShiftStart.Value <= TimeOnly.FromDateTime(taskStart) &&
+                        schedule.ShiftEnd.Value >= TimeOnly.FromDateTime(taskEnd) &&
+
+                        schedule.DriverStatus == "待命" &&
+
+                        schedule.LicensePlateNavigation != null &&
+
+                        schedule.LicensePlateNavigation.VehicleStatus == "可用" &&
+
+                        schedule.LicensePlateNavigation.VehicleType == trip.VehicleType &&
+
+                        schedule.LicensePlateNavigation.MaxPassengers >= trip.PassengerCount &&
+
+                        schedule.LicensePlateNavigation.MaxLuggage >= trip.LuggageCount
+
+                        )
+                        .FirstOrDefaultAsync();
+
+            if (Find == null)
+            { return null; }
+
+            return new FindDriverCar
+            {
+                DriverId = Find.DriverId,
+                LicensePlate = Find.LicensePlate,
+            };
+        }
+        */
+
+
+        // 派車邏輯 - 新
         public async Task<FindDriverCar> OrderDriver(Trip trip)
         {
             if (trip.DepartureTime is not DateTime departureTime)
@@ -83,11 +130,10 @@ namespace FinalProject.Controllers
 
                         schedule.LicensePlateNavigation.MaxLuggage >= trip.LuggageCount &&
 
-                        // 檢查車輛的起始位置是否與訂單的取車地點相符
-                        schedule.LicensePlateNavigation.BaseLocation == trip.PickupLocation &&
+                        // 檢查車輛的起始位置是否與訂單的取車地點相符(待解決暫不使用)
+                        //schedule.LicensePlateNavigation.BaseLocation == trip.PickupLocation &&
 
-                        schedule.LicensePlateNavigation.VehicleType == trip.VehicleType &&
-
+                 
                        !_context.Trips.Any(existingTrip =>
                            // 舊訂單的完整資料
                            existingTrip.DepartureTime.HasValue &&
@@ -118,20 +164,11 @@ namespace FinalProject.Controllers
             };
         }
 
-
+        /* 建立訂單 - 舊版
         [HttpPost]
         public async Task<IActionResult> Create(
         [FromBody] Trip trip)
         {
-            /* 測試用
-                // 這裡就收到 JavaScript 傳來的資料了
-                Console.WriteLine(model.PickupLocation);
-                Console.WriteLine(model.Destination);
-                Console.WriteLine(model.PassengerCount);
-                return Json(new
-                { success = true });
-            */
-
             // 測試用假資料
             trip.Account = "user03";
             trip.OrderNo = GenerateOrderNumber();
@@ -189,10 +226,6 @@ namespace FinalProject.Controllers
                 });
             }
 
-
-
-
-
             //Trip newtrip = new Trip();
             //newtrip.DepartureTime = 
             var bookingData = new Trip
@@ -213,8 +246,6 @@ namespace FinalProject.Controllers
                 //CreatedAt = DateTime.Now
             };
 
-           
-
             _context.Trips.Add(bookingData);
             await _context.SaveChangesAsync();
 
@@ -226,38 +257,108 @@ namespace FinalProject.Controllers
                 driverId = result.DriverId,
                 licensePlate = result.LicensePlate
             });
+        }
+        */
 
+
+        // 建立訂單 - 新版
+        [HttpPost]
+        public async Task<IActionResult> Create([FromBody] CreateBookingDto dto)
+        {
+            if (!ModelState.IsValid)
+            {
+                var errors = ModelState
+                    .Where(x => x.Value != null && x.Value.Errors.Count > 0)
+                    .ToDictionary(
+                        x => x.Key,
+                        x => x.Value!.Errors
+                            .Select(e => e.ErrorMessage)
+                            .ToArray()
+                    );
+
+                return BadRequest(new
+                {
+                    success = false,
+                    message = "訂單資料格式錯誤",
+                    errors
+                });
+            }
+
+            // 建立 Trip Entity
+            var trip = new Trip
+            {
+                OrderNo = GenerateOrderNumber(),
+
+                // 暫時測試用
+                Account = "user03",
+
+                DepartureTime = dto.DepartureTime,
+                PickupLocation = dto.PickupLocation,
+                PickupLat = dto.PickupLat,
+                PickupLng = dto.PickupLng,
+
+                Destination = dto.Destination,
+                DestinationLat = dto.DestinationLat,
+                DestinationLng = dto.DestinationLng,
+
+                VehicleType = dto.VehicleType,
+                PassengerCount = dto.PassengerCount,
+                LuggageCount = dto.LuggageCount,
+
+                TripStatus = "待執行",
+
+                // 暫時測試用
+                EstimatedDuration = 2
+            };
+
+            // 引用派車邏輯派車
+            var result = await OrderDriver(trip);
+
+            if (result == null)
+            {
+                return BadRequest(new
+                {
+                    success = false,
+                    message = "找不到符合條件的司機與車輛"
+                });
+            }
+
+            // 將派車結果寫入訂單
+            trip.AssignedDriverId = result.DriverId;
+            trip.LicensePlate = result.LicensePlate;
+
+
+            // 將trip更新至資料庫，用try catch
+            /* try catch 抓到catch中的 BadRequest (抓到錯誤時/Exception)
+               進到 前端 fetch() POST /Booking/Create -> Controller.Create() 有問題(找不到司機/傳進資料庫有問題...) -> BadRequest(...)
+               -> HTTP 400 + JSON -> const response = await fetch(...) -> const result = await... -> result.message
+               -> if (!response.ok) -> throw new Error(...) -> catch(error) -> alert(error.message)
+             */
+            try
+            {
+                _context.Trips.Add(trip);
+                await _context.SaveChangesAsync();
+            }
+            catch
+            {
+                return BadRequest(new
+                {
+                    success = false,
+                    message = "資料建立有問題，請與本公司聯繫!!"
+                });
+            }
+
+            return Json(new
+            {
+                success = true,
+                bookingId = trip.OrderNo,
+                driverId = result.DriverId,
+                licensePlate = result.LicensePlate
+            });
         }
 
 
 
-
-        // ----------------------------------------------------
-        // 測試派車的 API
-        //[HttpPost]
-        //public async Task<IActionResult> TestDispatch([FromBody] Trip trip)
-        //{
-        //    // 呼叫你的派車 Function
-        //    var result = await OrderDriver(trip);
-
-
-        //    // 找不到司機或車
-        //    if (result == null)
-        //    {
-        //        return BadRequest(new
-        //        {
-        //            message = "找不到符合條件的司機與車輛"
-        //        });
-        //    }
-
-
-        //    // 找到了
-        //    return Json(new
-        //    {
-        //        driverId = result.DriverId,
-        //        licensePlate = result.LicensePlate
-        //    });
-        //}
 
 
 
