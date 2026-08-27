@@ -16,7 +16,8 @@ CREATE TABLE member (
     full_name NVARCHAR(50) NOT NULL,     -- 會員姓名 (必填)
     gender NVARCHAR(10),                 -- 性別
     email NVARCHAR(254) NOT NULL,        -- 電子郵件 (必填)
-    phone_number VARCHAR(20) NOT NULL    -- 聯絡電話 (必填)
+    phone_number VARCHAR(20) NOT NULL,    -- 聯絡電話 (必填)
+    birthday DATE NOT NULL               --生日(必填)
 );
 
 -- 2. 會員常用地址表 (MemberSavedAddress)
@@ -40,6 +41,20 @@ CREATE TABLE vehicle (
     child_seats TINYINT DEFAULT 0,         -- 兒童座椅數量 (預設 0)
     base_fare INT,                         -- 起跳基本運費
     vehicle_status NVARCHAR(10)            -- 車輛狀態 (如：可用、維修中)
+);
+
+-- 3-1. 車輛表型錄 (VehicleMenu) (08/23 益)
+CREATE TABLE vehicle_menu (
+    vehicle_id INT IDENTITY(1,1) PRIMARY KEY, -- 車型流水編號 (主鍵)
+    vehicle_type NVARCHAR(20),                -- 車輛類型 (如：轎車、休旅車)
+    max_passengers TINYINT,                   -- 最大載客人數
+    max_luggage TINYINT,                      -- 最大行李件數
+    child_seats TINYINT DEFAULT 0,            -- 兒童座椅數量 (預設 0)
+    base_fare INT,                            -- 起跳基本運費
+    image_title NVARCHAR(100) NOT NULL,       -- 圖片名稱 / 標題 (例如：地圖導航示意圖、架構圖，必填)
+    image_url NVARCHAR(500),                  -- 圖片網址 / 檔案路徑
+    description NVARCHAR(500)                 -- 圖片說明 / 備註
+
 );
 
 -- 4. 司機表 (Driver)

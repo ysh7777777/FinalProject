@@ -32,7 +32,6 @@ body {
     flex-direction: column;
     min-width: 0;
     word-wrap: break-word;
-    background-color: #fff;
     background-clip: border-box;
     border: 1px solid rgba(0,0,0,.125);
     border-radius: .375rem;
@@ -41,6 +40,7 @@ body {
     width: 100%;
     max-width: 500px;
     box-sizing: border-box;
+    background-color: #ffffff;
 }
 
 /* 標題  */
@@ -116,7 +116,7 @@ body {
 .password-toggle-btn {
     position: absolute;
     right: 12px;
-    top: 50%; 
+    top: 19px; 
     transform: translateY(-50%);
     cursor: pointer;
     z-index: 5;
@@ -195,4 +195,28 @@ body {
 .cancel-btn:hover {
     color: #343a40;
     text-decoration: underline;
+}
+
+/* 原密碼外層容器間距 */
+.fg-old-password {
+    margin-bottom: 1.25rem;
+}
+
+/* 修正：移除 display: flex，維持 relative 讓眼睛按鈕與錯誤訊息正常定位與換行 */
+.fg-old-password .password-wrapper {
+    position: relative;
+}
+
+/* 錯誤訊息反饋樣式 */
+.fg-old-password .error-feedback {
+    display: none;
+    color: #dc3545;
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+}
+
+/* 驗證失敗時顯示錯誤訊息 */
+.was-validated .fg-old-password .form-input:invalid ~ .error-feedback,
+.fg-old-password .form-input.is-invalid ~ .error-feedback {
+    display: block;
 }

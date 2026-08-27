@@ -1,5 +1,28 @@
 ﻿document.addEventListener('DOMContentLoaded', function () {
 
+    // 控制「原密碼」眼睛 (新增)
+    const toggleOldPassword = document.querySelector('#toggleOldPassword');
+    if (toggleOldPassword) {
+        toggleOldPassword.addEventListener('click', function () {
+            const oldPasswordInput = document.querySelector('#oldPassword');
+            const img = this.querySelector('img');
+
+            if (!oldPasswordInput || !img) {
+                return;
+            }
+
+            const currentSrc = img.getAttribute('src');
+
+            if (oldPasswordInput.type === 'password') {
+                oldPasswordInput.type = 'text';
+                img.src = currentSrc.replace('eye-fill.svg', 'eye-slash-fill.svg');
+            } else {
+                oldPasswordInput.type = 'password';
+                img.src = currentSrc.replace('eye-slash-fill.svg', 'eye-fill.svg');
+            }
+        });
+    }
+
     // 控制「密碼」眼睛
     const togglepassword = document.querySelector('#togglePassword');
     if (togglepassword) {

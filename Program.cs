@@ -49,9 +49,9 @@ app.MapStaticAssets();
 
 app.MapControllerRoute(
     name: "default",
-    //pattern: "{controller=DriverNavigation}/{action=Navigation}/{id?}")
-
-    pattern: "{controller=Members}/{action=Login}/{id?}")
+    //pattern: "{controller=Booking}/{action=BookingPage}/{id?}")
+    //pattern: "{controller=Members}/{action=Login}/{id?}")
+    pattern: "{controller=Home}/{action=Index}/{id?}")
     .WithStaticAssets();
 
 app.MapHub<DriverLocationHub>(

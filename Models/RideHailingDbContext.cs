@@ -33,6 +33,9 @@ public partial class RideHailingDbContext : DbContext
 
     public virtual DbSet<Vehicle> Vehicles { get; set; }
 
+    // 因為新增 VehicleMenu 表單，所以新增 (08/23 益)
+    public virtual DbSet<VehicleMenu> VehicleMenu { get; set; }
+
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
         => optionsBuilder.UseSqlServer("Server=.;Database=RideHailingDB;Trusted_Connection=True;Integrated Security=True;TrustServerCertificate=True;");
@@ -314,6 +317,48 @@ public partial class RideHailingDbContext : DbContext
                 .HasMaxLength(20)
                 .HasColumnName("vehicle_type");
         });
+        // 因為新增 VehicleMenu 表單，所以新增 (08/23 益)
+        modelBuilder.Entity<VehicleMenu>(entity =>
+        {
+            entity.HasKey(e => e.VehicleId);
+
+            entity.ToTable("vehicle_menu");
+
+            entity.Property(e => e.VehicleId)
+                .ValueGeneratedOnAdd()
+                .HasColumnName("vehicle_id");
+
+            entity.Property(e => e.VehicleType)
+                .HasMaxLength(20)
+                .HasColumnName("vehicle_type");
+
+            entity.Property(e => e.MaxPassengers)
+                .HasColumnName("max_passengers");
+
+            entity.Property(e => e.MaxLuggage)
+                .HasColumnName("max_luggage");
+
+            entity.Property(e => e.ChildSeats)
+                .HasDefaultValue((byte)0)
+                .HasColumnName("child_seats");
+
+            entity.Property(e => e.BaseFare)
+                .HasColumnName("base_fare");
+
+            entity.Property(e => e.ImageTitle)
+                .HasMaxLength(100)
+                .IsRequired()
+                .HasColumnName("image_title");
+
+            entity.Property(e => e.ImageUrl)
+                .HasMaxLength(500)
+                .HasColumnName("image_url");
+
+            entity.Property(e => e.Description)
+                .HasMaxLength(500)
+                .HasColumnName("description");
+        });
+
 
         OnModelCreatingPartial(modelBuilder);
     }

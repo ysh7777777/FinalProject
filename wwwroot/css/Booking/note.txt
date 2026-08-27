@@ -1,0 +1,13 @@
+
+- 測試用假資料
+    trip.Account = "user03";
+    trip.OrderNo = "TEST-" + DateTime.Now.ToString("yyyyMMddHHmmss");
+    driverschedule.ShiftId = "S2026082501";
+    driverschedule.DriverId = "D001";
+    trip.EstimatedDuration = 2;
+
+
+
+
+
+
