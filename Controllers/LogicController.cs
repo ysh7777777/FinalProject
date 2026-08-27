@@ -34,7 +34,7 @@ namespace FinalProject.Controllers
             DateTime taskStart = departureTime.AddMinutes(-eta);
             DateTime taskEnd = departureTime.AddMinutes(estimatedDuration + eta);
 
-            string[] activeStatuses = { "行程中", "接單中", "休息", "請假", "下班", "已派車", "前往中", "已完成" };
+            string[] activeStatuses = { "已派車", "接單中","前往中","行程中" };
 
             var Find = await _context.DriverShiftSchedules
                         .AsNoTracking()
@@ -59,11 +59,6 @@ namespace FinalProject.Controllers
                         schedule.LicensePlateNavigation.MaxPassengers >= trip.PassengerCount &&
 
                         schedule.LicensePlateNavigation.MaxLuggage >= trip.LuggageCount &&
-
-                        // 檢查車輛的起始位置是否與訂單的取車地點相符
-                        schedule.LicensePlateNavigation.BaseLocation == trip.PickupLocation &&
-
-                        schedule.LicensePlateNavigation.VehicleType == trip.VehicleType &&
 
                        !_context.Trips.Any(existingTrip =>
                         // 舊訂單的完整資料
