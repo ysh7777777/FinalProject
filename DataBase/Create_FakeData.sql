@@ -93,27 +93,28 @@ VALUES
 -- =============================================
 -- 4. 司機表 (driver) - 20 筆
 -- =============================================
+-- 測試登入密碼：Driver01（以下皆為有效 BCrypt 雜湊）
 INSERT INTO driver (driver_id, driver_name, base_location, password) VALUES
-('D001', N'陳大明', N'台北車站', '$2a$10$drv1...hash'),
-('D002', N'林國強', N'台北車站', '$2a$10$drv2...hash'),
-('D003', N'張順發', N'板橋車站', '$2a$10$drv3...hash'),
-('D004', N'黃文彬', N'南港車站', '$2a$10$drv4...hash'),
-('D005', N'李志明', N'桃園機場', '$2a$10$drv5...hash'),
-('D006', N'王世傑', N'桃園機場', '$2a$10$drv6...hash'),
-('D007', N'吳清山', N'高鐵新竹站', '$2a$10$drv7...hash'),
-('D008', N'蔡明哲', N'高鐵台中站', '$2a$10$drv8...hash'),
-('D009', N'楊正雄', N'台中車站', '$2a$10$drv9...hash'),
-('D010', N'劉永福', N'高鐵左營站', '$2a$10$drv10..hash'),
-('D011', N'鄭家祥', N'高雄車站', '$2a$10$drv11..hash'),
-('D012', N'謝建國', N'松山機場', '$2a$10$drv12..hash'),
-('D013', N'郭義雄', N'高鐵台南站', '$2a$10$drv13..hash'),
-('D014', N'曾振興', N'高鐵桃園站', '$2a$10$drv14..hash'),
-('D015', N'廖德財', N'高鐵嘉義站', '$2a$10$drv15..hash'),
-('D016', N'賴進富', N'花蓮車站', '$2a$10$drv16..hash'),
-('D017', N'徐金龍', N'台東車站', '$2a$10$drv17..hash'),
-('D018', N'周忠信', N'宜蘭車站', '$2a$10$drv18..hash'),
-('D019', N'葉勇氣', N'基隆車站', '$2a$10$drv19..hash'),
-('D020', N'蘇光明', N'彰化車站', '$2a$10$drv20..hash');
+('D001', N'陳大明', N'台北車站', '$2a$10$9vJNx30y/KLPFuVHTdUfueOawJEp8a0tBHlYCOfUB5hBgAdl0654q'),
+('D002', N'林國強', N'台北車站', '$2a$10$9vJNx30y/KLPFuVHTdUfueOawJEp8a0tBHlYCOfUB5hBgAdl0654q'),
+('D003', N'張順發', N'板橋車站', '$2a$10$9vJNx30y/KLPFuVHTdUfueOawJEp8a0tBHlYCOfUB5hBgAdl0654q'),
+('D004', N'黃文彬', N'南港車站', '$2a$10$9vJNx30y/KLPFuVHTdUfueOawJEp8a0tBHlYCOfUB5hBgAdl0654q'),
+('D005', N'李志明', N'桃園機場', '$2a$10$9vJNx30y/KLPFuVHTdUfueOawJEp8a0tBHlYCOfUB5hBgAdl0654q'),
+('D006', N'王世傑', N'桃園機場', '$2a$10$9vJNx30y/KLPFuVHTdUfueOawJEp8a0tBHlYCOfUB5hBgAdl0654q'),
+('D007', N'吳清山', N'高鐵新竹站', '$2a$10$9vJNx30y/KLPFuVHTdUfueOawJEp8a0tBHlYCOfUB5hBgAdl0654q'),
+('D008', N'蔡明哲', N'高鐵台中站', '$2a$10$9vJNx30y/KLPFuVHTdUfueOawJEp8a0tBHlYCOfUB5hBgAdl0654q'),
+('D009', N'楊正雄', N'台中車站', '$2a$10$9vJNx30y/KLPFuVHTdUfueOawJEp8a0tBHlYCOfUB5hBgAdl0654q'),
+('D010', N'劉永福', N'高鐵左營站', '$2a$10$9vJNx30y/KLPFuVHTdUfueOawJEp8a0tBHlYCOfUB5hBgAdl0654q'),
+('D011', N'鄭家祥', N'高雄車站', '$2a$10$9vJNx30y/KLPFuVHTdUfueOawJEp8a0tBHlYCOfUB5hBgAdl0654q'),
+('D012', N'謝建國', N'松山機場', '$2a$10$9vJNx30y/KLPFuVHTdUfueOawJEp8a0tBHlYCOfUB5hBgAdl0654q'),
+('D013', N'郭義雄', N'高鐵台南站', '$2a$10$9vJNx30y/KLPFuVHTdUfueOawJEp8a0tBHlYCOfUB5hBgAdl0654q'),
+('D014', N'曾振興', N'高鐵桃園站', '$2a$10$9vJNx30y/KLPFuVHTdUfueOawJEp8a0tBHlYCOfUB5hBgAdl0654q'),
+('D015', N'廖德財', N'高鐵嘉義站', '$2a$10$9vJNx30y/KLPFuVHTdUfueOawJEp8a0tBHlYCOfUB5hBgAdl0654q'),
+('D016', N'賴進富', N'花蓮車站', '$2a$10$9vJNx30y/KLPFuVHTdUfueOawJEp8a0tBHlYCOfUB5hBgAdl0654q'),
+('D017', N'徐金龍', N'台東車站', '$2a$10$9vJNx30y/KLPFuVHTdUfueOawJEp8a0tBHlYCOfUB5hBgAdl0654q'),
+('D018', N'周忠信', N'宜蘭車站', '$2a$10$9vJNx30y/KLPFuVHTdUfueOawJEp8a0tBHlYCOfUB5hBgAdl0654q'),
+('D019', N'葉勇氣', N'基隆車站', '$2a$10$9vJNx30y/KLPFuVHTdUfueOawJEp8a0tBHlYCOfUB5hBgAdl0654q'),
+('D020', N'蘇光明', N'彰化車站', '$2a$10$9vJNx30y/KLPFuVHTdUfueOawJEp8a0tBHlYCOfUB5hBgAdl0654q');
 
 -- =============================================
 -- 5. 司機值班表 (driver_shift_schedule) - 20 筆

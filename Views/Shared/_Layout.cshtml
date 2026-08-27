@@ -1,45 +1,68 @@
-﻿<!DOCTYPE html>
-<html lang="en">
+﻿@{
+    var isAuthenticated = User?.Identity?.IsAuthenticated ?? false;
+    ViewData["Title"] ??= "機場接送";
+}
+<!DOCTYPE html>
+<html lang="zh-Hant">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - FinalProject</title>
+    <title>@ViewData["Title"] - 機場接送</title>
     <script type="importmap"></script>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/layout-v2.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/FinalProject.styles.css" asp-append-version="true" />
+    @await RenderSectionAsync("Styles", required: false)
 </head>
-<body>
-    <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-            <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">FinalProject</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
+<body class="layout-v2 client-v2 d-flex flex-column min-vh-100 @ViewData["PageClass"]">
+    @* 修改：預設 Layout 也使用固定頂端的共用導覽列 *@
+    <header class="sticky-top layout-v2-header">
+        <nav class="navbar navbar-expand-lg navbar-light client-v2-nav" aria-label="網站主選單">
+            @* 修改：參考圖一，導覽內容使用置中的固定寬度容器 *@
+            <div class="container-xl">
+                <a class="navbar-brand py-0 d-flex align-items-center" asp-area="" asp-controller="Home" asp-action="Index" aria-label="機場接送首頁">
+                    <img src="~/Images/LOGO.png" class="layout-v2-logo" alt="萬馬接送" />
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#defaultLayoutMenu" aria-controls="defaultLayoutMenu"
+                        aria-expanded="false" aria-label="開啟選單">
                     <span class="navbar-toggler-icon"></span>
                 </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-                        </li>
+                <div class="collapse navbar-collapse" id="defaultLayoutMenu">
+                    <ul class="navbar-nav mx-lg-auto align-items-lg-center gap-lg-2">
+                        @* 修改：參考圖一，主要功能改為置中的文字選單 *@
+                        <li class="nav-item"><a class="nav-link" href="/Booking/Create">點我訂車</a></li>
+                        <li class="nav-item"><a class="nav-link" href="/Booking/History">訂單查詢</a></li>
+                        @if (isAuthenticated)
+                        {
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" id="defaultLayoutMember" role="button" data-bs-toggle="dropdown" aria-expanded="false">會員專區</a>
+                                <ul class="dropdown-menu dropdown-menu-end shadow border-0" aria-labelledby="defaultLayoutMember">
+                                    <li><a class="dropdown-item" href="/Member/Profile">帳號資料管理</a></li>
+                                    <li><a class="dropdown-item" href="/Member/Addresses">常用地址維護</a></li>
+                                    <li><hr class="dropdown-divider" /></li>
+                                    <li><form action="/Account/Logout" method="post"><button class="dropdown-item" type="submit">登出</button></form></li>
+                                </ul>
+                            </li>
+                        }
+                        else
+                        {
+                            <li class="nav-item"><a class="nav-link" href="/Account/Register">登入/註冊</a></li>
+                        }
                     </ul>
                 </div>
             </div>
         </nav>
     </header>
-    <div class="container">
-        <main role="main" class="pb-3">
+    <div class="container flex-grow-1 py-4 py-lg-5">
+        <main role="main">
             @RenderBody()
         </main>
     </div>
 
-    <footer class="border-top footer text-muted">
+    <footer class="layout-v2-footer py-4 mt-auto">
         <div class="container">
-            &copy; 2026 - FinalProject - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+            <div class="text-center small">© 2026 機場接送 · 安心抵達每一段旅程</div>
         </div>
     </footer>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>

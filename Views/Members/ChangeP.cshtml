@@ -14,13 +14,28 @@
         <div class="register-row">
             <div class="register-card">
                 <h2 class="register-title">修改密碼</h2>
-                <form action="/Change" method="get" class="register-form" novalidate>
+                <form action="/Change" id="changePasswordForm" method="post" onsubmit="handleChangePassword(event)" class="register-form" novalidate>
+                    
+                    @Html.AntiForgeryToken()
+                    
+                    <!-- 舊密碼 (原密碼) -->
+                    <div class="fg fg-old-password">
+                        <label for="oldPassword" class="form-label">原密碼<span class="text-danger">*</span></label>
+                        <div class="password-wrapper">
+                            <input type="password" class="form-input" id="oldPassword" name="OldPassword" required placeholder="請輸入當前密碼">
+                            <button type="button" class="password-toggle-btn" id="toggleOldPassword">
+                                <img src="~/icon/eye-fill.svg" alt="顯示密碼">
+                            </button>
+                            <div class="error-feedback">請輸入原密碼</div>
+                        </div>
+                    </div>
+                    
                     <!-- 密碼 -->
                     <div class="fg">
-                        <label for="password" class="form-label">密碼(區分大小寫)<span class="text-danger">*</span></label>
+                        <label for="password" class="form-label">新密碼(區分大小寫)<span class="text-danger">*</span></label>
                         <div class="password-wrapper">
-                            <input type="password" class="form-input" id="password" name="password" maxlength="11" pattern="[A-Za-z0-9]{6,11}" required placeholder="請輸入密碼（6~11位英數）">
-                            <button type="button" class="password-toggle-btn" id="togglepassword">
+                            <input type="password" class="form-input" id="passWord" name="password" maxlength="11" pattern="[A-Za-z0-9]{6,11}" required placeholder="請輸入密碼（6~11位英數）">
+                            <button type="button" class="password-toggle-btn" id="togglePassword">
                                 <img src="~/icon/eye-fill.svg" alt="顯示密碼">
                             </button>
                             <div class="error-feedback">請輸入密碼（6~11位英數）</div>
@@ -31,13 +46,19 @@
                     <div class="fg-confirm-password">
                         <label for="Confirmpassword" class="form-label">確認密碼(區分大小寫)<span class="text-danger">*</span></label>
                         <div class="password-wrapper">
-                            <input type="password" class="form-input" id="Confirmpassword" name="Confirmpassword" maxlength="11" pattern="[A-Za-z0-9]{6,11}" required placeholder="請輸入密碼（6~11位英數）">
-                            <button type="button" class="password-toggle-btn" id="toggleConfirmpassword">
+                            <input type="password" class="form-input" id="confirmPassword" name="Confirmpassword" maxlength="11" pattern="[A-Za-z0-9]{6,11}" required placeholder="請輸入密碼（6~11位英數）">
+                            <button type="button" class="password-toggle-btn" id="toggleConfirmPassword">
                                 <img src="~/icon/eye-fill.svg" alt="顯示密碼">
                             </button>
                             <div class="error-feedback">請輸入密碼（6~11位英數）</div>
                         </div>
                     </div>
+
+                    <!-- 取消密碼 -->
+                    <div class="cancel-wrapper">
+                        <a href="/Login" class="cancel-btn">取消修改</a>
+                    </div>
+
 
                     <!-- 提交按鈕 -->
                     <button type="submit" class="submit-btn">送出</button>
@@ -46,7 +67,7 @@
         </div>
     </div>
 
-    @* <script src="~/js/Members/Register.js"></script> *@
+    <script src="~/js/Members/ChangeP.js"></script>
     <script src="~/js/Members/icon.js"></script>
 
 </body>
