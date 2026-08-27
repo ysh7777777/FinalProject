@@ -44,9 +44,20 @@ namespace FinalProject.Controllers
         // 派車邏輯
         public async Task<FindDriverCar> OrderDriver(Trip trip)
         {
-            if (trip.DepartureTime is not DateTime departureTime) { return null; }
-            if (trip.EstimatedDuration is not int estimatedDuration) { return null; }
-            int eta = 30; DateTime taskStart = departureTime.AddMinutes(-eta); DateTime taskEnd = departureTime.AddMinutes(estimatedDuration + eta);
+            if (trip.DepartureTime is not DateTime departureTime)
+            {
+                return null;
+            }
+            if (trip.EstimatedDuration is not int estimatedDuration || estimatedDuration <= 0)
+            {
+                return null;
+            }
+
+            const int eta = 30;
+            DateTime taskStart = departureTime.AddMinutes(-eta);
+            DateTime taskEnd = departureTime.AddMinutes(estimatedDuration + eta);
+
+            string[] activeStatuses = { "行程中", "接單中", "休息", "請假", "下班", "已派車", "前往中", "已完成" };
 
             var Find = await _context.DriverShiftSchedules
                         .AsNoTracking()
@@ -70,9 +81,31 @@ namespace FinalProject.Controllers
 
                         schedule.LicensePlateNavigation.MaxPassengers >= trip.PassengerCount &&
 
-                        schedule.LicensePlateNavigation.MaxLuggage >= trip.LuggageCount
+                        schedule.LicensePlateNavigation.MaxLuggage >= trip.LuggageCount &&
 
+                        // 檢查車輛的起始位置是否與訂單的取車地點相符
+                        schedule.LicensePlateNavigation.BaseLocation == trip.PickupLocation &&
+
+                        schedule.LicensePlateNavigation.VehicleType == trip.VehicleType &&
+
+                       !_context.Trips.Any(existingTrip =>
+                           // 舊訂單的完整資料
+                           existingTrip.DepartureTime.HasValue &&
+                           existingTrip.EstimatedDuration.HasValue &&
+                           // 只檢查尚未取消、尚未完成的有效訂單
+                           existingTrip.TripStatus != null &&
+                           activeStatuses.Contains(existingTrip.TripStatus) &&
+                           (
+                           existingTrip.AssignedDriverId == schedule.DriverId ||
+                           existingTrip.LicensePlate == schedule.LicensePlate
+                           ) &&
+                           existingTrip.DepartureTime.Value.AddMinutes(-eta) < taskEnd &&
+                           existingTrip.DepartureTime.Value.AddMinutes(existingTrip.EstimatedDuration.Value + eta) > taskStart
                         )
+
+
+
+                        ).OrderBy(schedule => schedule.DriverId)
                         .FirstOrDefaultAsync();
 
             if (Find == null)
