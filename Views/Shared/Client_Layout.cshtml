@@ -2,9 +2,17 @@
   var isAuthenticated = User?.Identity?.IsAuthenticated ?? false;
     //var isAuthenticated = true;
     // isAuthenticated = true;
+
+    var displayName = User
+      .FindFirst(System.Security.Claims.ClaimTypes.GivenName)
+      ?.Value
+      ?? User?.Identity?.Name
+      ?? "";
+
     ViewData["Title"] ??= "機場接送";
     var pageClass = ViewData["PageClass"]?.ToString() ?? "";
     var isHomePage = pageClass == "home-index";
+
 }
 <!DOCTYPE html>
 <html lang="zh-Hant">
@@ -44,6 +52,11 @@
                                     <li><hr class="dropdown-divider" /></li>
                                     <li><form action="/Account/Logout" method="post"><button class="dropdown-item" type="submit">登出</button></form></li>
                                 </ul>
+                            </li>
+                            <li class="nav-item ms-lg-2 d-flex align-items-center">
+                                <span class="nav-link fw-semibold text-nowrap">
+                                    歡迎，@displayName
+                                </span>
                             </li>
                         }
                         else

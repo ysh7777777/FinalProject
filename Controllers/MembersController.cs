@@ -105,7 +105,7 @@ namespace FinalProject.Controllers
                 await _context.SaveChangesAsync();
             }
 
-            await SignInAsync(driver.DriverId, "driver");
+            await SignInAsync(driver.DriverId, "driver", driver.DriverName ?? driver.DriverId);
 
             return Ok(new
             {
@@ -141,7 +141,7 @@ namespace FinalProject.Controllers
                 return Unauthorized(new { success = false, message = "乘客帳號或密碼錯誤" });
             }
 
-            await SignInAsync(member.Account, "passenger");
+            await SignInAsync(member.Account, "passenger",member.FullName??member.Account);
 
             return Ok(new
             {
@@ -153,13 +153,14 @@ namespace FinalProject.Controllers
             });
         }
 
-        private async Task SignInAsync(string account, string role)
+        private async Task SignInAsync(string account, string role, string displayName)
         {
             var claims = new List<Claim>
             {
                 new(ClaimTypes.NameIdentifier, account),
                 new(ClaimTypes.Name, account),
-                new(ClaimTypes.Role, role)
+                new(ClaimTypes.Role, role),
+                new(ClaimTypes.GivenName,displayName)
             };
 
             var identity = new ClaimsIdentity(
