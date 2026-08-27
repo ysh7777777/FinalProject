@@ -129,7 +129,9 @@
                             <div class="row g-2">
                                 <div class="col-6">
                                     <span class="info-label"><i class="bi bi-person"></i> 客戶姓名：</span>
-                                    <span class="info-value">@item.Account</span>
+                                    <span class="info-value">
+                                      @(item.AccountNavigation?.FullName ?? item.Account)
+                                 </span>
                                 </div>
                                 @* <div class="col-6">
                                     <span class="info-label"><i class="bi bi-currency-dollar"></i> 費用：</span>
@@ -185,7 +187,7 @@
                 </div>
 
                 <div class="row g-2">
-                    <div class="col-6"><span class="info-label"><i class="bi bi-person"></i> 客戶姓名：</span><span class="info-value">@item.Account</span></div>
+                                <div class="col-6"><span class="info-label"><i class="bi bi-person"></i> 客戶姓名：</span><span class="info-value">@(item.AccountNavigation?.FullName ?? item.Account)</span></div>
 
                     <div class="col-12"><span class="info-label"><i class="bi bi-geo-alt"></i> 出發地：</span><span class="info-value">@item.PickupLocation</span></div>
                     <div class="col-12"><span class="info-label"><i class="bi bi-pin-map-fill"></i> 目的地：</span><span class="info-value">@item.Destination</span></div>

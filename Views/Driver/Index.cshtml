@@ -273,7 +273,9 @@
                                     <div class="row g-1 my-1 text-secondary small">
                                         <div class="col-6">
                                             <strong>客戶：</strong>
-                                            <span class="text-dark">@order.Account</span>
+                                            <span class="text-dark">
+                                                @(order.AccountNavigation?.FullName ?? order.Account)
+                                        </span>
                                         </div>
                                         <div class="col-6">
                                             <strong>預計出發：</strong>

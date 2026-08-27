@@ -36,7 +36,7 @@ namespace FinalProject.Controllers
             SELECT TOP 1
                 t.order_no,
                 t.account,
-                m.full_name AS customer_name,
+                ISNULL(m.full_name, t.account) AS customer_name,
                 t.departure_time,
                 t.pickup_location,
                 t.destination,
@@ -72,7 +72,11 @@ namespace FinalProject.Controllers
                                 LuggageCount = reader["luggage_count"] != DBNull.Value ? Convert.ToByte(reader["luggage_count"]) : (byte)0,
                                 //Fare = reader["fare"] != DBNull.Value ? Convert.ToInt32(reader["fare"]) : 0,
                                 EstimatedDuration = reader["estimated_duration"] != DBNull.Value ? Convert.ToInt32(reader["estimated_duration"]) : 0,
-                                TripStatus = reader["trip_status"]?.ToString() ?? string.Empty
+                                TripStatus = reader["trip_status"]?.ToString() ?? string.Empty,
+                                AccountNavigation = new Member
+                                {
+                                    FullName = reader["customer_name"]?.ToString() ?? string.Empty
+                                }
                             };
 
                             activeTrips.Add(trip);
@@ -115,7 +119,7 @@ namespace FinalProject.Controllers
                     SELECT 
                         t.order_no,
                         t.account,
-                        m.full_name AS customer_name,
+                        ISNULL(m.full_name, t.account) AS customer_name,
                         t.departure_time,
                         t.pickup_location,
                         t.destination,
@@ -151,11 +155,16 @@ namespace FinalProject.Controllers
                                 LuggageCount = reader["luggage_count"] != DBNull.Value ? Convert.ToByte(reader["luggage_count"]) : (byte)0,
                                 //Fare = reader["fare"] != DBNull.Value ? Convert.ToInt32(reader["fare"]) : 0,
                                 EstimatedDuration = reader["estimated_duration"] != DBNull.Value ? Convert.ToInt32(reader["estimated_duration"]) : 0,
-                                TripStatus = reader["trip_status"]?.ToString() ?? string.Empty
+                                TripStatus = reader["trip_status"]?.ToString() ?? string.Empty,
+                                AccountNavigation = new Member
+                                {
+                                    FullName = reader["customer_name"]?.ToString() ?? string.Empty
+                                }
                             };
 
                             // 根據行程狀態分類（'待出發'、'行程中' 屬於未來/進行中訂單；'已完成'、'已取消' 屬於歷史訂單）
                             if (item.TripStatus == "已完成" || item.TripStatus == "已取消")
+
                             {
                                 viewModel.HistoryOrders.Add(item);
                             }
