@@ -27,7 +27,7 @@ namespace FinalProject.Controllers
         // 私有方法：取得司機當前進行中或下一筆待出發的訂單
         private List<Trip> GetActiveTripOrders()
         {
-            string currentDriverId = "DRV001"; // 當前司機編號
+            string currentDriverId = "D001"; // 當前司機編號
             var activeTrips = new List<Trip>();
 
             using (SqlConnection conn = new SqlConnection(_connectionString))
@@ -35,6 +35,7 @@ namespace FinalProject.Controllers
                 string sql = @"
             SELECT TOP 1
                 t.order_no,
+                t.account,
                 m.full_name AS customer_name,
                 t.departure_time,
                 t.pickup_location,
@@ -44,7 +45,7 @@ namespace FinalProject.Controllers
                 ISNULL(t.estimated_duration, 0) AS estimated_duration,
                 t.trip_status
             FROM trip t
-            INNER JOIN member m ON t.account = m.account
+            LEFT JOIN member m ON t.account = m.account
             WHERE t.assigned_driver_id = @DriverId 
               AND t.trip_status IN ('待出發', '行程中')
             ORDER BY t.departure_time ASC"; // 抓時間最近的那一筆
@@ -73,6 +74,8 @@ namespace FinalProject.Controllers
                                 EstimatedDuration = reader["estimated_duration"] != DBNull.Value ? Convert.ToInt32(reader["estimated_duration"]) : 0,
                                 TripStatus = reader["trip_status"]?.ToString() ?? string.Empty
                             };
+
+                            activeTrips.Add(trip);
                         }
                     }
                 }
@@ -102,8 +105,8 @@ namespace FinalProject.Controllers
         {
             var viewModel = new OrdersViewModel();
 
-            // 範例：先固定以 DRV001 作為當前登入司機編號（後續可替換為 Session 或 User.Identity）
-            string currentDriverId = "DRV001";
+            // 範例：先固定以 D001 作為當前登入司機編號（後續可替換為 Session 或 User.Identity）
+            string currentDriverId = "D001";
 
             using (SqlConnection conn = new SqlConnection(_connectionString))
             {
@@ -111,6 +114,7 @@ namespace FinalProject.Controllers
                 string sql = @"
                     SELECT 
                         t.order_no,
+                        t.account,
                         m.full_name AS customer_name,
                         t.departure_time,
                         t.pickup_location,
@@ -123,6 +127,8 @@ namespace FinalProject.Controllers
                     INNER JOIN member m ON t.account = m.account
                     WHERE t.assigned_driver_id = @DriverId
                     ORDER BY t.departure_time DESC";
+
+               
 
                 using (SqlCommand cmd = new SqlCommand(sql, conn))
                 {
