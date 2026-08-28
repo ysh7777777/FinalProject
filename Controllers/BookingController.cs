@@ -9,7 +9,7 @@ namespace FinalProject.Controllers
 {
     public class BookingController : Controller
     {    
-        private const string TemporaryAccount = "user21";
+        private const string TemporaryAccount = "user01";
         private readonly RideHailingDbContext _context;
 
         public BookingController(RideHailingDbContext context)
