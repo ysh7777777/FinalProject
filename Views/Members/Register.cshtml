@@ -15,9 +15,6 @@
                 <h2 class="rg-title">會員註冊</h2>
 
                 <form action="/Join" method="POST" class="rg-form" novalidate>
-                    <!-- Id 欄位 -->
-                    <input type="hidden" id="id" name="id">
-
                     <!-- 帳號 -->
                     <div class="rg-fg">
                         <label for="account" class="rg-label">帳號(輸入6位英數)<span class="rg-text-danger">*</span></label>
@@ -37,19 +34,19 @@
                         <label class="rg-label">性別 <span class="rg-text-danger">*</span></label>
                         <div class="rg-gender-options">
                             <div class="rg-radio-inline">
-                                <input class="rg-radio-input" type="radio" name="gender" id="gender-male" value="Male" required>
-                                <label class="rg-radio-label" for="gender-male">男</label>
+                                <input class="rg-radio-input" type="radio" name="gender" id="genderMale" value="Male" required>
+                                <label class="rg-radio-label" for="genderMale">男</label>
                             </div>
                             <div class="rg-radio-inline">
-                                <input class="rg-radio-input" type="radio" name="gender" id="gender-female" value="Female" required>
-                                <label class="rg-radio-label" for="gender-female">女</label>
+                                <input class="rg-radio-input" type="radio" name="gender" id="genderFemale" value="Female" required>
+                                <label class="rg-radio-label" for="genderFemale">女</label>
                             </div>
                             <div class="rg-radio-inline">
-                                <input class="rg-radio-input" type="radio" name="gender" id="gender-other" value="Other" required>
-                                <label class="rg-radio-label" for="gender-other">其他</label>
+                                <input class="rg-radio-input" type="radio" name="gender" id="genderOther" value="Other" required>
+                                <label class="rg-radio-label" for="genderOther">其他</label>
                             </div>
                         </div>
-                        <div class="rg-error-feedback" id="gender-error">請選擇性別</div>
+                        <div class="rg-error-feedback" id="genderError">請選擇性別</div>
                     </div>
 
                     <!-- 生日 -->
@@ -63,7 +60,7 @@
                     <div class="rg-fg">
                         <label for="phone-number" class="rg-label">手機</label>
                         <div class="rg-phone-group">
-                            <select id="country-code" name="countryCode" class="rg-select">
+                            <select id="countryCode" name="countryCode" class="rg-select">
                                 <option value="">選取國碼</option>
                                 <option value="+886">台灣 (+886)</option>
                                 <option value="+852">香港 (+852)</option>
@@ -101,7 +98,7 @@
                                 <option value="+27">南非 (+27)</option>
                                 <option value="+20">埃及 (+20)</option>
                             </select>
-                            <input type="tel" class="rg-input" id="phone-number" name="phoneNumber" maxlength="20" pattern="[0-9]*">
+                            <input type="tel" class="rg-input" id="phoneNumber" name="phoneNumber" maxlength="20" pattern="[0-9]*">
                         </div>
                     </div>
 
@@ -116,8 +113,8 @@
                     <div class="rg-fg">
                         <label for="password" class="rg-label">密碼(區分大小寫)<span class="rg-text-danger">*</span></label>
                         <div class="rg-password-wrapper">
-                            <input type="password" class="rg-input" id="password" name="password" maxlength="11" pattern="[A-Za-z0-9]{6,11}" required placeholder="請輸入密碼（6~11位英數）">
-                            <span class="rg-icon-right" id="toggle-password">
+                            <input type="password" class="rg-input" id="passWord" name="passWord" maxlength="11" pattern="[A-Za-z0-9]{6,11}" required placeholder="請輸入密碼（6~11位英數）">
+                            <span class="rg-icon-right" id="togglePassword">
                                 <img src="~/icon/eye-fill.svg" alt="顯示密碼" class="rg-icon-img">
                             </span>
                         </div>
@@ -128,12 +125,12 @@
                     <div class="rg-fg">
                         <label for="confirm-password" class="rg-label">確認密碼(區分大小寫)<span class="rg-text-danger">*</span></label>
                         <div class="rg-password-wrapper">
-                            <input type="password" class="rg-input" id="confirm-password" name="confirmPassword" maxlength="11" pattern="[A-Za-z0-9]{6,11}" required placeholder="請輸入密碼（6~11位英數）">
-                            <span class="rg-icon-right" id="toggle-confirm-password">
+                            <input type="password" class="rg-input" id="confirmPassword" name="confirmPassword" maxlength="11" pattern="[A-Za-z0-9]{6,11}" required placeholder="請輸入密碼（6~11位英數）">
+                            <span class="rg-icon-right" id="toggleConfirmPassword">
                                 <img src="~/icon/eye-fill.svg" alt="顯示密碼" class="rg-icon-img">
                             </span>
                         </div>
-                        <div class="rg-error-feedback" id="confirm-password-error">請輸入密碼（6~11位英數）</div>
+                        <div class="rg-error-feedback" id="confirmPasswordError">請輸入密碼（6~11位英數）</div>
                     </div>
 
                     <!-- 取消註冊 -->
@@ -148,7 +145,7 @@
         </div>
     </div>
 
-    @* <script src="/js/Members/Register.js"></script> *@
-    <script src="/js/Members/icon.js"></script>
+    <script src="~/js/Members/Register.js"></script>
+    <script src="~/js/Members/icon.js"></script>
 </body>
 </html>

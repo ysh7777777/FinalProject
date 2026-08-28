@@ -17,6 +17,8 @@ public partial class Member
 
     public string PhoneNumber { get; set; } = null!;
 
+    public DateOnly Birthday { get; set; }
+
     public virtual ICollection<MemberSavedAddress> MemberSavedAddresses { get; set; } = new List<MemberSavedAddress>();
 
     public virtual ICollection<Trip> Trips { get; set; } = new List<Trip>();
