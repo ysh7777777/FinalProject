@@ -57,6 +57,46 @@ namespace finalProject.Controllers
                     InProgressStatus));
         }
 
+        // 新增：取得司機的訂單資料並打包為 OrdersViewModel
+        private OrdersViewModel GetDriverOrders()
+        {
+            var now = DateTime.Now;
+
+            // 1. 未來訂單：狀態為 待執行 或 行程中，且出發時間在未來（或今日尚未完成）
+            var futureOrders = GetCurrentDriverTrips()
+                .Include(t => t.AccountNavigation)
+                .Include(t => t.LicensePlateNavigation)
+                .Where(t => t.TripStatus == "待執行" || t.TripStatus == "行程中")
+                .OrderBy(t => t.DepartureTime)
+                .ToList();
+
+            // 2. 歷史訂單：狀態為 已完成 或 已取消
+            var historyOrders = GetCurrentDriverTrips()
+                .Include(t => t.AccountNavigation)
+                .Include(t => t.LicensePlateNavigation)
+                .Where(t => t.TripStatus == "已完成" || t.TripStatus == "已取消")
+                .OrderByDescending(t => t.CompletedAt ?? t.DepartureTime)
+                .ToList();
+
+            return new OrdersViewModel
+            {
+                FutureOrders = futureOrders,
+                HistoryOrders = historyOrders
+            };
+        }
+
+        // 新增：訂單查詢頁面 Action
+        public IActionResult Orders(string tab = "future")
+        {
+            var viewModel = GetDriverOrders();
+
+            ViewBag.ActiveTab = tab;
+
+            // 由於控制器叫 DriverNavigationController，預設會找 Views/DriverNavigation/Orders.cshtml
+            // 若你的檔名位在 Views/Driver/Orders.cshtml，請保留下方寫法：
+            return View("~/Views/DriverNavigation/Orders.cshtml", viewModel);
+        }
+
         // 既有登入流程會導向 /Driver/Index；在不修改登入檔案的
         // 前提下，由此端點銜接至正式的司機導航頁。
         [HttpGet("/Driver", Order = -1)]
@@ -111,8 +151,8 @@ namespace finalProject.Controllers
             {
                 if (ViewBag.HasCompletedToday == true)
                 {
-                    TempData["OrderMessage"] =
-                        "今日訂單已全部完成，以下為今日完成訂單";
+                    //TempData["OrderMessage"] =
+                    //    "今日訂單已全部完成，以下為今日完成訂單";
 
                     return RedirectToAction(
                         "LastOrder",
