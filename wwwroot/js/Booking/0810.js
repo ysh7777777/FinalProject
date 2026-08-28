@@ -1526,10 +1526,13 @@ bookingForm.addEventListener(
 
             PassengerCount: Number(document.getElementById("passengerCount").value ),
 
-            LuggageCount: Number(document.getElementById("luggageCount").value ),
-            // babySeat: Number(document.getElementById("babySeatCount").value ),
+            LuggageCount: Number(document.getElementById("luggageCount").value),
 
-            // flight: document.getElementById("flightNumber").value
+            // 新增資料
+            // Fare: Number(document.getElementById("summaryFare").value),
+
+            // BabySeat: Number(document.getElementById("babySeatCount").value ),
+
         };
 
         console.log("訂單驗證成功，準備送出");

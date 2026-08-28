@@ -333,6 +333,10 @@ namespace FinalProject.Controllers
                 VehicleType = dto.VehicleType,
                 PassengerCount = dto.PassengerCount,
                 LuggageCount = dto.LuggageCount,
+                
+                // 新增資料
+                //BabySeat = dto.BabySeat,
+                //Fare = dto.Fare,
 
                 TripStatus = "待執行",
 

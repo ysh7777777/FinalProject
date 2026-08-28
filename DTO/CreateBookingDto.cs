@@ -22,6 +22,11 @@
 
         public byte? LuggageCount { get; set; }
 
+        // 新增資料
+        //public byte? BabySeat { get; set; }
+
+        //public int? Fare { get; set; }
+
         public int? EstimatedDuration { get; set; }
     }
 }
