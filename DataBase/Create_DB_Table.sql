@@ -107,11 +107,15 @@ CREATE TABLE trip (
     vehicle_type NVARCHAR(20),              -- 乘客指定的偏好車型
     passenger_count TINYINT,                -- 搭乘人數
     luggage_count TINYINT,                  -- 行物/行李件數
+    child_seat_count TINYINT NOT NULL
+    CONSTRAINT DF_trip_child_seat_count DEFAULT 0, -- 所需嬰兒座椅數量
     completed_at SMALLDATETIME,             -- 訂單結束時間 (用於完成訂單排序)
     canceled_at SMALLDATETIME,              -- 訂單取消時間 (用於取消訂單排序)
     FOREIGN KEY (account) REFERENCES member(account),                 -- 連結至會員表
     FOREIGN KEY (license_plate) REFERENCES vehicle(license_plate),     -- 連結至車輛表
-    FOREIGN KEY (assigned_driver_id) REFERENCES driver(driver_id)     -- 連結至司機表
+    FOREIGN KEY (assigned_driver_id) REFERENCES driver(driver_id),     -- 連結至司機表
+    CONSTRAINT CK_trip_child_seat_count 
+    CHECK (child_seat_count BETWEEN 0 AND 3)
 );
 
 -- 8. 地圖熱點 / 地標表 (MapLandmark) [新增 - 用於地圖搜尋自動補全或快取]

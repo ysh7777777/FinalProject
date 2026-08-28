@@ -3,6 +3,13 @@ using System.Collections.Generic;
 
 namespace FinalProject.Models;
 
+public class OrdersViewModel
+{
+    public List<Trip> FutureOrders { get; set; } = new List<Trip> ();
+
+    public List<Trip> HistoryOrders{ get; set; } = new List<Trip> ();
+}
+
 public partial class Trip
 {
     public string OrderNo { get; set; } = null!;
@@ -36,6 +43,11 @@ public partial class Trip
     public byte? PassengerCount { get; set; }
 
     public byte? LuggageCount { get; set; }
+
+    // 新增資料
+    public byte? BabySeat { get; set; }
+
+    public int? Fare { get; set; }
 
     public DateTime? CompletedAt { get; set; }
 

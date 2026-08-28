@@ -228,9 +228,13 @@ initializeAirportSelect("dropoffAirport");
 function bindTerminalSelect(airportSelectId, terminalSelectId) {
     const airportSelect = document.getElementById(airportSelectId);
     const terminalSelect = document.getElementById(terminalSelectId);
+    const location = airportSelectId.replace("Airport", "");
+
     airportSelect.addEventListener("change", function () {
         const airport = this.value;
         terminalSelect.innerHTML = "";
+        window.clearBookingLocation?.(location);
+
         if (!airport) {
             terminalSelect.disabled = true;
             const option = document.createElement("option");
@@ -253,7 +257,33 @@ function bindTerminalSelect(airportSelectId, terminalSelectId) {
         });
         updateSummary();
     });
-    terminalSelect.addEventListener("change", updateSummary);
+
+    terminalSelect.addEventListener("change", async function () {
+        const airport = airportSelect.value;
+        const terminal = this.value;
+
+        if (!airport || !terminal) {
+            window.clearBookingLocation?.(location);
+            return;
+        }
+
+        this.disabled = true;
+        try {
+            await window.selectAirportBookingLocation(
+                location,
+                airport,
+                terminal
+            );
+        }
+        catch (error) {
+            console.error("機場航廈解析失敗：", error);
+            window.clearBookingLocation?.(location);
+            alert("無法取得此機場航廈的位置，請稍後再試或改用 API 搜尋。");
+        }
+        finally {
+            this.disabled = false;
+        }
+    });
 }
 bindTerminalSelect("pickupAirport", "pickupTerminal");
 bindTerminalSelect("dropoffAirport", "dropoffTerminal");
@@ -266,24 +296,36 @@ function setupLocationSwitch(locationName) {
     );
     buttons.forEach(button => {
         button.addEventListener("click", function () {
+            if (this.classList.contains("active")) {
+                return;
+            }
+
             const type = this.dataset.type;
             buttons.forEach(btn => {
                 btn.classList.remove("active");
             });
             this.classList.add("active");
-            const cityPanel = document.getElementById(
-                `${locationName}CityPanel`
+            const panels = {
+                api: document.getElementById(`${locationName}ApiPanel`),
+                favorite: document.getElementById(`${locationName}FavoritePanel`),
+                airport: document.getElementById(`${locationName}AirportPanel`)
+            };
+
+            Object.entries(panels).forEach(([panelType, panel]) => {
+                panel.classList.toggle("d-none-custom", panelType !== type);
+            });
+
+            document.getElementById(`${locationName}Favorite`).value = "";
+            document.getElementById(`${locationName}Airport`).value = "";
+
+            const terminalSelect = document.getElementById(
+                `${locationName}Terminal`
             );
-            const airportPanel = document.getElementById(
-                `${locationName}AirportPanel`
-            );
-            if (type === "city") {
-                cityPanel.classList.remove("d-none-custom");
-                airportPanel.classList.add("d-none-custom");
-            } else {
-                cityPanel.classList.add("d-none-custom");
-                airportPanel.classList.remove("d-none-custom");
-            }
+            terminalSelect.innerHTML =
+                '<option value="">請先選擇機場</option>';
+            terminalSelect.disabled = true;
+
+            window.clearBookingLocation?.(locationName);
             updateSummary();
         });
     });
@@ -383,36 +425,40 @@ function clearCityDistrict(location) {
 //     });
 
 /* =========================================================
-常用地址 → 地址欄
-選擇常用地址時，清除城市／行政區
+   SQL 常用地址 → Booking API 共用地點資料
 ========================================================== */
-document
-    .getElementById("pickupFavorite")
-    .addEventListener("change", function () {
-        if (this.value) {
-            clearCityDistrict("pickup");
+function bindFavoriteAddressSelect(location) {
+    const select = document.getElementById(`${location}Favorite`);
 
-            document
-                .getElementById("pickupAddress")
-                .value = this.value;
+    select.addEventListener("change", async function () {
+        const option = this.selectedOptions[0];
+
+        if (!this.value || !option?.dataset.address) {
+            window.clearBookingLocation?.(location);
+            return;
         }
 
-        updateSummary();
-    });
-
-document
-    .getElementById("dropoffFavorite")
-    .addEventListener("change", function () {
-        if (this.value) {
-            clearCityDistrict("dropoff");
-
-            document
-                .getElementById("dropoffAddress")
-                .value = this.value;
+        this.disabled = true;
+        try {
+            await window.selectSavedBookingAddress(location, {
+                address: option.dataset.address,
+                lat: option.dataset.lat,
+                lng: option.dataset.lng
+            });
         }
-
-        updateSummary();
+        catch (error) {
+            console.error("常用地址解析失敗：", error);
+            window.clearBookingLocation?.(location);
+            alert("無法取得此常用地址的位置，請稍後再試或改用 API 搜尋。");
+        }
+        finally {
+            this.disabled = false;
+        }
     });
+}
+
+bindFavoriteAddressSelect("pickup");
+bindFavoriteAddressSelect("dropoff");
 
 /* =========================================================
    地址輸入
@@ -432,7 +478,7 @@ function getLocationType(location) {
     );
     return activeButton
         ? activeButton.dataset.type
-        : "city";
+        : "api";
 }
 /* =========================================================
    功能：取得地點文字
@@ -683,8 +729,48 @@ function updateSummary() {
         rideTime = date;
     }
     document.getElementById("summaryRideTime").textContent = rideTime;
-    document.getElementById("summaryPickup").textContent = getLocationText("pickup");
-    document.getElementById("summaryDropoff").textContent = getLocationText("dropoff");
+
+    const mapData = window.bookingMapData;
+    document.getElementById("summaryPickup").textContent =
+        mapData?.pickupLocation?.address || "尚未選擇";
+    document.getElementById("summaryDropoff").textContent =
+        mapData?.destinationLocation?.address || "尚未選擇";
+
+    const estimatedDistanceKm = mapData?.estimatedDistanceKm;
+    const estimatedDuration = mapData?.estimatedDuration;
+    const summaryEstimatedDistance = document.getElementById(
+        "summaryEstimatedDistance"
+    );
+    const summaryEstimatedDuration = document.getElementById(
+        "summaryEstimatedDuration"
+    );
+    const summaryFare = document.getElementById("summaryFare");
+
+    const hasEstimatedDistance =
+        Number.isFinite(estimatedDistanceKm) && estimatedDistanceKm > 0;
+    const hasEstimatedDuration =
+        Number.isInteger(estimatedDuration) && estimatedDuration > 0;
+
+    summaryEstimatedDistance.textContent = hasEstimatedDistance
+        ? `${estimatedDistanceKm.toFixed(2)} 公里`
+        : "尚未計算";
+    summaryEstimatedDuration.textContent = hasEstimatedDuration
+        ? `${estimatedDuration} 分鐘`
+        : "尚未計算";
+
+    if (!hasEstimatedDistance || !hasEstimatedDuration) {
+        summaryFare.textContent = "尚未計算";
+        return;
+    }
+
+    const baseFare = Number(window.selectedCar?.price);
+    if (!window.selectedCar || !Number.isFinite(baseFare)) {
+        summaryFare.textContent = "請先選擇車型";
+        return;
+    }
+
+    const fare = Math.round(estimatedDistanceKm * 20 + baseFare);
+    summaryFare.textContent = `NT$${fare.toLocaleString()}`;
 }
 /* ======================= 初始化 ======================= */
 updateSummary();
@@ -1029,6 +1115,7 @@ document.addEventListener(
 
             /* ----------------------- 更新訂單總覽 ----------------------- */
             updateCarSummary();
+            updateSummary();
         }
 
         /* ======================= 訂單總覽 ======================= */
@@ -1397,6 +1484,30 @@ bookingForm.addEventListener(
          */
         bookingForm.classList.add( "was-validated" );
 
+        const mapData = window.bookingMapData;
+        if (
+            !mapData?.pickupLocation ||
+            !mapData?.destinationLocation ||
+            !Number.isFinite(mapData.estimatedDistanceKm) ||
+            mapData.estimatedDistanceKm <= 0 ||
+            !Number.isInteger(mapData.estimatedDuration) ||
+            mapData.estimatedDuration <= 0
+        ) {
+            alert("請選擇有效的出發地與目的地，並等待路線里程與時間計算完成。");
+            return;
+        }
+        // 
+        const baseFare = Number(window.selectedCar?.price);
+
+        if (!window.selectedCar || !Number.isFinite(baseFare)) {
+            alert("請先選擇車型");
+            return;
+        }
+
+        const fare = Math.round(
+            mapData.estimatedDistanceKm * 20 + baseFare
+        );
+
         /* ======================= 送出中 ======================= */
         submitOrderBtn.disabled = true;
         submitOrderSpinner.classList.remove( "d-none" );
@@ -1408,18 +1519,31 @@ bookingForm.addEventListener(
             DepartureTime: document.getElementById("summaryRideTime").textContent.trim().replace(" ", "T") + ":00",
             // 加上 .trim().replace(" ", "T") + ":00" 讓時間 2026-08-27 05:25 -> 2026-08-27T05:25:00
 
-            PickupLocation: document.getElementById("pickupAddress").value,
+            PickupLocation: mapData.pickupLocation.address,
 
-            Destination: document.getElementById("dropoffAddress").value,
+            PickupLat: mapData.pickupLocation.lat,
+
+            PickupLng: mapData.pickupLocation.lng,
+
+            Destination: mapData.destinationLocation.address,
+
+            DestinationLat: mapData.destinationLocation.lat,
+
+            DestinationLng: mapData.destinationLocation.lng,
+
+            EstimatedDuration: mapData.estimatedDuration,
 
             VehicleType: document.querySelector(".car-name").textContent.trim(),
 
             PassengerCount: Number(document.getElementById("passengerCount").value ),
 
-            LuggageCount: Number(document.getElementById("luggageCount").value ),
-            // babySeat: Number(document.getElementById("babySeatCount").value ),
+            LuggageCount: Number(document.getElementById("luggageCount").value),
 
-            // flight: document.getElementById("flightNumber").value
+            // 新增資料
+            BabySeat: Number(document.getElementById("babySeatCount").value ),
+            Fare: fare,
+
+
         };
 
         console.log("訂單驗證成功，準備送出");

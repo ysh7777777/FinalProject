@@ -1,3 +1,4 @@
+using finalProject.Hubs;
 using FinalProject.Models;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
@@ -21,10 +22,12 @@ builder.Services
         options.Cookie.SameSite = SameSiteMode.Lax;
         options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
         options.ExpireTimeSpan = TimeSpan.FromDays(1);
-        options.SlidingExpiration = true;
+        options.SlidingExpiration = false;
     });
 
 
+
+builder.Services.AddSignalR();
 
 var app = builder.Build();
 
@@ -46,11 +49,14 @@ app.MapStaticAssets();
 
 app.MapControllerRoute(
     name: "default",
-    //pattern: "{controller=Booking}/{action=BookingPage}/{id?}")
+    pattern: "{controller=Booking}/{action=BookingPage}/{id?}")
     //pattern: "{controller=Members}/{action=Login}/{id?}")
     pattern: "{controller=ClientHistory}/{action=ClientHistory}/{id?}")
     //pattern: "{controller=Home}/{action=Index}/{id?}")
     .WithStaticAssets();
 
+app.MapHub<DriverLocationHub>(
+    "/driverLocationHub"
+);
 
 app.Run();

@@ -2,6 +2,7 @@
 @{
     var Drivers = ViewBag.Drivers;
     var VehicleMenu = ViewBag.VehicleMenu;
+    var SavedAddresses = ViewBag.SavedAddresses as List<MemberSavedAddress> ?? new List<MemberSavedAddress>();
 
     @* 我想要一個一個取，取法如下 -> <img src="@vehicleMenuSin[0].ImageUrl"> *@
     var vehicleMenuSin = ViewData["VehicleMenuSin"] as List<VehicleMenu>;
@@ -116,7 +117,7 @@
                     </div>
                 </section>
                 <!-- ======================= 上下車地點 section ======================= -->
-                <section class="booking-card">
+                <section class="booking-card location-card">
                     <div class="booking-card-header">
                         <h2 class="booking-card-title">
                             <i class="bi bi-geo-alt-fill"></i>
@@ -134,47 +135,27 @@
                             </div>
                             <!-- 上車地點類型 div -->
                             <div class="location-type-switch" role="group">
-                                <button type="button" class="btn active" data-location="pickup" data-type="city">
-                                    全台各市區
+                                <button type="button" class="btn active" data-location="pickup" data-type="api">
+                                    API 搜尋
+                                </button>
+                                <button type="button" class="btn" data-location="pickup" data-type="favorite">
+                                    常用地址
                                 </button>
                                 <button type="button" class="btn" data-location="pickup" data-type="airport">
                                     機場
                                 </button>
                             </div>
-                            <!-- 上車：全台各市區 div -->
-                            <div id="pickupCityPanel" class="city-panel">
+                            <!-- 上車：API 搜尋 -->
+                            <div id="pickupApiPanel" class="city-panel">
                                 <div class="row g-3">
-                                    <!-- 常用地址 div -->
-                                    <div class="col-12">
-                                        <label class="form-label" for="pickupFavorite">常用地址</label>
-                                        <div class="favorite-address-group">
-                                            <select id="pickupFavorite" class="form-select">
-                                                <option value="">請選擇常用地址</option>
-                                                <option value="台北市信義區市府路1號">公司</option>
-                                                <option value="台北市中山區南京東路100號">住家</option>
-                                                <option value="新北市板橋區文化路一段188號">板橋辦公室</option>
-                                            </select>
-                                            <!-- 開啟常用地址管理 -->
-                                            <a href="favorite-address.html" target="_blank" rel="noopener noreferrer"
-                                               class="favorite-add-btn" title="管理常用地址">
-                                                    @* <a asp-controller="FavoriteAddress" asp-action="Index"
-                                                       target="_blank" rel="noopener noreferrer"
-                                                       class="favorite-add-btn" title="管理常用地址"> *@
-                                                <i class="bi bi-plus-lg"></i>
-                                            </a>
-                                        </div>
-                                    </div>
-                                    <!-- 縣市 div -->
-                                    <div class="col-md-6">
+                                    <!-- 保留組員欄位供後續相容，但不在叫車頁顯示。 -->
+                                    <div class="d-none-custom" aria-hidden="true">
                                         <label for="pickupCity" class="form-label">
                                             縣市
                                         </label>
                                         <select id="pickupCity" class="form-select">
                                             <option value="">請選擇縣市</option>
                                         </select>
-                                    </div>
-                                    <!-- 行政區 div -->
-                                    <div class="col-md-6">
                                         <label for="pickupDistrict" class="form-label">
                                             行政區
                                         </label>
@@ -182,21 +163,34 @@
                                             <option value="">請先選擇縣市</option>
                                         </select>
                                     </div>
-                                    <!-- 地址 div -->
                                     <div class="col-12">
-                                        <label for="pickupAddress" class="form-label">
+                                        <label class="form-label">
                                             上車地址
                                         </label>
-                                        <input type="text" id="pickupAddress" 
-                                            class="form-control" 
-                                            @* style="display:none" *@
-                                               placeholder="請輸入上車地址">
+                                        <div id="pickup-autocomplete-container"></div>
+                                        <input type="hidden" id="pickupAddress">
                                     </div>
-                                    @* 接轉換地址的API
-                                    <div id="pickup-autocomplete-container"></div>
-                                    <button id="temp1" onclick="TempData()">temp</button> 
-                                    *@
                                 </div>
+                            </div>
+                            <!-- 上車：常用地址 -->
+                            <div id="pickupFavoritePanel" class="city-panel d-none-custom">
+                                <label class="form-label" for="pickupFavorite">常用地址</label>
+                                <select id="pickupFavorite" class="form-select">
+                                    <option value="">請選擇常用地址</option>
+                                    @foreach (var address in SavedAddresses)
+                                    {
+                                        <option value="@address.AddressId"
+                                                data-address="@address.AddressText"
+                                                data-lat="@(address.Latitude?.ToString(System.Globalization.CultureInfo.InvariantCulture) ?? "")"
+                                                data-lng="@(address.Longitude?.ToString(System.Globalization.CultureInfo.InvariantCulture) ?? "")">
+                                            @address.Label｜@address.AddressText
+                                        </option>
+                                    }
+                                </select>
+                                @if (SavedAddresses.Count == 0)
+                                {
+                                    <div class="form-text">目前沒有常用地址，請至會員專區的常用地址維護新增。</div>
+                                }
                             </div>
                             <!-- ======================= 上車：機場 div ======================= -->
                             <div id="pickupAirportPanel" class="airport-panel d-none-custom">
@@ -238,43 +232,27 @@
                             </div>
                             <!-- 下車地點類型 div -->
                             <div class="location-type-switch" role="group">
-                                <button type="button" class="btn active" data-location="dropoff" data-type="city">
-                                    全台各市區
+                                <button type="button" class="btn active" data-location="dropoff" data-type="api">
+                                    API 搜尋
+                                </button>
+                                <button type="button" class="btn" data-location="dropoff" data-type="favorite">
+                                    常用地址
                                 </button>
                                 <button type="button" class="btn" data-location="dropoff" data-type="airport">
                                     機場
                                 </button>
                             </div>
-                            <!-- ======================= 下車：全台各市區 div ======================= -->
-                            <div id="dropoffCityPanel" class="city-panel">
+                            <!-- 下車：API 搜尋 -->
+                            <div id="dropoffApiPanel" class="city-panel">
                                 <div class="row g-3">
-                                    <!-- 常用地址 div -->
-                                    <div class="col-12">
-                                        <label for="dropoffFavorite" class="form-label">常用地址</label>
-                                        <div class="favorite-address-group">
-                                            <select id="dropoffFavorite" class="form-select">
-                                                <option value="">請選擇常用地址</option>
-                                                <option value="台北市信義區市府路1號">公司</option>
-                                                <option value="台北市中山區南京東路100號">住家</option>
-                                                <option value="新北市板橋區文化路一段188號">板橋辦公室</option>
-                                            </select>
-                                            <a href="favorite-address.html" target="_blank" rel="noopener noreferrer"
-                                               class="favorite-add-btn" title="管理常用地址">
-                                                <i class="bi bi-plus-lg"></i>
-                                            </a>
-                                        </div>
-                                    </div>
-                                    <!-- 縣市 div -->
-                                    <div class="col-md-6">
+                                    <!-- 保留組員欄位供後續相容，但不在叫車頁顯示。 -->
+                                    <div class="d-none-custom" aria-hidden="true">
                                         <label for="dropoffCity" class="form-label">
                                             縣市
                                         </label>
                                         <select id="dropoffCity" class="form-select">
                                             <option value="">請選擇縣市</option>
                                         </select>
-                                    </div>
-                                    <!-- 行政區 div -->
-                                    <div class="col-md-6">
                                         <label for="dropoffDistrict" class="form-label">
                                             行政區
                                         </label>
@@ -282,15 +260,34 @@
                                             <option value="">請先選擇縣市</option>
                                         </select>
                                     </div>
-                                    <!-- 地址 div -->
                                     <div class="col-12">
-                                        <label for="dropoffAddress" class="form-label">
+                                        <label class="form-label">
                                             下車地址
                                         </label>
-                                        <input type="text" id="dropoffAddress" class="form-control"
-                                               placeholder="請輸入下車地址">
+                                        <div id="destination-autocomplete-container"></div>
+                                        <input type="hidden" id="dropoffAddress">
                                     </div>
                                 </div>
+                            </div>
+                            <!-- 下車：常用地址 -->
+                            <div id="dropoffFavoritePanel" class="city-panel d-none-custom">
+                                <label class="form-label" for="dropoffFavorite">常用地址</label>
+                                <select id="dropoffFavorite" class="form-select">
+                                    <option value="">請選擇常用地址</option>
+                                    @foreach (var address in SavedAddresses)
+                                    {
+                                        <option value="@address.AddressId"
+                                                data-address="@address.AddressText"
+                                                data-lat="@(address.Latitude?.ToString(System.Globalization.CultureInfo.InvariantCulture) ?? "")"
+                                                data-lng="@(address.Longitude?.ToString(System.Globalization.CultureInfo.InvariantCulture) ?? "")">
+                                            @address.Label｜@address.AddressText
+                                        </option>
+                                    }
+                                </select>
+                                @if (SavedAddresses.Count == 0)
+                                {
+                                    <div class="form-text">目前沒有常用地址，請至會員專區的常用地址維護新增。</div>
+                                }
                             </div>
                             <!-- ======================= 下車：機場 div ======================= -->
                             <div id="dropoffAirportPanel" class="airport-panel d-none-custom">
@@ -486,7 +483,7 @@
                                 <div class="quantity-field">
                                     <label for="passengerCount" class="form-label">
                                         <i class="bi bi-person-fill"></i>
-                                        人數
+                                        總人數
                                     </label>
                                     <div class="input-group quantity-input-group">
                                         <!-- 減少 -->
@@ -539,7 +536,8 @@
                             <div class="col-12 col-md-4">
                                 <div class="quantity-field">
                                     <label for="babySeatCount" class="form-label">
-                                        <i class="bi bi-person-standing"></i>
+                                            @* <i class="bi bi-person-standing"></i> *@
+                                            <i class="bi bi-balloon-fill"></i>
                                         嬰兒座椅
                                     </label>
                                     <div class="input-group quantity-input-group">
@@ -631,6 +629,36 @@
                                 尚未選擇
                             </div>
                         </div>
+                        <!-- 預估里程數 -->
+                        <div class="summary-item">
+                            <div class="summary-label">
+                                <i class="bi bi-signpost-2"></i>
+                                預估里程數
+                            </div>
+                            <div class="summary-value" id="summaryEstimatedDistance">
+                                尚未計算
+                            </div>
+                        </div>
+                        <!-- 預估行程時間 -->
+                        <div class="summary-item">
+                            <div class="summary-label">
+                                <i class="bi bi-clock"></i>
+                                預估行程時間
+                            </div>
+                            <div class="summary-value" id="summaryEstimatedDuration">
+                                尚未計算
+                            </div>
+                        </div>
+                        <!-- 車資 -->
+                        <div class="summary-item">
+                            <div class="summary-label">
+                                <i class="bi bi-cash-coin"></i>
+                                車資
+                            </div>
+                            <div class="summary-value" id="summaryFare">
+                                尚未計算
+                            </div>
+                        </div>
                         <!-- =================================== -->
                         <!-- 乘客資訊 div -->
                         <div class="summary-section-title">
@@ -711,6 +739,10 @@
 
     <!-- ======================= JS ======================== -->
     <script src="~/js/Booking/0810.js"></script>
+    <script src="~/js/Booking/place-autocomplete.js"></script>
+    <!-- 串接地址轉換 API JS ======================== -->
+    <script async src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAk5HVk6NmgjgNL9vu5m2HRjvcbghlyMn4&libraries=places&callback=initAutocomplete"></script>
+
 </body>
 
 </html>

@@ -1,17 +1,31 @@
 @{
-  var isAuthenticated = User?.Identity?.IsAuthenticated ?? false;
-    //var isAuthenticated = true;
-    // isAuthenticated = true;
+    var isAuthenticated =
+         User?.Identity?.IsAuthenticated ?? false;
 
-    var displayName = User
-      .FindFirst(System.Security.Claims.ClaimTypes.GivenName)
-      ?.Value
-      ?? User?.Identity?.Name
-      ?? "";
+    if (isAuthenticated && User!.IsInRole("driver"))
+    {
+        Context.Response.Redirect("/Driver/Index");
+    }
+
+    var displayName =
+        User?.FindFirst(
+            System.Security.Claims.ClaimTypes.GivenName
+        )?.Value
+        ?? User?.Identity?.Name
+        ?? "";
+
+    var isPassenger =
+        isAuthenticated &&
+        User!.IsInRole("passenger");
 
     ViewData["Title"] ??= "機場接送";
-    var pageClass = ViewData["PageClass"]?.ToString() ?? "";
-    var isHomePage = pageClass == "home-index";
+
+    var pageClass =
+        ViewData["PageClass"]?.ToString()
+        ?? "";
+
+    var isHomePage =
+        pageClass == "home-index";
 
 }
 <!DOCTYPE html>
@@ -39,7 +53,7 @@
                 <div class="collapse navbar-collapse" id="clientV2Menu">
                     <ul class="navbar-nav ms-lg-auto me-lg-5 align-items-lg-center gap-lg-2">
                         @* 修改：參考圖一，主要功能改為置中的文字選單 *@
-                        <li class="nav-item"><a class="nav-link" href="/Booking/Create">點我訂車</a></li>
+                        <li class="nav-item"><a class="nav-link" href="/Booking/BookingPage">點我訂車</a></li>
                         <li class="nav-item"><a class="nav-link" href="/Booking/History">訂單查詢</a></li>
                         @if (isAuthenticated)
                         {
@@ -47,7 +61,7 @@
                                 <a class="nav-link dropdown-toggle" href="#" id="clientV2Member" role="button" data-bs-toggle="dropdown" aria-expanded="false">會員專區</a>
                                 <ul class="dropdown-menu dropdown-menu-end shadow border-0" aria-labelledby="clientV2Member">
                                     <li><a class="dropdown-item" href="/Change">修改密碼</a></li>
-                                    <li><a class="dropdown-item" href="/Member/Addresses">常用地址維護</a></li>
+                                    <li><a class="dropdown-item" asp-controller="SavedAddress" asp-action="Index">常用地址維護</a></li>
                                     <li><a class="dropdown-item" href="/Booking/History">訂單查詢</a></li>
                                     <li><hr class="dropdown-divider" /></li>
                                     <li><form action="/Account/Logout" method="post"><button class="dropdown-item" type="submit">登出</button></form></li>

@@ -289,6 +289,12 @@ public partial class RideHailingDbContext : DbContext
             entity.HasOne(d => d.LicensePlateNavigation).WithMany(p => p.Trips)
                 .HasForeignKey(d => d.LicensePlate)
                 .HasConstraintName("FK__trip__license_pl__5DCAEF64");
+            // 因為新增 trip 表單的 baby_seat 及 fare，所以新增 (08/23 益)
+            entity.Property(e => e.BabySeat)
+                .HasDefaultValue((byte)0)
+                .HasColumnName("baby_seat");
+            entity.Property(e => e.Fare)
+                .HasColumnName("fare");
         });
 
         modelBuilder.Entity<Vehicle>(entity =>

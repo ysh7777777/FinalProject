@@ -3,16 +3,31 @@ using FinalProject.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Reflection.Metadata;
+using System.Security.Claims;
 
 namespace FinalProject.Controllers
 {
     public class BookingController : Controller
     {    
+        private const string TemporaryAccount = "user01";
         private readonly RideHailingDbContext _context;
 
         public BookingController(RideHailingDbContext context)
         {
             _context = context;
+        }
+
+        private string GetCurrentAccount()
+        {
+            // TODO: 登入驗證完成後，統一以 NameIdentifier claim 存放會員 account。
+            var authenticatedAccount =
+                User.FindFirst(ClaimTypes.NameIdentifier)?.Value ??
+                User.Identity?.Name;
+
+            return User.Identity?.IsAuthenticated == true &&
+                   !string.IsNullOrWhiteSpace(authenticatedAccount)
+                ? authenticatedAccount
+                : TemporaryAccount;
         }
 
 
@@ -24,8 +39,17 @@ namespace FinalProject.Controllers
         public async Task<IActionResult> BookingPage(string id)
         {
             var VehicleMenu = await _context.VehicleMenu.ToListAsync();
+            var currentAccount = GetCurrentAccount();
+            var savedAddresses = await _context.MemberSavedAddresses
+                .AsNoTracking()
+                .Where(address => address.Account == currentAccount)
+                .OrderBy(address => address.Label)
+                .ThenBy(address => address.AddressId)
+                .ToListAsync();
 
             ViewBag.VehicleMenu = VehicleMenu;
+            ViewBag.SavedAddresses = savedAddresses;
+            ViewBag.CurrentAccount = currentAccount;
             ViewData["VehicleMenuSin"] = VehicleMenu;  // 我想要一個一個取
 
             return View();
@@ -169,10 +193,11 @@ namespace FinalProject.Controllers
         public async Task<IActionResult> Create(
         [FromBody] Trip trip)
         {
-            // 測試用假資料
-            trip.Account = "user03";
+
+
+            // 登入功能完成前使用 user21；完成後由 GetCurrentAccount() 讀取登入會員。
+            trip.Account = GetCurrentAccount();
             trip.OrderNo = GenerateOrderNumber();
-            trip.EstimatedDuration = 2;
 
             // 暫時移除這三個驗證錯誤
             ModelState.Remove("Account");
@@ -233,12 +258,16 @@ namespace FinalProject.Controllers
                 OrderNo = GenerateOrderNumber(),
                 DepartureTime = trip.DepartureTime,
                 PickupLocation = trip.PickupLocation,
+                PickupLat = trip.PickupLat,
+                PickupLng = trip.PickupLng,
                 Destination = trip.Destination,
+                DestinationLat = trip.DestinationLat,
+                DestinationLng = trip.DestinationLng,
                 VehicleType = trip.VehicleType,
                 PassengerCount = trip.PassengerCount,
                 LuggageCount = trip.LuggageCount,
                 Account = trip.Account,
-                EstimatedDuration = trip.EstimatedDuration = 2,
+                EstimatedDuration = trip.EstimatedDuration,
                 AssignedDriverId = result.DriverId,
                 LicensePlate = result.LicensePlate,
                 //BabySeat = model.BabySeat,
@@ -290,7 +319,7 @@ namespace FinalProject.Controllers
                 OrderNo = GenerateOrderNumber(),
 
                 // 暫時測試用
-                Account = "user03",
+                Account = GetCurrentAccount(),
 
                 DepartureTime = dto.DepartureTime,
                 PickupLocation = dto.PickupLocation,
@@ -305,10 +334,14 @@ namespace FinalProject.Controllers
                 PassengerCount = dto.PassengerCount,
                 LuggageCount = dto.LuggageCount,
 
+                // 新增資料
+                BabySeat = dto.BabySeat,
+                Fare = dto.Fare,
+
                 TripStatus = "待執行",
 
                 // 暫時測試用
-                EstimatedDuration = 2
+                EstimatedDuration = dto.EstimatedDuration
             };
 
             // 引用派車邏輯派車
@@ -337,7 +370,7 @@ namespace FinalProject.Controllers
             try
             {
                 _context.Trips.Add(trip);
-                await _context.SaveChangesAsync();
+            await _context.SaveChangesAsync();
             }
             catch
             {
