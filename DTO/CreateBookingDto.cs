@@ -21,5 +21,7 @@
         public byte? PassengerCount { get; set; }
 
         public byte? LuggageCount { get; set; }
+
+        public int? EstimatedDuration { get; set; }
     }
 }

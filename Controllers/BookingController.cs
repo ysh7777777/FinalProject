@@ -319,7 +319,7 @@ namespace FinalProject.Controllers
                 OrderNo = GenerateOrderNumber(),
 
                 // 暫時測試用
-                Account = "user03",
+                Account = GetCurrentAccount(),
 
                 DepartureTime = dto.DepartureTime,
                 PickupLocation = dto.PickupLocation,
@@ -337,7 +337,7 @@ namespace FinalProject.Controllers
                 TripStatus = "待執行",
 
                 // 暫時測試用
-                EstimatedDuration = 2
+                EstimatedDuration = dto.EstimatedDuration
             };
 
             // 引用派車邏輯派車
