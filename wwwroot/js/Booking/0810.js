@@ -1496,6 +1496,17 @@ bookingForm.addEventListener(
             alert("請選擇有效的出發地與目的地，並等待路線里程與時間計算完成。");
             return;
         }
+        // 
+        const baseFare = Number(window.selectedCar?.price);
+
+        if (!window.selectedCar || !Number.isFinite(baseFare)) {
+            alert("請先選擇車型");
+            return;
+        }
+
+        const fare = Math.round(
+            mapData.estimatedDistanceKm * 20 + baseFare
+        );
 
         /* ======================= 送出中 ======================= */
         submitOrderBtn.disabled = true;
@@ -1529,9 +1540,9 @@ bookingForm.addEventListener(
             LuggageCount: Number(document.getElementById("luggageCount").value),
 
             // 新增資料
-            // Fare: Number(document.getElementById("summaryFare").value),
+            BabySeat: Number(document.getElementById("babySeatCount").value ),
+            Fare: fare,
 
-            // BabySeat: Number(document.getElementById("babySeatCount").value ),
 
         };
 

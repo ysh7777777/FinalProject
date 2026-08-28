@@ -333,10 +333,10 @@ namespace FinalProject.Controllers
                 VehicleType = dto.VehicleType,
                 PassengerCount = dto.PassengerCount,
                 LuggageCount = dto.LuggageCount,
-                
+
                 // 新增資料
-                //BabySeat = dto.BabySeat,
-                //Fare = dto.Fare,
+                BabySeat = dto.BabySeat,
+                Fare = dto.Fare,
 
                 TripStatus = "待執行",
 
@@ -370,7 +370,7 @@ namespace FinalProject.Controllers
             try
             {
                 _context.Trips.Add(trip);
-                await _context.SaveChangesAsync();
+            await _context.SaveChangesAsync();
             }
             catch
             {
