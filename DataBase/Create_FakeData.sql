@@ -224,25 +224,56 @@ INSERT INTO map_landmark (landmark_name, address_text, latitude, longitude) VALU
 -- =============================================
 -- 9. 專題圖片表 (project_image) - 20 筆
 -- =============================================
-INSERT INTO project_image (image_title, image_url, description) VALUES
-(N'系統架構圖', '/images/architecture.png', N'整體叫車系統服務與資料庫關聯圖'),
-(N'地圖導航主介面', '/images/ui_map_main.png', N'乘客端即時地圖與定位顯示畫面'),
-(N'司機接單介面', '/images/ui_driver_accept.png', N'司機端收到叫車推播時的接單介面'),
-(N'熱點自動補全示意', '/images/ui_autocomplete.png', N'輸入地名時利用 map_landmark 快取自動補全'),
-(N'行駛路線實時追蹤', '/images/ui_live_tracking.png', N'使用 GPS 座標更新車輛在地圖上的朝向與動態'),
-(N'會員註冊頁面', '/images/ui_member_register.png', N'新會員帳號與聯絡資訊輸入表單'),
-(N'會員常用地址設定', '/images/ui_saved_address.png', N'快速選擇「家」、「公司」等預設地點'),
-(N'車輛車型選擇圖表', '/images/ui_vehicle_types.png', N'提供轎車、休旅車、九人座及兒童座椅勾選'),
-(N'車隊地圖熱力圖', '/images/chart_heatmap.png', N'統計高需求時段與區域的地圖熱力圖'),
-(N'司機排班管理系統', '/images/admin_shift.png', N'後台管理員對司機與車輛配對排班'),
-(N'訂單歷史紀錄表', '/images/ui_trip_history.png', N'乘客與司機查詢已完成與取消之行程記錄'),
-(N'計費預估與明細', '/images/ui_fare_estimate.png', N'依起跳價與距離計算預估車資'),
-(N'司機評價與星級', '/images/ui_driver_rating.png', N'行程結束後乘客對司機的評分系統'),
-(N'系統資料庫 E-R 圖', '/images/db_erd.png', N'RideHailingDB 的實體關聯圖'),
-(N'緊急求助/SOS 畫面', '/images/ui_sos_button.png', N'行程中一鍵發送即時 GPS 給緊急聯絡人'),
-(N'優惠券選用介面', '/images/ui_coupon.png', N'結帳時折抵運費之優惠券清單'),
-(N'司機審核上傳介面', '/images/ui_driver_verify.png', N'上傳駕照與良民證的審核介面'),
-(N'後台即時營運看板', '/images/admin_dashboard.png', N'即時顯示線上司機數與進行中訂單'),
-(N'退款與客服單據', '/images/ui_support_ticket.png', N'訂單爭議處理與客服回應紀錄'),
-(N'App 啟動與 Splash 圖', '/images/splash_logo.png', N'App 開啟時的品牌識別畫面');
+INSERT INTO project_image
+(
+    image_title,
+    image_url,
+    description
+)
+VALUES
+(
+    N'五人座轎車',
+    N'https://drive.google.com/uc?export=view&id=1KYV56Jk9VkP5-Cs1arW3iPioLpNy3HRj',
+    N'五人座轎車車型圖片'
+),
+(
+    N'五人座 SUV',
+    N'https://drive.google.com/uc?export=view&id=1Zu79V8bWJ9vAPH9ybWTXdhbynwpQoVXA',
+    N'五人座 SUV 車型圖片'
+),
+(
+    N'九人座廂型車',
+    N'https://drive.google.com/uc?export=view&id=1oVummPmGZ6kw97E1pT_wQoaLjsjazO7b',
+    N'九人座廂型車車型圖片'
+),
+(
+    N'賓士九人座廂型車',
+    N'https://drive.google.com/uc?export=view&id=1Q5pB9vWG5MkJ5_J0-U9HolgyO4LYCOpo',
+    N'賓士九人座廂型車車型圖片'
+),
+(
+    N'阿法',
+    N'https://drive.google.com/uc?export=view&id=1eCRJWckmZiXm1xZKYvfsLzpnhwbgbaE6',
+    N'阿法車型圖片'
+),
+(
+    N'大T',
+    N'https://drive.google.com/uc?export=view&id=1VnSmnm_f8x-lwtbj1NtOucIbycBQhB9G',
+    N'大T車型圖片'
+),
+(
+    N'首頁輪播｜從容出發 安心抵達',
+    N'/Images/hero-airport-welcome-v2.png',
+    N'專業預約接送，讓每一次往返機場都更準時、更舒適。'
+),
+(
+    N'首頁輪播｜專業接送 準時守候',
+    N'/Images/hero-comfort-ride.png',
+    N'事先安排乘車時間與車型，告別臨時找車的不確定感。'
+),
+(
+    N'首頁輪播｜全程貼心 舒適到家',
+    N'/Images/hero-family-arrival.png',
+    N'停靠點、嬰兒座椅與航班追蹤，依照你的旅程彈性安排。'
+);
 

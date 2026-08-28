@@ -74,7 +74,7 @@ else
                     @* 修改 3：依照輪播順序設定按鈕連結 *@
                     string buttonLink = i switch
                     {
-                        0 => "/Booking/Create",
+                        0 => "/Booking/BookingPage",
                         1 => "#fleet",
                         2 => "#services",
                         _ => "#"
@@ -313,9 +313,9 @@ else
 
 <!-- 前端查登入資料的測試(Member新增) -->
 
-@* <button id="tempButton">測試前端取得資料按鈕</button> *@
+@* <button id="tempButton">測試前端取得資料按鈕</button> 
 
-<script>
+@* <script>
     document.getElementById('tempButton').addEventListener('click', async function () {
         const response = await fetch('/api/auth/me');
         const auth = await response.json();
@@ -335,4 +335,4 @@ else
             alert(`司機帳號：${auth.driverId}`);
         }
     });
-</script>
+</script> *@
