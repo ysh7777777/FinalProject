@@ -1,0 +1,465 @@
+﻿@model FinalProject.Models.Trip
+@{
+    ViewData["Title"] = "司機導航";
+    Layout = "Driver_Layout";
+    var promotedTripCount =
+        ViewBag.PromotedTripCount is int count ? count : 0;
+}
+
+@if (ViewBag.CanUseOrderDateDemo == true)
+{
+    <div class="card border-info mb-3">
+        <div class="card-body d-flex flex-wrap gap-3 align-items-center justify-content-between">
+            <div>
+                <h6 class="fw-bold mb-1">8/11 訂單狀態 Demo</h6>
+                <div class="small text-muted">
+                    將 D001 在 2026-08-11 的待執行訂單批次轉為行程中。
+                </div>
+                @if (ViewBag.IsOrderDateDemo == true)
+                {
+                    <div class="mt-2">
+                        <span class="badge bg-info text-dark">
+                            Demo 日期：2026-08-11
+                        </span>
+                        <span class="badge @(promotedTripCount > 0 ? "bg-success" : "bg-secondary") ms-1">
+                            本次轉換 @promotedTripCount 筆
+                        </span>
+                        @if (promotedTripCount == 0)
+                        {
+                            <span class="small text-muted ms-1">
+                                目前沒有待執行訂單，可能已完成啟用。
+                            </span>
+                        }
+                    </div>
+                }
+            </div>
+
+            <form asp-controller="DriverNavigation"
+                  asp-action="ActivateOrderDateDemo"
+                  method="post">
+                @Html.AntiForgeryToken()
+                <button type="submit"
+                        class="btn btn-outline-info">
+                    啟用 8/11 待執行訂單
+                </button>
+            </form>
+        </div>
+    </div>
+}
+
+
+
+
+@{
+    var hasTrip = ViewBag.HasTrip == true && Model != null;
+}
+
+
+
+
+
+@if (!hasTrip)
+{
+    <div class="container py-5">
+        <div class="card shadow-sm border-0 mx-auto" style="max-width: 720px;">
+            <div class="card-body p-4 text-center">
+                <h4 class="fw-bold mb-3">目前沒有可執行的行程</h4>
+                <p class="text-muted mb-4">
+                    今天沒有進行中或可顯示的已完成訂單。
+                    若有新訂單加入，請重新整理頁面查看。
+                </p>
+                <a asp-controller="DriverNavigation"
+                   asp-action="Navigation"
+                   class="btn btn-primary">
+                    重新整理訂單
+                </a>
+            </div>
+        </div>
+    </div>
+}
+else
+{
+    <form id="driver-antiforgery-form"
+          class="d-none">
+        @Html.AntiForgeryToken()
+    </form>
+
+<div class="container-fluid p-0">
+
+    <!-- ========================= -->
+    <!-- 地圖 -->
+    <!-- ========================= -->
+
+    <div id="driver-map"
+         style="width:100%; height:500px;">
+    </div>
+
+
+    <!-- ========================= -->
+    <!-- 訂單資料 -->
+    <!-- ========================= -->
+
+    <div class="container py-3">
+
+        <div class="card shadow-sm mb-3">
+
+            <div class="card-body">
+
+                <h5 class="fw-bold mb-3">
+                    目前訂單
+                </h5>
+
+
+                <div class="row mb-2">
+
+                    <div class="col-md-6">
+                        <strong>訂單編號：</strong>
+                        <span id="order-no">
+                            @Model?.OrderNo
+                        </span>
+                    </div>
+
+                    <div class="col-md-6">
+                        <strong>乘客：</strong>
+                        <span>
+                            @Model?.AccountNavigation?.FullName
+                        </span>
+                    </div>
+
+                </div>
+
+
+                <div class="row mb-2">
+
+                    <div class="col-md-6">
+                        <strong>出發地：</strong>
+                        <span id="pickup-address">
+                            @Model?.PickupLocation
+                        </span>
+                    </div>
+
+                    <div class="col-md-6">
+                        <strong>目的地：</strong>
+                        <span id="destination-address">
+                            @Model?.Destination
+                        </span>
+                    </div>
+
+                 
+                </div>
+
+
+                <div class="row mb-2">
+
+                    <div class="col-md-6">
+                        <strong>車牌：</strong>
+                        @Model?.LicensePlate
+                    </div>
+
+                    <div class="col-md-6">
+                        <strong>車資：</strong>
+                        <span id="driver-trip-fare">計算中...</span>
+                    </div>
+
+                   
+
+                </div>
+                <div class="row mb-2">
+
+                    <div class="col-md-6">
+                        <strong>乘客乘車時間：</strong>
+                        <span id="departure-time">
+                            @Model?.DepartureTime 
+                        </span>
+                    </div>
+
+
+                    <div class="col-md-6">
+                        <strong>訂單狀態</strong>
+                        <span id="order-status">
+                            @Model?.TripStatus
+                        </span>
+                    </div>
+                </div>
+
+
+            </div>
+
+        </div>
+
+
+        <!-- ========================= -->
+        <!-- GPS 狀態 -->
+        <!-- ========================= -->
+
+        <div class="card shadow-sm mb-3">
+
+            <div class="card-body">
+
+                <div class="row" style="display:none;">
+
+                    <div class="col-md-6">
+                        <strong>目前 Latitude：</strong>
+                        <span id="driver-lat">
+                            尚未上線
+                        </span>
+                    </div>
+
+                    <div class="col-md-6">
+                        <strong>目前 Longitude：</strong>
+                        <span id="driver-lng">
+                            尚未上線
+                        </span>
+                    </div>
+
+                </div>
+
+                <div class="row mt-3">
+
+                    <div class="col-md-4">
+                        <strong>目前前往：</strong>
+                        <span id="driver-route-target">
+                            等待司機上線
+                        </span>
+                    </div>
+
+                    <div class="col-md-4">
+                        <strong>剩餘距離：</strong>
+                        <span id="driver-route-distance">
+                            尚未取得
+                        </span>
+                    </div>
+
+                    <div class="col-md-4">
+                        <strong>預計抵達時間：</strong>
+                        <span id="driver-route-eta">
+                            尚未取得
+                        </span>
+                    </div>
+
+                </div>
+
+            </div>
+           
+
+        </div>
+
+
+        <!-- ========================= -->
+        <!-- 操作按鈕 -->
+        <!-- ========================= -->
+
+        <div class="d-flex gap-2 flex-wrap">
+
+
+          
+
+            <button id="online-btn"
+                    type="button"
+                    class="btn btn-success">
+
+                上線
+
+            </button>
+
+
+            <button id="arrived-passenger-btn"
+                    type="button"
+                    class="btn btn-primary"
+                    disabled>
+
+                已抵達客人位置
+
+            </button>
+
+
+            <button id="arrived-destination-btn"
+                    type="button"
+                    class="btn btn-warning"
+                    disabled>
+
+                已送達目的地
+
+            </button>
+
+            <button id="last-order-btn"
+                    type="button"
+                    class="btn btn-outline-primary"
+                    disabled="@(
+                    ViewBag.IsHistory == true
+                        ? !(ViewBag.HasOlderOrder ?? false)
+                        : !(ViewBag.HasCompletedToday ?? false)
+                    )">
+                查看上個訂單
+            </button>
+
+            <button id="nextpage-order-btn"
+                    type="button"
+                    class="btn btn-outline-primary"
+                    style="display:@(ViewBag.IsHistory == true ? "inline-block" : "none");">
+                下一頁
+            </button>
+
+            @if (ViewBag.IsHistory == true)
+            {
+                <a id="refresh-orders-btn"
+                   asp-controller="DriverNavigation"
+                   asp-action="Navigation"
+                   class="btn btn-success">
+                    重整訂單
+                </a>
+            }
+
+            <button id="next-order-btn" 
+                    type="button"
+                    class="btn btn-outline-primary"
+                    disabled>
+                前往下個訂單
+            </button>
+
+            
+
+
+
+            <button id="offline-btn"
+                    type="button"
+                    class="btn btn-danger"
+                    disabled>
+
+                下線
+
+            </button>
+
+            
+
+        </div>
+
+
+        <div class="mt-3">
+
+            <strong>目前狀態：</strong>
+
+            <span id="driver-status"
+                  class="badge bg-secondary">
+
+                下線
+
+            </span>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- ========================= -->
+<!-- 展示 / 測試工具 -->
+<!-- ========================= -->
+
+<div class="card border-secondary mb-3">
+
+    <div class="card-body">
+
+        <h6 class="fw-bold mb-2">
+            展示 / 測試工具
+        </h6>
+
+        <div class="text-muted small mb-3">
+            以下功能僅供專題展示與開發測試使用。
+        </div>
+
+        <div class="d-flex gap-2 flex-wrap">
+
+            <button id="tempyshare-btn"
+                    type="button"
+                    class="btn btn-outline-secondary">
+
+                啟用 Demo 5 秒模式
+
+            </button>
+
+
+            <button id="tempnshare-btn"
+                    type="button"
+                    class="btn btn-outline-secondary">
+
+                測試 5 秒後自動分享 GPS
+
+            </button>
+
+
+            <button id="temproute-btn"
+                    type="button"
+                    class="btn btn-outline-secondary">
+
+                模擬行駛
+
+            </button>
+
+        </div>
+
+        <div class="mt-3 small text-muted">
+            <span id="gps-share-demo-countdown">
+                Demo 倒數尚未啟動
+            </span>
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+    window.tripData = {
+        driverId: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(
+            User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value ?? "")),
+
+        orderNo: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(
+            Model?.OrderNo ?? "")),
+
+        isHistory: @(ViewBag.IsHistory == true ? "true" : "false"),
+
+        tripStatus: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(
+            Model?.TripStatus ?? "")),
+
+        pickupLat: @((Model?.PickupLat ?? 0)
+                                .ToString(System.Globalization.CultureInfo.InvariantCulture)),
+
+        pickupLng: @((Model?.PickupLng ?? 0)
+                                .ToString(System.Globalization.CultureInfo.InvariantCulture)),
+
+        destinationLat: @((Model?.DestinationLat ?? 0)
+                                .ToString(System.Globalization.CultureInfo.InvariantCulture)),
+
+        destinationLng: @((Model?.DestinationLng ?? 0)
+                                .ToString(System.Globalization.CultureInfo.InvariantCulture)),
+
+        baseFare: @(Model?.LicensePlateNavigation?.BaseFare ?? 0),
+
+        departureTime: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(
+            Model?.DepartureTime?.ToString("yyyy-MM-ddTHH:mm:ss") ?? ""))
+    };
+</script>
+
+
+}
+
+@section Scripts {
+    @if (hasTrip)
+    {
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/8.0.7/signalr.min.js"></script>
+
+        <script src="~/js/trip-fare.js"></script>
+        <script src="~/js/driver-navigation.js"></script>
+
+        <script async
+                src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAk5HVk6NmgjgNL9vu5m2HRjvcbghlyMn4&callback=initDriverMap">
+        </script>
+    }
+}
+@if (TempData["OrderMessage"] != null)
+{
+    <script>
+        alert('@Html.Raw(TempData["OrderMessage"])');
+    </script>
+}

@@ -1,0 +1,240 @@
+﻿@model FinalProject.Models.Trip
+
+@{
+    ViewData["Title"] = "司機狀態";
+    var canTrackDriver = ViewBag.CanTrackDriver == true;
+    var isCompleted = Model?.TripStatus == "已完成";
+}
+
+
+<div class="container py-4">
+
+    <div class="mb-3">
+
+        <h2 class="fw-bold">
+            司機狀態
+        </h2>
+
+        <p class="text-muted">
+            @(canTrackDriver
+                ? "可查看目前司機位置與行程狀態。"
+                : "本次行程已完成，即時位置追蹤已結束。")
+        </p>
+
+    </div>
+
+
+    <!-- ========================= -->
+    <!-- 地圖 -->
+    <!-- ========================= -->
+
+    @if (canTrackDriver)
+    {
+        <div id="passenger-map"
+             class="border rounded"
+             style="width:100%; height:500px;">
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-success" role="status">
+            <strong>本次行程已完成</strong>
+            <div>即時位置追蹤已結束。</div>
+            @if (Model?.CompletedAt != null)
+            {
+                <div class="small mt-1">
+                    完成時間：@Model.CompletedAt.Value.ToString("yyyy/MM/dd HH:mm")
+                </div>
+            }
+        </div>
+    }
+
+
+    <!-- ========================= -->
+    <!-- 司機資料 -->
+    <!-- ========================= -->
+
+    <div class="card shadow-sm mt-3">
+
+        <div class="card-body">
+
+            <div class="row mb-2">
+
+                <div class="col-md-6">
+
+                    <strong>訂單編號：</strong>
+                    <span id="passenger-order-no">
+                        @Model?.OrderNo
+                    </span>
+
+                </div>
+
+                
+
+
+                <div class="col-md-6">
+
+                    <strong>車牌：</strong>
+                    <span>
+                        @Model?.LicensePlate
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <div class="row mb-2">
+
+                <div class="col-md-6">
+
+                    <strong>車型：</strong>
+                    <span>
+                        @Model?.VehicleType
+                    </span>
+
+                </div>
+
+
+                <div class="col-md-6">
+
+                    <strong>車資：</strong>
+                    <span id="passenger-trip-fare">計算中...</span>
+
+                </div>
+
+            </div>
+
+
+
+
+            <div class="row mb-2">
+
+                <div class="col-md-6">
+
+                    <strong>乘車地點：</strong>
+                    <span id="passenger-pickup-location">
+                        @Model?.PickupLocation
+                    </span>
+
+                </div>
+
+                <div class="col-md-6">
+
+                    <strong>目的地：</strong>
+                    <span id="passenger-destination">
+                        @Model?.Destination
+                    </span>
+
+                </div>
+
+                
+
+            </div>
+
+
+            <div class="row">
+
+                <div class="col-md-6">
+
+                    <strong>目前狀態：</strong>
+
+                    <span id="passenger-trip-status"
+                          class="badge @(isCompleted ? "bg-success" : "bg-secondary")">
+
+                        @(isCompleted ? "已完成" : "等待司機上線")
+
+                    </span>
+
+                </div>
+
+
+                <div class="col-md-6">
+
+                    <strong>司機位置更新：</strong>
+
+                    <span id="last-update">
+                        尚未收到資料
+                    </span>
+
+                </div>
+
+            </div>
+
+            @if (canTrackDriver)
+            {
+                <hr>
+
+                <div class="row mt-3">
+
+                    <div class="col-md-4">
+                        <strong>目前路線：</strong>
+                        <span id="passenger-route-target">
+                            等待司機分享位置
+                        </span>
+                    </div>
+
+                    <div class="col-md-4">
+                        <strong>剩餘距離：</strong>
+                        <span id="passenger-route-distance">
+                            尚未取得
+                        </span>
+                    </div>
+
+                    <div class="col-md-4">
+                        <strong>預計抵達時間：</strong>
+                        <span id="passenger-route-eta">
+                            尚未取得
+                        </span>
+                    </div>
+
+                </div>
+            }
+
+        </div>
+
+    </div>
+
+</div>
+<script>
+    window.passengerTripData = {
+        orderNo: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(
+            Model?.OrderNo ?? "")),
+        driverId: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(
+            Model?.AssignedDriverId ?? "")),
+        pickupLat: @((Model?.PickupLat ?? 0).ToString(System.Globalization.CultureInfo.InvariantCulture)),
+        pickupLng: @((Model?.PickupLng ?? 0).ToString(System.Globalization.CultureInfo.InvariantCulture)),
+        destinationLat: @((Model?.DestinationLat ?? 0).ToString(System.Globalization.CultureInfo.InvariantCulture)),
+        destinationLng: @((Model?.DestinationLng ?? 0).ToString(System.Globalization.CultureInfo.InvariantCulture)),
+        baseFare: @(Model?.LicensePlateNavigation?.BaseFare ?? 0)
+    };
+</script>
+
+@section Scripts {
+    <script src="~/js/trip-fare.js"></script>
+
+    @if (canTrackDriver)
+    {
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/8.0.7/signalr.min.js"></script>
+        <script src="~/js/passenger-driver-status.js"></script>
+
+        <script async
+                src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAk5HVk6NmgjgNL9vu5m2HRjvcbghlyMn4&callback=initPassengerMap">
+        </script>
+    }
+    else
+    {
+        <script>
+            window.initPassengerFare = function () {
+                window.updateTripFareDisplay(
+                    window.passengerTripData,
+                    "passenger-trip-fare"
+                );
+            };
+        </script>
+
+        <script async
+                src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAk5HVk6NmgjgNL9vu5m2HRjvcbghlyMn4&callback=initPassengerFare">
+        </script>
+    }
+}
