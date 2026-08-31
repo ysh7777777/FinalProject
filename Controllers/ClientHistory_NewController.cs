@@ -1,4 +1,5 @@
-﻿using FinalProject.Models;
+﻿using FinalProject.DTO;
+using FinalProject.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FinalProject.Controllers
@@ -14,39 +15,63 @@ namespace FinalProject.Controllers
 
         public IActionResult ClientHistory_New()
         {
-            return View();
+            var orders = _context.Trips
+                .Select(o => new ClientHistoryViewModel
+                {
+                    OrderNoView = o.OrderNo,
+                    TripStatusView = o.TripStatus,
+                    DepartureTimeView = o.DepartureTime,
+                    PickupLocationView = o.PickupLocation,
+                    DestinationView = o.Destination,
+
+                    LicensePlateView = o.LicensePlate,
+                    VehicleTypeView = o.VehicleType,
+
+                    PassengerCountView = o.PassengerCount,
+                    LuggageCountView = o.LuggageCount,
+                    BabySeatView = o.BabySeat,
+
+                    FareView = o.Fare,
+                    EstimatedDurationView = o.EstimatedDuration,
+                })
+                .ToList();
+
+            return View(orders);
+            //return View();
         }
 
-        // 待處理
-        //[HttpGet]
-        //public IActionResult GetOrders()
-        //{
-        //    var orders = _context.Trip
-        //        .Select(o => new
-        //        {
-        //            orderNumber = o.OrderNumber,
-        //            status = o.Status,
-        //            departureTime = o.DepartureTime,
-        //            pickupLocation = o.PickupLocation,
-        //            dropoffLocation = o.DropoffLocation,
+        // 取得訂單 - 待處理
+       //[HttpGet]
+       // public IActionResult GetOrders()
+       // {
+       //     var orders = _context.Trips
+       //         .Select(o => new
+       //         {
+       //             orderNumber = o.OrderNo,
+       //             status = o.TripStatus,
+       //             departureTime = o.DepartureTime,
+       //             pickupLocation = o.PickupLocation,
+       //             dropoffLocation = o.Destination,
 
-        //            licensePlate = o.LicensePlate,
-        //            carType = o.CarType,
+       //             licensePlate = o.LicensePlate,
+       //             carType = o.VehicleType,
 
-        //            passengerCount = o.PassengerCount,
-        //            luggageCount = o.LuggageCount,
+       //             passengerCount = o.PassengerCount,
+       //             luggageCount = o.LuggageCount,
+       //             babySeat = o.BabySeat,
 
-        //            price = o.Price,
-        //            estimatedMinutes = o.EstimatedMinutes,
+       //             fare = o.Fare,
+       //             estimatedMinutes = o.EstimatedDuration,
 
-        //            passengerName = o.PassengerName,
-        //            passengerPhone = o.PassengerPhone,
-        //            remark = o.Remark
-        //        })
-        //        .ToList();
+       //             // 可能司機端需要
+       //             //passengerName = o.Member,
+       //             //passengerPhone = o.PassengerPhone,
+       //             //remark = o.Remark
+       //         })
+       //         .ToList();
 
-        //    return Json(orders);
-        //}
+       //     return Json(orders);
+       // }
 
 
 

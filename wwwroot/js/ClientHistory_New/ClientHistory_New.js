@@ -51,8 +51,8 @@ document.addEventListener("DOMContentLoaded", function () {
             if (
                 status === "processing" &&
                 (
-                    orderStatus === "processing" ||
-                    orderStatus === "pending"
+                    orderStatus === "行程中" ||
+                    orderStatus === "待執行"
                 )
             ) {
                 card.style.display = "";
@@ -64,7 +64,7 @@ document.addEventListener("DOMContentLoaded", function () {
             // ==========================================
             else if (
                 status === "completed" &&
-                orderStatus === "completed"
+                orderStatus === "已完成"
             ) {
                 card.style.display = "";
             }
@@ -75,7 +75,7 @@ document.addEventListener("DOMContentLoaded", function () {
             // ==========================================
             else if (
                 status === "cancelled" &&
-                orderStatus === "cancelled"
+                orderStatus === "已取消"
             ) {
                 card.style.display = "";
             }
