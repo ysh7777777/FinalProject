@@ -43,7 +43,9 @@ namespace FinalProject.Controllers
                 t.passenger_count,
                 t.luggage_count,
                 ISNULL(t.estimated_duration, 0) AS estimated_duration,
-                t.trip_status
+                t.trip_status,
+                t.fare,
+                t.baby_seat
             FROM trip t
             LEFT JOIN member m ON t.account = m.account
             WHERE t.assigned_driver_id = @DriverId 
@@ -70,7 +72,8 @@ namespace FinalProject.Controllers
                                 //FlightNumber = reader["flight_number"]?.ToString() ?? "無",
                                 PassengerCount = reader["passenger_count"] != DBNull.Value ? Convert.ToByte(reader["passenger_count"]) : (byte)0,
                                 LuggageCount = reader["luggage_count"] != DBNull.Value ? Convert.ToByte(reader["luggage_count"]) : (byte)0,
-                                //Fare = reader["fare"] != DBNull.Value ? Convert.ToInt32(reader["fare"]) : 0,
+                                Fare = reader["fare"] != DBNull.Value ? Convert.ToInt32(reader["fare"]) : 0,
+                                BabySeat = reader["baby_seat"] != DBNull.Value ? Convert.ToByte(reader["baby_seat"]) : (byte)0,
                                 EstimatedDuration = reader["estimated_duration"] != DBNull.Value ? Convert.ToInt32(reader["estimated_duration"]) : 0,
                                 TripStatus = reader["trip_status"]?.ToString() ?? string.Empty,
                                 AccountNavigation = new Member
@@ -126,7 +129,9 @@ namespace FinalProject.Controllers
                         t.passenger_count,
                         t.luggage_count,
                         ISNULL(t.estimated_duration, 0) AS estimated_duration,
-                        t.trip_status
+                        t.trip_status,
+                        t.fare,
+                        t.baby_seat
                     FROM trip t
                     INNER JOIN member m ON t.account = m.account
                     WHERE t.assigned_driver_id = @DriverId
@@ -153,7 +158,8 @@ namespace FinalProject.Controllers
                                 //FlightNumber = reader["flight_number"]?.ToString() ?? "無",
                                 PassengerCount = reader["passenger_count"] != DBNull.Value ? Convert.ToByte(reader["passenger_count"]) : (byte)0,
                                 LuggageCount = reader["luggage_count"] != DBNull.Value ? Convert.ToByte(reader["luggage_count"]) : (byte)0,
-                                //Fare = reader["fare"] != DBNull.Value ? Convert.ToInt32(reader["fare"]) : 0,
+                                Fare = reader["fare"] != DBNull.Value ? Convert.ToInt32(reader["fare"]) : 0,
+                                BabySeat = reader["baby_seat"] != DBNull.Value ? Convert.ToByte(reader["baby_seat"]) : (byte)0,
                                 EstimatedDuration = reader["estimated_duration"] != DBNull.Value ? Convert.ToInt32(reader["estimated_duration"]) : 0,
                                 TripStatus = reader["trip_status"]?.ToString() ?? string.Empty,
                                 AccountNavigation = new Member
