@@ -1,0 +1,313 @@
+﻿@model List<FinalProject.DTO.ClientHistoryViewModel>
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+
+    <!-- Bootstrap 5.3.3 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+
+    <!-- 自訂 CSS -->
+    <link rel="stylesheet" href="~/css/ClientHistory_New/ClientHistory_New.css">
+</head>
+
+<body>
+    <div class="container order-page">
+        <!-- ========================= 訂單狀態切換 ========================== -->
+        <div class="row g-2 order-tabs">
+            <div class="col-4">
+                <button class="order-tab active" type="button" data-status="processing">
+                    <i class="bi bi-hourglass-split"></i>
+                    <span>進行中/行程中</span>
+                </button>
+            </div>
+            <div class="col-4">
+                <button class="order-tab" type="button" data-status="completed">
+                    <i class="bi bi-check-circle"></i>
+                    <span>已完成</span>
+                </button>
+            </div>
+            <div class="col-4">
+                <button class="order-tab" type="button" data-status="cancelled">
+                    <i class="bi bi-x-circle"></i>
+                    <span>已取消</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- ========================= 訂單列表 ========================== -->
+        <div id="orderList">
+            @foreach (var order in Model)
+                {
+                    <!-- ========================= 訂單卡 ========================== -->
+                    <div class="order-card" data-order-status="@order.TripStatusView">
+                        <div class="row g-3 align-items-center">
+                            <!-- ========================= 左側：狀態 + 交通工具 ========================== -->
+                            <div class="col-4 col-sm-2 col-md-2">
+                                <div class="order-icon-area">
+                                        <span class="status-badge status-processing">@order.TripStatusView</span>
+                                    <div class="transport-icon">
+                                        <i class="bi bi-airplane-engines-fill"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- ========================= 中間：訂單資訊 ========================== -->
+                            <div class="col-8 col-sm-6 col-md-7">
+                                <div class="order-info">
+                                    <!-- 訂單編號 -->
+                                    <div class="order-number">
+                                        <span class="info-label">訂單編號</span>
+                                            <strong>@order.OrderNoView</strong>
+                                    </div>
+                                    <!-- 出發時間 -->
+                                    <div class="departure-time">
+                                        <i class="bi bi-clock"></i>
+                                            <span>@order.DepartureTimeView.ToString()</span>
+                                    </div>
+                                    <!-- 出發 / 到達 -->
+                                    <div class="route">
+                                        <div class="route-item">
+                                            <div class="route-title">
+                                                <i class="bi bi-geo-alt-fill"></i>
+                                                出發
+                                            </div>
+                                                <div class="route-address">@order.PickupLocationView</div>
+                                        </div>
+
+                                        <div class="route-item">
+                                            <div class="route-title">
+                                                <i class="bi bi-geo-alt"></i>
+                                                到達
+                                            </div>
+                                                <div class="route-address">@order.DestinationView</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- ========================= 右側：操作按鈕 ========================== -->
+                            <div class="col-12 col-sm-4 col-md-3">
+                                <div class="order-actions">
+                                        <button class="btn btn-cancel" type="button" onclick="cancelOrder('@order.OrderNoView')">
+                                        <i class="bi bi-x-circle"></i>
+                                        取消訂單
+                                    </button>
+                                    <button class="btn btn-driver" type="button" onclick="showDriverStatus('R-342827955')">
+                                        <i class="bi bi-person-badge"></i>
+                                        司機狀態
+                                    </button>
+                                    @* <a class="btn btn-driver"
+                                        href="@Url.Action("DriverStatus", "ClientHistory_New", new { orderNumber = order.OrderNo })">
+                                        <i class="bi bi-person-badge"></i>
+                                        司機狀態
+                                    </a> *@
+                                </div>
+                            </div>
+                        </div>
+                        <!-- ========================= 分隔線 ========================== -->
+                        <div class="order-divider"></div>
+                        <!-- ========================= 展開按鈕 ========================== -->
+                        <button class="expand-button" type="button" onclick="toggleOrder(this)" aria-label="展開訂單詳細資訊">
+                            <i class="bi bi-chevron-down"></i>
+                        </button>
+                        <!-- ========================= 訂單摘要 ========================== -->
+                        <div class="order-extra">
+                            <div class="row g-2 order-detail">
+                                <!-- 車牌 / 車型 -->
+                                <div class="col-6 col-md-3">
+                                    <div class="detail-item">
+                                        <div class="detail-title">
+                                            <i class="bi bi-car-front"></i>
+                                            車牌 / 車型
+                                        </div>
+                                        <div class="detail-content">
+                                            @order.LicensePlateView
+                                            <br>
+                                                @order.VehicleTypeView
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- 人數 / 行李 -->
+                                <div class="col-6 col-md-3">
+                                    <div class="detail-item">
+                                        <div class="detail-title">
+                                            <i class="bi bi-people"></i>
+                                            人數 / 行李
+                                        </div>
+                                        <div class="detail-content">
+                                                @order.PassengerCountView 人
+                                            <br>
+                                                @order.LuggageCountView 行李
+                                            <br>
+                                                @order.BabySeatView 嬰兒座椅
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- 費用 -->
+                                <div class="col-6 col-md-3">
+                                    <div class="detail-item">
+                                        <div class="detail-title">
+                                            <i class="bi bi-currency-dollar"></i>
+                                            費用
+                                        </div>
+                                            <div class="detail-content price">NT$ @order.FareView</div>
+                                    </div>
+                                </div>
+                                <!-- 行程時間 -->
+                                <div class="col-6 col-md-3">
+                                    <div class="detail-item">
+                                        <div class="detail-title">
+                                            <i class="bi bi-hourglass-split"></i>
+                                            預計行程時間
+                                        </div>
+                                            <div class="detail-content">@order.EstimatedDurationView 分鐘</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+
+			<!-- @* 訂單 1 (範例訂單 留存備用) *@
+            <div class="order-card" data-order-status="processing">
+                <div class="row g-3 align-items-center">
+                    @* 左側：狀態 + 交通工具 *@
+                    <div class="col-4 col-sm-2 col-md-2">
+                        <div class="order-icon-area">
+                            <span class="status-badge status-processing">進行中</span>
+                            <div class="transport-icon">
+                                <i class="bi bi-airplane-engines-fill"></i>
+                            </div>
+                        </div>
+                    </div>
+                    @* 中間：訂單資訊 *@
+                    <div class="col-8 col-sm-6 col-md-7">
+                        <div class="order-info">
+                            @* 訂單編號 *@
+                            <div class="order-number">
+                                <span class="info-label">訂單編號</span>
+                                <strong>R-342827955</strong>
+                            </div>
+
+                            @* 出發時間 *@
+                            <div class="departure-time">
+                                <i class="bi bi-clock"></i>
+                                <span>7 / 25 (日) 18：30</span>
+                            </div>
+
+                            @* 出發 / 到達 *@
+                            <div class="route">
+                                <div class="route-item">
+                                    <div class="route-title">
+                                        <i class="bi bi-geo-alt-fill"></i>
+                                        出發
+                                    </div>
+                                    <div class="route-address">桃園國際機場 T2</div>
+                                </div>
+
+                                <div class="route-item">
+                                    <div class="route-title">
+                                        <i class="bi bi-geo-alt"></i>
+                                        到達
+                                    </div>
+                                    <div class="route-address">台中市 南屯區...</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    @* 右側：操作按鈕 *@
+                    <div class="col-12 col-sm-4 col-md-3">
+                        <div class="order-actions">
+                            <button class="btn btn-cancel" type="button" onclick="cancelOrder('R-342827955')">
+                                <i class="bi bi-x-circle"></i>
+                                取消訂單
+                            </button>
+                            <button class="btn btn-driver" type="button" onclick="showDriverStatus('R-342827955')">
+                                <i class="bi bi-person-badge"></i>
+                                司機狀態
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                @* 分隔線 *@
+                <div class="order-divider"></div>
+                @* 展開按鈕 *@
+                <button class="expand-button" type="button" onclick="toggleOrder(this)" aria-label="展開訂單詳細資訊">
+                    <i class="bi bi-chevron-down"></i>
+                </button>
+                @* 訂單摘要 *@
+                <div class="order-extra">
+                    <div class="row g-2 order-detail">
+                        @* 車牌 / 車型 *@
+                        <div class="col-6 col-md-3">
+                            <div class="detail-item">
+                                <div class="detail-title">
+                                    <i class="bi bi-car-front"></i>
+                                    車牌 / 車型
+                                </div>
+                                <div class="detail-content">
+                                    ER-57825
+                                    <br>
+                                    白色 賓士九人座
+                                </div>
+                            </div>
+                        </div>
+                        @* 人數 / 行李 *@
+                        <div class="col-6 col-md-3">
+                            <div class="detail-item">
+                                <div class="detail-title">
+                                    <i class="bi bi-people"></i>
+                                    人數 / 行李
+                                </div>
+                                <div class="detail-content">
+                                    5 人
+                                    <br>
+                                    6 行李
+                                </div>
+                            </div>
+                        </div>
+                        @* 費用 *@
+                        <div class="col-6 col-md-3">
+                            <div class="detail-item">
+                                <div class="detail-title">
+                                    <i class="bi bi-currency-dollar"></i>
+                                    費用
+                                </div>
+                                <div class="detail-content price">NT$ 30,000</div>
+                            </div>
+                        </div>
+                        @* 行程時間 *@
+                        <div class="col-6 col-md-3">
+                            <div class="detail-item">
+                                <div class="detail-title">
+                                    <i class="bi bi-hourglass-split"></i>
+                                    預計行程時間
+                                </div>
+                                <div class="detail-content">120 分鐘</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            -->
+        
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- ======================= JS ======================== -->
+    <script src="~/js/ClientHistory_New/ClientHistory_New.js"></script>
+</body>
+
+</html>
+
