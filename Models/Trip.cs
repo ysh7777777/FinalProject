@@ -47,6 +47,10 @@ public partial class Trip
     public byte? PassengerCount { get; set; }
 
     public byte? LuggageCount { get; set; }
+    public byte? BabySeat { get; set; }
+
+    public int? Fare { get; set; }
+
 
     public DateTime? CompletedAt { get; set; }
 
