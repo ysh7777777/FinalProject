@@ -118,6 +118,35 @@ CREATE TABLE trip (
     CHECK (child_seat_count BETWEEN 0 AND 3)
 );
 
+
+-- 7-1. 行程訂單表 (Trip) [新增地圖座標欄位] 更新版本 "兒童座椅" "預估總價"
+CREATE TABLE trip (
+    order_no VARCHAR(15) PRIMARY KEY,       -- 訂單編號 (主鍵)
+    account NVARCHAR(50) NOT NULL,          -- 叫車會員帳號 (外鍵，必填)
+    trip_status NVARCHAR(10),               -- 行程狀態 (如：待派車、行程中、已完成、已取消)
+    departure_time SMALLDATETIME,           -- 預計出發時間
+    estimated_duration INT,                 -- 預估行程時間 (分鐘)
+    pickup_location NVARCHAR(200),          -- 上車地點名稱/地址
+    pickup_lat DECIMAL(9, 6),               -- 上車點緯度 (新增：地圖定位與導航)
+    pickup_lng DECIMAL(9, 6),               -- 上車點經度 (新增：地圖定位與導航)
+    destination NVARCHAR(200),              -- 下車地點名稱/地址
+    destination_lat DECIMAL(9, 6),          -- 下車點緯度 (新增：地圖定位與導航)
+    destination_lng DECIMAL(9, 6),          -- 下車點經度 (新增：地圖定位與導航)
+    license_plate VARCHAR(10),              -- 接單車牌 (外鍵)
+    assigned_driver_id VARCHAR(15),         -- 接單司機編號 (外鍵)
+    vehicle_type NVARCHAR(20),              -- 乘客指定的偏好車型
+    passenger_count TINYINT,                -- 搭乘人數
+    luggage_count TINYINT,                  -- 行物/行李件數
+    baby_seat TINYINT,                      -- 兒童座椅
+    fare INT,                               -- 預估總價
+    completed_at SMALLDATETIME,             -- 訂單結束時間 (用於完成訂單排序)
+    canceled_at SMALLDATETIME,              -- 訂單取消時間 (用於取消訂單排序)
+    FOREIGN KEY (account) REFERENCES member(account),                 -- 連結至會員表
+    FOREIGN KEY (license_plate) REFERENCES vehicle(license_plate),     -- 連結至車輛表
+    FOREIGN KEY (assigned_driver_id) REFERENCES driver(driver_id),     -- 連結至司機表
+);
+
+
 -- 8. 地圖熱點 / 地標表 (MapLandmark) [新增 - 用於地圖搜尋自動補全或快取]
 CREATE TABLE map_landmark (
     landmark_id INT IDENTITY(1,1) PRIMARY KEY, -- 地標編號 (主鍵，自動遞增)
