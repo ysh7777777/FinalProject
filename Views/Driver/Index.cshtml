@@ -37,14 +37,16 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
 
 <style>
-            .driver-dashboard {
+             /* 主要容器：以視窗高度為基準，避免被 Layout 的 container 推擠 */
+             .driver-dashboard {
                 position: relative;
-                height: calc(100vh - 18rem);
-                min-height: 600px;
+                height: calc(100vh - 220px);
+                min-height: 550px;
                 margin: 0;
                 padding: 0;
                 overflow: hidden;
-                font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+                border-radius: 16px;
+                background: #e9ecef;
             }
 
             /* 1. 地圖滿版背景 */
@@ -53,18 +55,79 @@
                 top: 0;
                 bottom: 0;
                 width: 100%;
+                height: 100%;
                 z-index: 1;
             }
 
+            /* ==============================
+                   地圖右上角全螢幕按鈕
+                   ============================== */
 
-            /* 2. 右上角漢堡選單導覽列 */
+            .map-fullscreen-btn {
+                position: absolute;
+                top: 15px;
+                right: 15px;
+                z-index: 1000;
+                width: 44px;
+                height: 44px;
+                border: none;
+                border-radius: 10px;
+                background: rgba(255, 255, 255, 0.95);
+                color: #333;
+                font-size: 20px;
+                box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+                cursor: pointer;
+            }
+
+                .map-fullscreen-btn:hover {
+                    background: #ffffff;
+                    transform: scale(1.05);
+                }
+
+
+            /* ==============================
+                   地圖全螢幕狀態
+                   ============================== */
+
+            .driver-dashboard.map-fullscreen {
+                position: fixed !important;
+
+                top: 0 !important;
+                left: 0 !important;
+
+                width: 100vw !important;
+                height: 100vh !important;
+
+                z-index: 99990 !important; /* 降低容器層級，預留空間給內部懸浮元件 */
+
+                min-height: 0 !important;
+
+                border-radius: 0 !important;
+
+                margin: 0 !important;
+            }
+
+             /* 確保全螢幕狀態下，地圖與底部容器維持正確分層與邊界 */
+            .driver-dashboard.map-fullscreen #map {
+                width: 100% !important;
+                height: 100% !important;
+                z-index: 1 !important;
+}
+
+
+            /* 2. 左上角漢堡選單導覽列 */
             .top-navbar {
                 position: absolute;
                 top: 10px;
                 left: 10px;
                 right: 10px;
                 z-index: 1000;
+                pointer-events: none;
             }
+
+           .top-navbar > * {
+            pointer-events: auto;
+        }
 
             .navbar-custom {
                 background-color: transparent;
@@ -76,10 +139,10 @@
             }
 
             .navbar-toggler {
-                background-color: rgba(255, 255, 255, 0.9); /* 漢堡按鈕保留微白底 */
+                background-color: rgba(255, 255, 255, 0.95); /* 漢堡按鈕保留微白底 */
                 border-radius: 8px;
-                padding: 4px 8px;
-                box-shadow: 0 2px 6px rgba(0,0,0,0.2); /* 加上微陰影提升圖示清晰度 */
+                padding: 6px 10px;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.2); /* 加上微陰影提升圖示清晰度 */
             }
 
             #driverNavbar {
@@ -94,9 +157,9 @@
                 #driverNavbar .btn {
                     background-color: rgba(255, 255, 255, 0.95); /* 獨立白底 */
                     backdrop-filter: blur(5px); /* 微毛玻璃質感 */
-                    box-shadow: 0 2px 10px rgba(0,0,0,0.15); /* 立體懸浮陰影 */
+                    box-shadow: 0 2px 8px rgba(0,0,0,0.2); /* 立體懸浮陰影 */
                     border-radius: 8px; /* 圓角 */
-                    padding: 8px 12px;
+                    padding: 6px 10px;
                     font-weight: 500;
                     border: 1px solid rgba(0, 0, 0, 0.05);
                     text-align: left; /* 文字靠左齊 */
@@ -136,10 +199,15 @@
                 bottom: 0;
                 left: 0;
                 right: 0;
-                z-index: 1000;
+                z-index: 100000 !important; /* 確保高於全螢幕容器與地圖 */
                 display: flex;
                 flex-direction: column;
                 pointer-events: none; /* 讓空白處可穿透點擊地圖 */
+            }
+
+            /* 全螢幕時的底部容器微調，避免全螢幕下與底欄重疊 */
+            .driver-dashboard.map-fullscreen .bottom-container {
+            bottom: 60px !important; /* 為固定於 viewport 底部的 status-bar 留出空間 */
             }
 
             .interactive-area {
@@ -148,9 +216,10 @@
 
             /* 卡片區域占畫面高 */
             .cards-section {
-                height: 18vh;
-                min-height: 160px;
-                padding: 0 10px;
+                height: 130px;
+                margin-bottom: 8px;
+                padding: 0 15px;
+                margin-bottom: 8px; /* 留出空間給底部狀態列，避免被覆蓋（視情況調整） */
             }
 
             .order-card {
@@ -168,17 +237,23 @@
 
             /* 狀態指示燈 */
             .status-badge {
-                font-size: 0.85rem;
+                font-size: 0.8rem;
                 padding: 4px 8px;
                 border-radius: 20px;
             }
 
-            /* 4. 最底部定位狀態列 */
+            /* 底部狀態列：固定定位並置頂於其他元素 */
             .status-bar {
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                z-index: 100001 !important; /* 保持在最上層 */
                 background-color: #ffffff;
                 border-top: 1px solid #dee2e6;
                 padding: 12px 16px;
                 box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
+                pointer-events: auto;
             }
 
             /* Carousel 箭頭調整 */
@@ -190,12 +265,25 @@
                 transition: opacity 0.2s;
             }
 
-</style>
+            </style>
 
-<div class="driver-dashboard">
+            <div class="driver-dashboard" id="driverDashboard">
 
-    <!-- 主要背景地圖 -->
-    <div id="map"></div>
+                <!-- 主要背景地圖 -->
+                <div id="map"></div>
+
+                <!-- =====================================
+                     地圖右上角全螢幕按鈕
+                     ===================================== -->
+
+                <button type="button"
+                        id="mapFullscreenBtn"
+                        class="map-fullscreen-btn"
+                        title="全螢幕地圖">
+
+                    <i class="bi bi-arrows-fullscreen"></i>
+
+                </button>
 
     <!-- 右上角頂部導覽列與漢堡選單 -->
     <div class="top-navbar">
@@ -207,19 +295,31 @@
                 </a> *@
 
                 <!-- 漢堡選單按鈕 -->
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#driverNavbar" aria-controls="driverNavbar" aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
+                <button class="navbar-toggler"
+                type="button" 
+                data-bs-toggle="collapse"
+                data-bs-target="#driverNavbar"
+                aria-controls="driverNavbar" 
+                aria-expanded="false"
+                aria-label="Toggle navigation">
+                   
+                <span class="navbar-toggler-icon"></span>
                 </button>
 
                 <!-- 展開選單內容 -->
-                <div class="collapse navbar-collapse mt-2 mt-lg-0" id="driverNavbar">
-                    <div class="navbar-nav ms-auto d-flex flex-column flex-lg-row gap-2">
+                <div class="collapse navbar-collapse mt-2 mt-lg-0" 
+                     id="driverNavbar">
+                    <div class="navbar-nav me-auto d-flex flex-column flex-lg-row gap-2">
+
                         <!-- 指向未來訂單 -->
-                        <a class="btn btn-outline-primary btn-sm" href="/Driver/FutureOrders">
+                        <a class="btn btn-outline-primary btn-sm" 
+                            href="/Driver/FutureOrders">
                             <i class="bi bi-calendar-event me-1"></i> 未來訂單
                         </a>
+
                         <!-- 指向歷史訂單（帶 tab=history 參數） -->
-                        <a class="btn btn-outline-secondary btn-sm" href="/Driver/HistoryOrders?tab=history">
+                        <a class="btn btn-outline-secondary btn-sm" 
+                            href="/Driver/HistoryOrders?tab=history">
                             <i class="bi bi-clock-history me-1"></i> 歷史訂單
                         </a>
                         @* <!-- 登出按鈕 -->
@@ -233,21 +333,33 @@
     </div>
 
     <!-- 底部區域 (包含 1/4 行程卡片 + 定位控制列) -->
-    <div class="bottom-container">
+    <div class="bottom-container interactive-area">
 
         <!-- 佔畫面約 1/4 的可滑動小卡 (Bootstrap 5 Carousel) -->
-        <div class="cards-section interactive-area mb-2">
+        <div class="cards-section interactive-area">
             <!-- data-bs-ride="false" 停用自動輪播，需要手動切換 -->
-            <div id="orderCarousel" class="carousel slide h-100" data-bs-ride="false" data-bs-interval="false">
+            <div id="orderCarousel" 
+                class="carousel slide h-100" 
+                data-bs-ride="false" 
+                data-bs-interval="false">
+
                 <div class="carousel-inner h-100">
 
                     @if (Model == null || !Model.Any())
                     {
                         <!-- 當資料庫無待處理訂單時顯示空卡片 -->
                         <div class="carousel-item active h-100">
-                            <div class="order-card p-3 d-flex flex-column justify-content-center align-items-center h-100">
-                                <i class="bi bi-check-circle text-success fs-2 mb-1"></i>
-                                <span class="fw-bold text-secondary">目前無進行中或待處理訂單</span>
+                            <div class="order-card p-3 
+                                        d-flex flex-column 
+                                        justify-content-center 
+                                        align-items-center h-100">
+
+                                <i class="bi bi-check-circle 
+                                          text-success 
+                                          fs-2
+                                          mb-1"></i>
+                                <span class="fw-bold text-secondary">
+                                    目前無進行中或待處理訂單 </span>
                             </div>
                         </div>
                     }
@@ -263,41 +375,65 @@
 
                             <!-- 每一張訂單卡片 (第一張加上 active 類別) -->
                             <div class="carousel-item h-100 @(isFirst ? "active" : "")">
-                                <div class="order-card p-2 d-flex flex-column justify-content-between h-100">
-                                    <div class="d-flex justify-content-between align-items-center border-bottom pb-2">
-                                        <span class="fw-bold @titleColor">
-                                            <i class="bi @iconClass me-1"></i>@cardTitle
-                                        </span>
-                                        <span class="badge bg-secondary">訂單編號: @order.OrderNo</span>
-                                    </div>
+                                <div class="order-card p-3 
+                                            d-flex flex-column 
+                                            justify-content-between 
+                                            h-100">
 
-                                    <div class="row g-1 my-1 text-secondary small">
-                                        <div class="col-6">
-                                            <strong>客戶：</strong>
-                                            <span class="text-dark">
-                                                @(order.AccountNavigation?.FullName ?? order.Account)
+                             <!-- 卡片頂部：標題與訂單編號 -->
+                        <div class="d-flex justify-content-between align-items-center border-bottom pb-2 mb-2">
+                            <span class="fw-bold @titleColor">
+                                <i class="bi @iconClass me-1"></i>@cardTitle
+                            </span>
+                            <span class="badge bg-secondary">訂單編號: @order.OrderNo</span>
+                        </div>
+
+                        <!-- 卡片主體：資訊欄 (左) + 狀態操作按鈕 (右) -->
+                        <div class="d-flex align-items-center justify-content-between gap-2 h-100">
+            
+                            <!-- 左側：訂單詳細資訊 -->
+                            <div class="flex-grow-1 text-secondary small pe-2" style="min-width: 0;">
+                                <div class="row g-2 align-items-center">
+                                    <div class="col-6 d-flex align-items-center">
+                                        <strong class="text-nowrap me-1">客戶：</strong>
+                                        <span class="text-dark text-truncate">
+                                            @(order.AccountNavigation?.FullName ?? order.Account)
                                         </span>
-                                        </div>
-                                        <div class="col-6">
-                                            <strong>預計出發：</strong>
-                                            <span class="text-danger fw-bold">@order.DepartureTime?.ToString("HH:mm")</span>
-                                        </div>
-                                        <div class="col-12">
-                                            <strong>目的地：</strong>
-                                            <span class="text-dark text-truncate d-inline-block" style="max-width: 80%;">@order.Destination</span>
-                                        </div>
-                                        @* <div class="col-6">
-                                            <strong>車資：</strong>
-                                            <span class="text-success fw-bold">@order.Fare.ToString("N0") 元</span>
-                                        </div> *@
-                                        @* <div class="col-6">
-                                            <strong>航班：</strong>
-                                            <span class="text-dark">@order.FlightNumber</span>
-                                            <span class="badge bg-success status-badge">@order.TripStatus</span>
-                                        </div> *@
+                                    </div>
+                                    <div class="col-6 d-flex align-items-center">
+                                        <strong class="text-nowrap me-1">預計出發：</strong>
+                                        <span class="text-danger fw-bold me-2">@order.DepartureTime?.ToString("HH:mm")</span>
+                                        <span class="badge bg-success status-badge text-nowrap">@order.TripStatus</span>
+                                    </div>
+                                    <div class="col-6 d-flex align-items-center">
+                                        <strong class="text-nowrap me-1">目的地：</strong>
+                                        <span class="text-dark text-truncate" title="@order.Destination">@order.Destination</span>
+                                    </div>
+                                    <div class="col-6 d-flex align-items-center">
+                                        <strong class="text-nowrap me-1">車資：</strong>
+                                        <span class="text-success fw-bold">@order.Fare?.ToString("N0") 元</span>
                                     </div>
                                 </div>
                             </div>
+
+                            <!-- 右側：司機行程動作按鈕區 -->
+                            <div class="d-flex flex-column gap-2 justify-content-center border-start ps-3" style="min-width: 140px;">
+                                <button type="button" 
+                                        class="btn btn-warning btn-sm fw-bold text-nowrap d-flex align-items-center justify-content-center"
+                                        onclick="updateTripStatus('@order.OrderNo', 'Arrived')">
+                                    <i class="bi bi-geo-alt-fill me-1"></i>已抵達客人位置
+                                </button>
+                                <button type="button" 
+                                        class="btn btn-primary btn-sm fw-bold text-nowrap d-flex align-items-center justify-content-center"
+                                        onclick="updateTripStatus('@order.OrderNo', 'Completed')">
+                                    <i class="bi bi-check-circle-fill me-1"></i>已送達目的地
+                                </button>
+                            </div>
+
+                        </div>
+
+                    </div>
+                </div>
 
                             index++;
                         }
@@ -357,7 +493,92 @@
                     maxZoom: 19,
                     attribution: '© OpenStreetMap'
                 }).addTo(map);
+                
+                 // 新增 Leaflet 放大縮小控制
+                L.control.zoom({
+                    position: 'bottomright'
+                }).addTo(map);
+        
             }
+
+                  /* =====================================
+                   2. 地圖全螢幕
+                   ===================================== */
+
+                const dashboard =
+                    document.getElementById("driverDashboard");
+
+                const fullscreenBtn =
+                    document.getElementById("mapFullscreenBtn");
+
+
+                fullscreenBtn.addEventListener("click", function () {
+
+                    // 如果目前不是全螢幕
+                    if (!dashboard.classList.contains("map-fullscreen")) {
+
+                        dashboard.classList.add("map-fullscreen");
+
+                        fullscreenBtn.innerHTML =
+                            '<i class="bi bi-fullscreen-exit"></i>';
+
+                        fullscreenBtn.title =
+                            "退出全螢幕";
+
+                    }
+                    else {
+
+                        dashboard.classList.remove("map-fullscreen");
+
+                        fullscreenBtn.innerHTML =
+                            '<i class="bi bi-arrows-fullscreen"></i>';
+
+                        fullscreenBtn.title =
+                            "全螢幕地圖";
+                    }
+
+
+                    // 等 CSS 完成後重新計算 Leaflet 地圖大小
+                    setTimeout(function () {
+
+                        if (map) {
+                            map.invalidateSize();
+                        }
+
+                    }, 300);
+
+                });
+
+
+                /* =====================================
+                   3. ESC 離開全螢幕
+                   ===================================== */
+
+                document.addEventListener("keydown", function (event) {
+
+                    if (event.key === "Escape") {
+
+                        dashboard.classList.remove("map-fullscreen");
+
+                        fullscreenBtn.innerHTML =
+                            '<i class="bi bi-arrows-fullscreen"></i>';
+
+                        fullscreenBtn.title =
+                            "全螢幕地圖";
+
+
+                        setTimeout(function () {
+
+                            if (map) {
+                                map.invalidateSize();
+                            }
+
+                        }, 300);
+
+                    }
+
+                });
+
 
             // 2. 開始 GPS 定位追蹤
             function startTracking() {
