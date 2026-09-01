@@ -72,41 +72,20 @@
                 
 
 
+              
+
                 <div class="col-md-6">
 
-                    <strong>車牌：</strong>
+                    <strong>司機編號：</strong>
                     <span>
-                        @Model?.LicensePlate
+						@Model?.AssignedDriverId
                     </span>
 
                 </div>
 
             </div>
 
-
-            <div class="row mb-2">
-
-                <div class="col-md-6">
-
-                    <strong>車型：</strong>
-                    <span>
-                        @Model?.VehicleType
-                    </span>
-
-                </div>
-
-
-                <div class="col-md-6">
-
-                    <strong>車資：</strong>
-                    <span id="passenger-trip-fare">計算中...</span>
-
-                </div>
-
-            </div>
-
-
-
+            
 
             <div class="row mb-2">
 
@@ -132,8 +111,39 @@
 
             </div>
 
+            <div class="row mb-2">
 
-            <div class="row">
+                <div class="col-md-6">
+
+                    <strong>車牌：</strong>
+                    <span>
+                        @Model?.LicensePlate
+                    </span>
+
+                </div>
+
+
+                <div class="col-md-6">
+
+                    <strong>車資：</strong>
+                    <span id="passenger-trip-fare">計算中...</span>
+
+                </div>
+
+            </div>
+
+
+
+
+            <div class="row mb-2">
+
+                <div class="col-md-6">
+
+                    <strong>乘車時間：</strong>
+
+                    <span id="passenger-trip-start-time">@Model?.DepartureTime</span>
+
+                </div>
 
                 <div class="col-md-6">
 
@@ -149,15 +159,7 @@
                 </div>
 
 
-                <div class="col-md-6">
-
-                    <strong>司機位置更新：</strong>
-
-                    <span id="last-update">
-                        尚未收到資料
-                    </span>
-
-                </div>
+               
 
             </div>
 
@@ -167,25 +169,35 @@
 
                 <div class="row mt-3">
 
-                    <div class="col-md-4">
+                    <div class="col-md-3">
                         <strong>目前路線：</strong>
                         <span id="passenger-route-target">
                             等待司機分享位置
                         </span>
                     </div>
 
-                    <div class="col-md-4">
+                    <div class="col-md-3">
                         <strong>剩餘距離：</strong>
                         <span id="passenger-route-distance">
                             尚未取得
                         </span>
                     </div>
 
-                    <div class="col-md-4">
+                    <div class="col-md-3">
                         <strong>預計抵達時間：</strong>
                         <span id="passenger-route-eta">
                             尚未取得
                         </span>
+                    </div>
+
+                    <div class="col-md-3">
+
+                        <strong>司機位置更新：</strong>
+
+                        <span id="last-update">
+                            尚未收到資料
+                        </span>
+
                     </div>
 
                 </div>
