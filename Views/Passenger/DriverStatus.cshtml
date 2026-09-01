@@ -126,7 +126,9 @@
                 <div class="col-md-6">
 
                     <strong>車資：</strong>
-                    <span id="passenger-trip-fare">計算中...</span>
+                    <span style="display:none;" id="passenger-trip-fare">計算中...</span>
+                    @* 原本沒有車資欄位未來待將passenger-trip-fare移除 *@
+                    <span id="Passenger-trip-fare-SQL">@Model?.Fare 元</span>
 
                 </div>
 
