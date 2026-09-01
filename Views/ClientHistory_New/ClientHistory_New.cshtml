@@ -43,138 +43,191 @@
         </div>
 
         <!-- ========================= 訂單列表 ========================== -->
+        <!-- 使用 [ValidateAntiForgeryToken] 版本時需加入 -->
+        @* @Html.AntiForgeryToken() *@
         <div id="orderList">
             @foreach (var order in Model)
                 {
-                    <!-- ========================= 訂單卡 ========================== -->
-                    <div class="order-card" data-order-status="@order.TripStatusView">
-                        <div class="row g-3 align-items-center">
-                            <!-- ========================= 左側：狀態 + 交通工具 ========================== -->
-                            <div class="col-4 col-sm-2 col-md-2">
-                                <div class="order-icon-area">
-                                        <span class="status-badge status-processing">@order.TripStatusView</span>
-                                    <div class="transport-icon">
-                                        <i class="bi bi-airplane-engines-fill"></i>
-                                    </div>
-                                </div>
-                            </div>
-                            <!-- ========================= 中間：訂單資訊 ========================== -->
-                            <div class="col-8 col-sm-6 col-md-7">
-                                <div class="order-info">
-                                    <!-- 訂單編號 -->
-                                    <div class="order-number">
-                                        <span class="info-label">訂單編號</span>
-                                            <strong>@order.OrderNoView</strong>
-                                    </div>
-                                    <!-- 出發時間 -->
-                                    <div class="departure-time">
-                                        <i class="bi bi-clock"></i>
-                                            <span>@order.DepartureTimeView.ToString()</span>
-                                    </div>
-                                    <!-- 出發 / 到達 -->
-                                    <div class="route">
-                                        <div class="route-item">
-                                            <div class="route-title">
-                                                <i class="bi bi-geo-alt-fill"></i>
-                                                出發
-                                            </div>
-                                                <div class="route-address">@order.PickupLocationView</div>
-                                        </div>
-
-                                        <div class="route-item">
-                                            <div class="route-title">
-                                                <i class="bi bi-geo-alt"></i>
-                                                到達
-                                            </div>
-                                                <div class="route-address">@order.DestinationView</div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <!-- ========================= 右側：操作按鈕 ========================== -->
-                            <div class="col-12 col-sm-4 col-md-3">
-                                <div class="order-actions">
-                                        <button class="btn btn-cancel" type="button" onclick="cancelOrder('@order.OrderNoView')">
-                                        <i class="bi bi-x-circle"></i>
-                                        取消訂單
-                                    </button>
-                                    <button class="btn btn-driver" type="button" onclick="showDriverStatus('R-342827955')">
-                                        <i class="bi bi-person-badge"></i>
-                                        司機狀態
-                                    </button>
-                                    @* <a class="btn btn-driver"
-                                        href="@Url.Action("DriverStatus", "ClientHistory_New", new { orderNumber = order.OrderNo })">
-                                        <i class="bi bi-person-badge"></i>
-                                        司機狀態
-                                    </a> *@
+                <!-- ========================= 訂單卡 ========================== -->
+                <div class="order-card" data-order-status="@order.TripStatusView">
+                    <div class="row g-3 align-items-center">
+                        <!-- ========================= 左側：狀態 + 交通工具 ========================== -->
+                        <div class="col-4 col-sm-2 col-md-2">
+                            <div class="order-icon-area">
+                                    <span class="status-badge status-processing">@order.TripStatusView</span>
+                                <div class="transport-icon">
+                                    <i class="bi bi-airplane-engines-fill"></i>
                                 </div>
                             </div>
                         </div>
-                        <!-- ========================= 分隔線 ========================== -->
-                        <div class="order-divider"></div>
-                        <!-- ========================= 展開按鈕 ========================== -->
-                        <button class="expand-button" type="button" onclick="toggleOrder(this)" aria-label="展開訂單詳細資訊">
-                            <i class="bi bi-chevron-down"></i>
-                        </button>
-                        <!-- ========================= 訂單摘要 ========================== -->
-                        <div class="order-extra">
-                            <div class="row g-2 order-detail">
-                                <!-- 車牌 / 車型 -->
-                                <div class="col-6 col-md-3">
-                                    <div class="detail-item">
-                                        <div class="detail-title">
-                                            <i class="bi bi-car-front"></i>
-                                            車牌 / 車型
+                        <!-- ========================= 中間：訂單資訊 ========================== -->
+                        <div class="col-8 col-sm-6 col-md-7">
+                            <div class="order-info">
+                                <!-- 訂單編號 -->
+                                <div class="order-number">
+                                    <span class="info-label">訂單編號</span>
+                                        <strong>@order.OrderNoView</strong>
+                                </div>
+                                <!-- 出發時間 -->
+                                <div class="departure-time">
+                                    <i class="bi bi-clock"></i>
+                                        <span>@order.DepartureTimeView.ToString()</span>
+                                </div>
+                                <!-- 出發 / 到達 -->
+                                <div class="route">
+                                    <div class="route-item">
+                                        <div class="route-title">
+                                            <i class="bi bi-geo-alt-fill"></i>
+                                            出發
                                         </div>
-                                        <div class="detail-content">
-                                            @order.LicensePlateView
-                                            <br>
-                                                @order.VehicleTypeView
+                                            <div class="route-address">@order.PickupLocationView</div>
+                                    </div>
+
+                                    <div class="route-item">
+                                        <div class="route-title">
+                                            <i class="bi bi-geo-alt"></i>
+                                            到達
                                         </div>
+                                            <div class="route-address">@order.DestinationView</div>
                                     </div>
                                 </div>
-                                <!-- 人數 / 行李 -->
-                                <div class="col-6 col-md-3">
-                                    <div class="detail-item">
-                                        <div class="detail-title">
-                                            <i class="bi bi-people"></i>
-                                            人數 / 行李
-                                        </div>
-                                        <div class="detail-content">
-                                                @order.PassengerCountView 人
-                                            <br>
-                                                @order.LuggageCountView 行李
-                                            <br>
-                                                @order.BabySeatView 嬰兒座椅
-                                        </div>
+                            </div>
+                        </div>
+                        <!-- ========================= 右側：操作按鈕 ========================== -->
+                        @* @{ var canCancel = order.DepartureTimeView > DateTime.Now.AddDays(1); } *@
+                        @{
+                            var isCancelled = order.TripStatusView == "已取消";
+                            var isCompleted = order.TripStatusView == "已完成";
+                            var isWithin24Hours = order.DepartureTimeView <= DateTime.Now.AddHours(24);
+                            var canCancel = !isCancelled && !isCompleted && !isWithin24Hours;
+                        }
+                        <div class="col-12 col-sm-4 col-md-3">
+                            <div class="order-actions">
+                                @* 
+                                - 版本 1 (沒限制)
+                                <button class="btn btn-cancel" type="button" onclick="cancelOrder('@order.OrderNoView')">
+                                <i class="bi bi-x-circle"></i>
+                                    取消訂單
+                                </button>
+                                - 版本 2 (距離出發時間 < 24 小時，就不能取消)
+                                <button class="btn btn-cancel" type="button" onclick="cancelOrder('@order.OrderNoView')" @(canCancel ? "" : "disabled")>
+                                    <i class="bi bi-x-circle"></i>
+                                    @(canCancel ? "取消訂單" : "無法取消")
+                                </button> *@
+                                @* 版本 3 (距離出發 ≤ 24 小時、已取消、已完成 -> 不能取消) *@
+                                <button class="btn btn-cancel"
+                                        type="button"
+                                        onclick="cancelOrder('@order.OrderNoView')"
+                                    @(canCancel ? "" : "disabled")>
+                                    <i class="bi bi-x-circle"></i>
+                                    @(canCancel ? "取消訂單" : "無法取消")
+                                </button>
+                                <button class="btn btn-driver" type="button" onclick="showDriverStatus('R-342827955')">
+                                    <i class="bi bi-person-badge"></i>
+                                    司機狀態
+                                </button>
+                                @* <a class="btn btn-driver"
+                                    href="@Url.Action("DriverStatus", "ClientHistory_New", new { orderNumber = order.OrderNo })">
+                                    <i class="bi bi-person-badge"></i>
+                                    司機狀態
+                                </a> *@
+                            </div>
+                        </div>
+                    </div>
+                    <!-- ========================= 分隔線 ========================== -->
+                    <div class="order-divider"></div>
+                    <!-- ========================= 展開按鈕 ========================== -->
+                    <button class="expand-button" type="button" onclick="toggleOrder(this)" aria-label="展開訂單詳細資訊">
+                        <i class="bi bi-chevron-down"></i>
+                    </button>
+                    <!-- ========================= 訂單摘要 ========================== -->
+                    <div class="order-extra">
+                        <div class="row g-2 order-detail">
+                            <!-- 車牌 / 車型 -->
+                            <div class="col-6 col-md-3">
+                                <div class="detail-item">
+                                    <div class="detail-title">
+                                        <i class="bi bi-car-front"></i>
+                                        車牌 / 車型
+                                    </div>
+                                    <div class="detail-content">
+                                        @order.LicensePlateView
+                                        <br>
+                                        @order.VehicleTypeView
                                     </div>
                                 </div>
-                                <!-- 費用 -->
-                                <div class="col-6 col-md-3">
-                                    <div class="detail-item">
-                                        <div class="detail-title">
-                                            <i class="bi bi-currency-dollar"></i>
-                                            費用
-                                        </div>
-                                            <div class="detail-content price">NT$ @order.FareView</div>
+                            </div>
+                            <!-- 人數 / 行李 -->
+                            <div class="col-6 col-md-3">
+                                <div class="detail-item">
+                                    <div class="detail-title">
+                                        <i class="bi bi-people"></i>
+                                    人數 / 行李 / 嬰兒座椅
+                                    </div>
+                                    <div class="detail-content">
+                                            @order.PassengerCountView 人
+                                        <br>
+                                            @order.LuggageCountView 行李
+                                        <br>
+                                            @order.BabySeatView 嬰兒座椅
                                     </div>
                                 </div>
-                                <!-- 行程時間 -->
-                                <div class="col-6 col-md-3">
-                                    <div class="detail-item">
-                                        <div class="detail-title">
-                                            <i class="bi bi-hourglass-split"></i>
-                                            預計行程時間
-                                        </div>
-                                            <div class="detail-content">@order.EstimatedDurationView 分鐘</div>
+                            </div>
+                            <!-- 費用 -->
+                            <div class="col-6 col-md-3">
+                                <div class="detail-item">
+                                    <div class="detail-title">
+                                        <i class="bi bi-currency-dollar"></i>
+                                        費用
                                     </div>
+                                        <div class="detail-content price">NT$ @order.FareView</div>
+                                </div>
+                            </div>
+                            <!-- 行程時間 -->
+                            <div class="col-6 col-md-3">
+                                <div class="detail-item">
+                                    <div class="detail-title">
+                                        <i class="bi bi-hourglass-split"></i>
+                                        預計行程時間
+                                    </div>
+                                        <div class="detail-content">@order.EstimatedDurationView 分鐘</div>
                                 </div>
                             </div>
                         </div>
                     </div>
+                </div>
                 }
+            <!-- ========================= 若無訂單 ========================== -->
+            <div id="noOrdersMessage" class="text-center py-5" style="display: none;">
+                <i class="bi bi-inbox fs-1 text-muted"></i>
+                <p class="mt-3 text-muted">目前沒有符合條件的訂單</p>
+            </div>
+            <!-- ========================= 按取消訂單的時候跳出(Model) ========================== -->
+            <div class="modal fade" id="cancelOrderModal" tabindex="-1" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <!-- 視窗頭 -->
+                        <div class="modal-header">
+                            <h5 class="modal-title">取消訂單</h5>
+							<!-- 關閉視窗紐 -->
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <!-- 視窗身 -->
+                        <div class="modal-body">
+                            <p>
+                                確定要取消訂單 <strong id="cancelOrderNumber"></strong> 嗎？
+                            </p>
+                        </div>
+                        <!-- 視窗尾 -->
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"> 返回 </button>
+                            <button type="button" class="btn btn-danger" onclick="confirmCancelOrder()"> 確定取消 </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-			<!-- @* 訂單 1 (範例訂單 留存備用) *@
+            <!-- @* 訂單 1 (範例訂單 留存備用) *@
             <div class="order-card" data-order-status="processing">
                 <div class="row g-3 align-items-center">
                     @* 左側：狀態 + 交通工具 *@
