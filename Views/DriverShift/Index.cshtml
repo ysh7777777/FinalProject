@@ -1,0 +1,311 @@
+﻿@using System.Collections.Generic
+@model List<FinalProject.Models.DriverShiftSchedule>
+@{
+    ViewData["Title"] = "司機值班表";
+    Layout = "~/Views/Shared/Driver_Layout.cshtml";
+     var orderNumbersByShift =ViewBag.OrderNumbersByShift as Dictionary<string, List<string>>;
+
+    if (orderNumbersByShift == null)
+    {
+        orderNumbersByShift = new Dictionary<string, List<string>>();
+    }
+    var availableVehicles = ViewBag.AvailableVehicles as List<FinalProject.Models.Vehicle>;
+
+    if (availableVehicles == null)
+    {
+         availableVehicles = new List<FinalProject.Models.Vehicle>();
+    }
+}
+@section Styles {
+    <link rel="stylesheet"
+          href="~/css/DriverShift/StyleSheet.css"
+          asp-append-version="true" />
+}
+    <main class="page-shell">
+        <section class="page-heading">
+            <div>
+                <h1>我的值班表</h1>
+                <p>查看已安排的車輛與班次，尚未派單的班次可以修改時間或刪除。</p>
+            </div>
+
+            <button class="primary-button" id="openCreateDialog" type="button">
+                ＋ 新增班表
+            </button>
+        </section>
+@* 成功訊息 *@
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success">
+        @TempData["SuccessMessage"]
+    </div>
+}
+
+@* 失敗訊息 *@
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger">
+        @TempData["ErrorMessage"]
+    </div>
+}
+        <section class="schedule-panel" aria-labelledby="scheduleTitle">
+            <div class="panel-heading">
+                <h2 id="scheduleTitle">班表資料</h2>
+                <span>已有訂單的班次不能修改或刪除</span>
+            </div>
+
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th scope="col">值班日期</th>
+                            <th scope="col">上班時間</th>
+                            <th scope="col">下班時間</th>
+                            <th scope="col">車牌號碼</th>
+                            <th scope="col">車輛種類</th>
+                            <th scope="col">工作狀態</th>
+                            <th scope="col">派單狀態</th>
+                            <th scope="col">操作</th>
+                        </tr>
+                    </thead>
+
+        <tbody id="scheduleRows">
+            @if (Model == null || Model.Count == 0)
+                    {
+                        <tr>
+                            <td colspan="8"class="empty-state">
+                                <strong>
+                                    目前沒有班表資料
+                                </strong>
+                                <p>
+                                    可以按右上角的「新增班表」建立資料。
+                                </p>
+                            </td>
+                        </tr>
+                    }
+                    else
+                    {
+                        @foreach (var item in Model)
+                        {
+                            // 這一筆班表的訂單編號
+                            List<string> orderNumbers = new List<string>();
+
+                            if (orderNumbersByShift.ContainsKey(item.ShiftId))
+                            {
+                                orderNumbers = orderNumbersByShift[item.ShiftId];
+                            }
+
+                            // 訂單數量大於 0，代表已經派有訂單
+                            bool hasAssignedOrder;
+
+                            if (orderNumbers.Count > 0)
+                            {
+                                hasAssignedOrder = true;
+                            }
+                            else
+                            {
+                                hasAssignedOrder = false;
+                            }
+
+                            // 沒有訂單才可以編輯
+                            bool canEdit;
+
+                            if (hasAssignedOrder == true)
+                            {
+                                canEdit = false;
+                            }
+                            else
+                            {
+                                canEdit = true;
+                            }
+
+                            // 整理工作狀態
+                            string driverStatus;
+
+                            if (item.DriverStatus == "接單中")
+                            {
+                                driverStatus = "接單中";
+                            }
+                            else if (item.DriverStatus == "休息")
+                            {
+                                driverStatus = "休息";
+                            }
+                            else
+                            {
+                                driverStatus = "待命";
+                            }
+
+                            // 決定狀態的 CSS
+                            string statusClass;
+
+                            if (driverStatus == "接單中")
+                            {
+                                statusClass = "status-working";
+                            }
+                            else if (driverStatus == "休息")
+                            {
+                                statusClass = "status-rest";
+                            }
+                            else
+                            {
+                                statusClass = "status-ready";
+                            }
+
+                            <tr data-shift-id="@item.ShiftId"data-can-edit="@canEdit.ToString().ToLower()">
+
+                                <td data-label="值班日期">
+                                    <strong class="date-main">
+                                        @(
+                                               item.ShiftDate?.ToString("yyyy / MM / dd")?? "無"
+                                          )
+                                    </strong>
+                                 </td>
+
+                                 <td data-label="上班時間"class="start-time">
+                                           @(
+                                                item.ShiftStart?.ToString("HH:mm")?? "無"
+                                             )
+                                 </td>
+
+                                 <td data-label="下班時間"class="end-time">
+                                             @(
+                                                 item.ShiftEnd?.ToString("HH:mm")?? "無"
+                                               )
+                                 </td>
+
+                                 <td data-label="車牌號碼">
+                                      <span class="plate">
+                                              @(item.LicensePlate ?? "無")
+                                      </span>
+                                 </td>
+
+                                   <td data-label="車輛種類">
+                                                @(
+                                                    item.LicensePlateNavigation ?.VehicleType?? "無"
+                                                )
+                                   </td>
+
+                                   <td data-label="工作狀態">
+                                       <span class="status @statusClass">
+                                               @driverStatus
+                                        </span>
+                                    </td>
+
+                                    <td data-label="派單狀態">
+                                           @if (hasAssignedOrder == true)
+                                    {
+                                        <span class="dispatch dispatch-assigned">
+                                            @string.Join("、", orderNumbers)
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="dispatch dispatch-free">
+                                            尚無訂單
+                                        </span>
+                                    }
+                                </td>
+
+                                <td data-label="操作"
+                                class="row-actions">
+
+                                    @if (canEdit == true)
+                                    {
+                                        <button type="button"class="link-button edit-button">
+                                            編輯
+                                        </button>
+
+                                        <button type="button"class="link-button delete-button">
+                                            刪除
+                                        </button>
+                                    }
+                                    else
+                                    {
+                                        <span class="locked-note">
+                                            不可修改
+                                        </span>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+                </table>
+            </div>
+
+        </section>
+    </main>
+
+    <dialog id="shiftDialog" class="dialog">
+        <form id="shiftForm" asp-controller="DriverShift"asp-action="Create"method="post" data-create-url="@Url.Action("Create", "DriverShift")"
+        data-edit-url="@Url.Action("Edit", "DriverShift")">
+            @Html.AntiForgeryToken()
+            <div class="dialog-heading">
+                <h2 id="dialogTitle">新增班表</h2>
+                <button class="close-button" id="closeDialog" type="button" aria-label="關閉">×</button>
+            </div>
+
+            <input id="editingShiftId" name="shiftId" type="hidden">
+
+            <div class="form-grid">
+                <label class="field full-width">
+                    <span>值班日期</span>
+                    <input id="shiftDate"  name="shiftDate" type="date" required>
+                </label>
+
+                <label class="field">
+                    <span>上班時間</span>
+                    <input id="startTime"  name="shiftStart"type="time" required>
+                </label>
+
+                <label class="field">
+                    <span>下班時間</span>
+                    <input id="endTime"  name="shiftEnd" type="time" required>
+                </label>
+
+                <label class="field full-width create-only-field">
+                    <span>值班車輛</span>
+                <select id="vehicle" name="licensePlate" required>
+                    <option value="">
+                            請選擇車輛
+                    </option>
+
+                     @foreach (var vehicleItem in availableVehicles)
+                      {
+                            <option value="@vehicleItem.LicensePlate" data-vehicle-type="@vehicleItem.VehicleType">
+                              @vehicleItem.LicensePlate｜@(vehicleItem.VehicleType ?? "未設定車型")
+                            </option>
+                      }
+                </select>
+                </label>
+            </div>
+
+            <p class="form-message" id="formMessage" role="alert"></p>
+
+            <div class="dialog-actions">
+                <button class="secondary-button" id="cancelDialog" type="button">取消</button>
+                <button class="primary-button" type="submit">儲存</button>
+            </div>
+        </form>
+    </dialog>
+
+    <dialog id="deleteDialog" class="dialog confirm-dialog">
+        
+    <form asp-controller = "DriverShift" asp-action = "Delete" method = "post">
+        @Html.AntiForgeryToken()
+
+        <input id = "deleteShiftId" name = "shiftId" type = "hidden">
+        <h2>確定刪除這筆班表？</h2>
+        <p>刪除後，這個日期將不會參與派車媒合。</p>
+        <div class="dialog-actions">
+            <button class="secondary-button" id="cancelDelete" type="button">取消</button>
+            <button class="danger-button" id="confirmDelete" type="submit">刪除</button>
+        </div>
+        </form>
+    </dialog>
+
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+@section Scripts {
+    <script src="~/js/DriverShift/JavaScript.js"
+            asp-append-version="true"></script>
+}

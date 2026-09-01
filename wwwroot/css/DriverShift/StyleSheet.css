@@ -1,0 +1,473 @@
+﻿:root {
+    --navy: #1b2d38;
+    --ink: #243541;
+    --muted: #6b7c87;
+    --line: #dce4e8;
+    --surface: #ffffff;
+    --canvas: #f4f6f7;
+    --yellow: #f5b800;
+    --green: #2d8a61;
+    --green-soft: #e9f6ef;
+    --orange: #b57900;
+    --orange-soft: #fff4d1;
+    --blue: #397ba3;
+    --blue-soft: #eaf3f8;
+    --red: #c64747;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    min-width: 320px;
+    color: var(--ink);
+    background: var(--canvas);
+    font-family: "Noto Sans TC", "Microsoft JhengHei", system-ui, sans-serif;
+}
+
+button,
+input,
+select {
+    font: inherit;
+}
+
+.page-shell {
+    width: min(1320px, calc(100% - 48px));
+    margin: 0 auto;
+    padding: 44px 0 64px;
+}
+
+.page-heading,
+.panel-heading,
+.dialog-heading,
+.dialog-actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+}
+
+.page-heading {
+    margin-bottom: 24px;
+}
+
+h1,
+h2,
+p {
+    margin-top: 0;
+}
+
+h1 {
+    margin-bottom: 8px;
+    color: var(--navy);
+    font-size: clamp(1.8rem, 3vw, 2.5rem);
+}
+
+.page-heading p {
+    margin-bottom: 0;
+    color: var(--muted);
+    line-height: 1.6;
+}
+
+.primary-button,
+.secondary-button,
+.danger-button {
+    min-height: 42px;
+    padding: 0 18px;
+    border: 0;
+    border-radius: 8px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.primary-button {
+    color: #172630;
+    background: var(--yellow);
+}
+
+    .primary-button:hover {
+        background: #ffc51a;
+    }
+
+.secondary-button {
+    color: var(--ink);
+    background: #e9eef1;
+}
+
+.danger-button {
+    color: #fff;
+    background: var(--red);
+}
+
+.schedule-panel {
+    overflow: hidden;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    box-shadow: 0 8px 28px rgba(24, 43, 54, 0.07);
+}
+
+.panel-heading {
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--line);
+}
+
+    .panel-heading h2 {
+        margin-bottom: 0;
+        color: var(--navy);
+        font-size: 1.15rem;
+    }
+
+    .panel-heading span {
+        color: var(--muted);
+        font-size: 0.82rem;
+    }
+
+.table-wrap {
+    overflow-x: auto;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    white-space: nowrap;
+}
+
+th,
+td {
+    padding: 17px 14px;
+    text-align: left;
+    vertical-align: middle;
+    border-bottom: 1px solid #edf1f3;
+}
+
+    th:first-child,
+    td:first-child {
+        padding-left: 24px;
+    }
+
+    th:last-child,
+    td:last-child {
+        padding-right: 24px;
+    }
+
+th {
+    color: #6e7f89;
+    background: #f8fafb;
+    font-size: 0.78rem;
+    font-weight: 800;
+}
+
+tbody tr:last-child td {
+    border-bottom: 0;
+}
+
+tbody tr:hover {
+    background: #fbfcfc;
+}
+
+td {
+    font-size: 0.9rem;
+}
+
+    .date-main,
+    td small {
+        display: block;
+    }
+
+.date-main {
+    color: var(--navy);
+}
+
+td small {
+    margin-top: 3px;
+    color: var(--muted);
+}
+
+.plate {
+    padding: 4px 7px;
+    color: var(--navy);
+    background: #f0f3f5;
+    border: 1px solid #dce4e8;
+    border-radius: 5px;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-weight: 700;
+}
+
+.status,
+.dispatch {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 9px;
+    border-radius: 999px;
+    font-size: 0.78rem;
+    font-weight: 700;
+}
+
+    .status::before,
+    .dispatch::before {
+        content: "";
+        width: 6px;
+        height: 6px;
+        background: currentColor;
+        border-radius: 50%;
+    }
+
+.status-ready,
+.dispatch-free {
+    color: var(--green);
+    background: var(--green-soft);
+}
+
+.status-working,
+.dispatch-assigned {
+    color: var(--orange);
+    background: var(--orange-soft);
+}
+
+.status-rest {
+    color: var(--blue);
+    background: var(--blue-soft);
+}
+
+.row-actions {
+    min-width: 126px;
+}
+
+.link-button {
+    padding: 5px 3px;
+    color: var(--blue);
+    background: transparent;
+    border: 0;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+    .link-button + .link-button {
+        margin-left: 10px;
+    }
+
+    .link-button:hover {
+        text-decoration: underline;
+    }
+
+.delete-button {
+    color: var(--red);
+}
+
+.locked-note {
+    color: #8a969e;
+    font-size: 0.8rem;
+}
+
+.empty-state {
+    padding: 60px 24px;
+    text-align: center;
+}
+
+    .empty-state p {
+        margin: 7px 0 0;
+        color: var(--muted);
+    }
+
+.dialog {
+    width: min(500px, calc(100% - 32px));
+    padding: 0;
+    color: var(--ink);
+    background: #fff;
+    border: 0;
+    border-radius: 14px;
+    box-shadow: 0 24px 70px rgba(15, 31, 41, 0.26);
+}
+
+    .dialog::backdrop {
+        background: rgba(13, 28, 37, 0.6);
+    }
+
+    .dialog form {
+        padding: 26px;
+    }
+
+.confirm-dialog {
+    padding: 0;
+}
+
+.dialog-heading {
+    margin-bottom: 22px;
+}
+
+    .dialog-heading h2,
+    .confirm-dialog h2 {
+        margin-bottom: 0;
+        color: var(--navy);
+        font-size: 1.3rem;
+    }
+
+.close-button {
+    width: 36px;
+    height: 36px;
+    color: var(--muted);
+    background: #edf1f3;
+    border: 0;
+    border-radius: 8px;
+    font-size: 1.4rem;
+    cursor: pointer;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 17px;
+}
+
+.field {
+    display: grid;
+    gap: 7px;
+}
+
+    .field.full-width {
+        grid-column: 1 / -1;
+    }
+
+    .field span {
+        color: var(--navy);
+        font-size: 0.82rem;
+        font-weight: 700;
+    }
+
+    .field input,
+    .field select {
+        width: 100%;
+        min-height: 44px;
+        padding: 0 11px;
+        color: var(--ink);
+        background: #fbfcfd;
+        border: 1px solid #cbd6dc;
+        border-radius: 7px;
+        outline: none;
+    }
+
+        .field input:focus,
+        .field select:focus {
+            border-color: #b98500;
+            box-shadow: 0 0 0 3px rgba(245, 184, 0, 0.15);
+        }
+
+.form-message {
+    min-height: 20px;
+    margin: 13px 0 0;
+    color: var(--red);
+    font-size: 0.82rem;
+}
+
+.dialog-actions {
+    justify-content: flex-end;
+    margin-top: 18px;
+}
+
+.confirm-dialog p {
+    margin: 10px 0 0;
+    color: var(--muted);
+}
+
+.toast {
+    padding: 12px 16px;
+    position: fixed;
+    right: 22px;
+    bottom: 22px;
+    color: #fff;
+    background: var(--navy);
+    border-left: 4px solid var(--yellow);
+    border-radius: 8px;
+    opacity: 0;
+    transform: translateY(10px);
+    pointer-events: none;
+    transition: 0.2s ease;
+}
+
+    .toast.show {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+@media (max-width: 760px) {
+    .page-shell {
+        width: min(100% - 28px, 1320px);
+        padding-top: 28px;
+    }
+
+    .page-heading,
+    .panel-heading {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .table-wrap {
+        padding: 4px 13px 13px;
+        overflow: visible;
+    }
+
+    table,
+    tbody,
+    tr,
+    td {
+        display: block;
+        width: 100%;
+    }
+
+    thead {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        overflow: hidden;
+        clip: rect(0 0 0 0);
+    }
+
+    tbody tr {
+        margin: 12px 0;
+        padding: 12px 15px;
+        border: 1px solid var(--line);
+        border-radius: 10px;
+    }
+
+    td,
+    th:first-child,
+    td:first-child,
+    th:last-child,
+    td:last-child {
+        min-height: 40px;
+        padding: 8px 0;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 18px;
+        text-align: right;
+        white-space: normal;
+        border-bottom: 1px dashed #e1e7ea;
+    }
+
+        td::before {
+            content: attr(data-label);
+            color: var(--muted);
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-align: left;
+        }
+
+        td:last-child {
+            border-bottom: 0;
+        }
+}
+
+@media (max-width: 480px) {
+    .form-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .field.full-width {
+        grid-column: auto;
+    }
+}
