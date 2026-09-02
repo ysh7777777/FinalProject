@@ -1,11 +1,11 @@
 ﻿@* @model List<FinalProject.Models.Driver> *@
 @{
-    var Drivers = ViewBag.Drivers;
+    // var Drivers = ViewBag.Drivers;  // 測試用
     var VehicleMenu = ViewBag.VehicleMenu;
     var SavedAddresses = ViewBag.SavedAddresses as List<MemberSavedAddress> ?? new List<MemberSavedAddress>();
 
     @* 我想要一個一個取，取法如下 -> <img src="@vehicleMenuSin[0].ImageUrl"> *@
-    var vehicleMenuSin = ViewData["VehicleMenuSin"] as List<VehicleMenu>;
+    // var vehicleMenuSin = ViewData["VehicleMenuSin"] as List<VehicleMenu>;
 }
 <!DOCTYPE html>
 <html lang="en">
