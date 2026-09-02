@@ -228,6 +228,16 @@ namespace FinalProject.Controllers
         [HttpPost("Join")]
         public async Task<IActionResult> Join([FromBody] Member request)
         {
+            DateOnly today = DateOnly.FromDateTime(DateTime.Today);
+
+            if (request.Birthday > today)
+            {
+                return BadRequest(new
+                {
+                    message = "生日不能晚於今天"
+                });
+            }
+
             // 後端安全檢查
             if (string.IsNullOrEmpty(request.Account) || request.Account.Contains("<script>") || request.Account.Contains("while"))
             {

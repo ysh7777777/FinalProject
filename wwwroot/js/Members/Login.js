@@ -6,12 +6,28 @@ document.addEventListener('DOMContentLoaded', function () {
     const accountInput = document.getElementById('account');
     const accountValidationMessage = document.getElementById('accountValidationMessage');
 
+    // 新增
+    const registerButtonCol =
+        document.getElementById('registerButtonCol');
+
+    const loginButtonCol =
+        document.getElementById('loginButtonCol');
+
     if (!loginForm || !loginBtn || !accountInput) {
         return;
     }
 
     function updateAccountRules() {
         const isDriver = driverBtn?.checked === true;
+
+        if (registerButtonCol) {
+            registerButtonCol.hidden = isDriver;
+        }
+
+        if (loginButtonCol) {
+            loginButtonCol.style.flex = isDriver ? '0 0 100%' : '';
+            loginButtonCol.style.width = isDriver ? '100%' : '';
+        }
 
         accountInput.maxLength = isDriver ? 15 : 6;
         accountInput.pattern = isDriver
@@ -25,6 +41,8 @@ document.addEventListener('DOMContentLoaded', function () {
             accountValidationMessage.textContent = isDriver
                 ? '請輸入司機帳號（1～15 位英數）'
                 : '請輸入帳號（6 位英數）';
+
+
         }
 
         accountInput.setCustomValidity('');
