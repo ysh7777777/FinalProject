@@ -15,6 +15,16 @@
     {
          availableVehicles = new List<FinalProject.Models.Vehicle>();
     }
+      var fullName =
+        User?.FindFirst(
+            System.Security.Claims.ClaimTypes.GivenName
+        )?.Value
+        ?? "司機";
+
+    var firstName =
+        fullName.Length > 1
+        ? fullName.Substring(1)
+        : fullName;
 }
 @section Styles {
     <link rel="stylesheet"
@@ -24,7 +34,7 @@
     <main class="page-shell">
         <section class="page-heading">
             <div>
-                <h1>我的值班表</h1>
+                <h1>@(firstName)的值班表</h1>
                 <p>查看已安排的車輛與班次，尚未派單的班次可以修改時間或刪除。</p>
             </div>
 

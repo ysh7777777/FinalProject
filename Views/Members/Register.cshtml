@@ -52,8 +52,15 @@
                     <!-- 生日 -->
                     <div class="rg-fg">
                         <label for="birthday" class="rg-label">生日<span class="rg-text-danger">*</span></label>
-                        <input type="date" class="rg-input" id="birthday" name="birthday" max="9999-12-31" required>
-                        <div class="rg-error-feedback">請選擇生日</div>
+                        <input type="date"
+                               class="rg-input"
+                               id="birthday"
+                               name="birthday"
+                               max="@DateTime.Today.ToString("yyyy-MM-dd")"
+                               required>
+                        <div class="rg-error-feedback">
+                            生日不能晚於今天
+                        </div>
                     </div>
 
                     <!-- 手機 -->
