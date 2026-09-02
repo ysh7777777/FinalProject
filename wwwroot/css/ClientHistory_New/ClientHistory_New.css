@@ -312,6 +312,11 @@ body {
         font-size: 16px;
         font-weight: 600;
         transition: all 0.2s ease;
+        /* 因為司機狀態按鈕需用<a ...>會跑版，所以下方新增水平垂直致中的調整 */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
     }
 
 
