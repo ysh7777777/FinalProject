@@ -1,11 +1,11 @@
 ﻿@* @model List<FinalProject.Models.Driver> *@
 @{
-    var Drivers = ViewBag.Drivers;
+    // var Drivers = ViewBag.Drivers;  // 測試用
     var VehicleMenu = ViewBag.VehicleMenu;
     var SavedAddresses = ViewBag.SavedAddresses as List<MemberSavedAddress> ?? new List<MemberSavedAddress>();
 
     @* 我想要一個一個取，取法如下 -> <img src="@vehicleMenuSin[0].ImageUrl"> *@
-    var vehicleMenuSin = ViewData["VehicleMenuSin"] as List<VehicleMenu>;
+    // var vehicleMenuSin = ViewData["VehicleMenuSin"] as List<VehicleMenu>;
 }
 <!DOCTYPE html>
 <html lang="en">
@@ -31,7 +31,7 @@
           rel="stylesheet">
 
     <!-- ======================= CSS ======================= -->
-    <link rel="stylesheet" href="~/css/Booking/0810.css">
+    <link rel="stylesheet" href="~/css/Booking/BookingPage.css">
 </head>
 
 <body>
@@ -90,17 +90,20 @@
                             <!-- 日期 -->
                             <div class="date-field">
                                 <label for="rideDate" class="form-label">
-                                    日期
+                                        日期
                                 </label>
-                                <input type="text" id="rideDate" class="form-control" placeholder="請選擇日期"
-                                       autocomplete="off">
+                                    <input type="text" id="rideDate" class="form-control" placeholder="請選擇日期"
+                                           autocomplete="off" required>
+                                    <div class="invalid-feedback" style="display: block;">
+                                        請選擇乘車日期
+                                    </div>
                             </div>
                             <!-- 小時 -->
                             <div>
                                 <label for="rideHour" class="form-label">
                                     時
                                 </label>
-                                <select id="rideHour" class="form-select">
+                                    <select id="rideHour" class="form-select" required>
                                     <option value="">時</option>
                                 </select>
                             </div>
@@ -109,7 +112,7 @@
                                 <label for="rideMinute" class="form-label">
                                     分
                                 </label>
-                                <select id="rideMinute" class="form-select">
+                                    <select id="rideMinute" class="form-select" required>
                                     <option value="">分</option>
                                 </select>
                             </div>
@@ -731,14 +734,14 @@
     </main>
 
     <!-- ======================= << JS 引用 >> ======================= -->
- 
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
     <!-- ======================= Flatpickr ======================= -->
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/zh-tw.js"></script>
 
     <!-- ======================= JS ======================== -->
-    <script src="~/js/Booking/0810.js"></script>
+    <script src="~/js/Booking/BookingPage.js"></script>
     <script src="~/js/Booking/place-autocomplete.js"></script>
     <!-- 串接地址轉換 API JS ======================== -->
     <script async src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAk5HVk6NmgjgNL9vu5m2HRjvcbghlyMn4&libraries=places&callback=initAutocomplete"></script>
