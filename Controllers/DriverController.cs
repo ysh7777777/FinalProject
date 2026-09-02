@@ -33,7 +33,7 @@ namespace FinalProject.Controllers
             using (SqlConnection conn = new SqlConnection(_connectionString))
             {
                 string sql = @"
-            SELECT TOP 1
+            SELECT 
                 t.order_no,
                 t.account,
                 ISNULL(m.full_name, t.account) AS customer_name,
@@ -50,6 +50,7 @@ namespace FinalProject.Controllers
             LEFT JOIN member m ON t.account = m.account
             WHERE t.assigned_driver_id = @DriverId 
               AND t.trip_status IN ('待出發', '行程中')
+              AND CAST(t.departure_time AS DATE) = CAST(GETDATE() AS DATE)
             ORDER BY t.departure_time ASC"; // 抓時間最近的那一筆
 
                 using (SqlCommand cmd = new SqlCommand(sql, conn))
@@ -59,7 +60,7 @@ namespace FinalProject.Controllers
 
                     using (SqlDataReader reader = cmd.ExecuteReader())
                     {
-                        if (reader.Read())
+                        while (reader.Read())
                         {
                             var trip = new Trip
                             {
