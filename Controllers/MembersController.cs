@@ -179,14 +179,17 @@ namespace FinalProject.Controllers
             var identity = new ClaimsIdentity(
                 claims,
                 CookieAuthenticationDefaults.AuthenticationScheme);
-            // 建立 ClaimsPrincipal，並將其簽入 HttpContext，設定 Cookie 過期時間為 1 天
+            // 發行登入識別證：設定關閉網頁不登出，且 1 天沒使用就自動過期，就需要再次登入
             await HttpContext.SignInAsync(
                 CookieAuthenticationDefaults.AuthenticationScheme,
                 new ClaimsPrincipal(identity),
                 new AuthenticationProperties
                 {
+                    // 記住我
                     IsPersistent = true,
+                    // 自動延期
                     AllowRefresh = true,
+                    // 設定這張識別證的有效期限是 1 天
                     ExpiresUtc = DateTimeOffset.UtcNow.AddDays(1)
                 });
         }
