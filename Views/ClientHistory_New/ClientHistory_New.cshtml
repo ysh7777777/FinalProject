@@ -25,7 +25,7 @@
             <div class="col-4">
                 <button class="order-tab active" type="button" data-status="processing">
                     <i class="bi bi-hourglass-split"></i>
-                    <span>進行中/行程中</span>
+                    <span>行程中/待執行</span>
                 </button>
             </div>
             <div class="col-4">
@@ -54,7 +54,17 @@
                         <!-- ========================= 左側：狀態 + 交通工具 ========================== -->
                         <div class="col-4 col-sm-2 col-md-2">
                             <div class="order-icon-area">
-                                    <span class="status-badge status-processing">@order.TripStatusView</span>
+                                @{
+                                        var statusClass = order.TripStatusView switch
+                                        {
+                                            "行程中" => "status-processing",
+                                            "已完成" => "status-completed",
+                                            "已取消" => "status-cancelled",
+                                            "待執行" => "status-pending",
+                                            _ => "status-default"
+                                        };
+                                    }
+                                <span class="status-badge @statusClass">@order.TripStatusView</span>
                                 <div class="transport-icon">
                                     <i class="bi bi-airplane-engines-fill"></i>
                                 </div>
