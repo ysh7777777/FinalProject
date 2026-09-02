@@ -387,7 +387,8 @@ body {
     .detail-item:hover {
         background-color: var(--primary-light);
         border-color: #c6d8e8;
-        transform: translateY(-2px);
+        transform: translateX(2px);
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
     }
 
 
