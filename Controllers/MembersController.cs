@@ -193,33 +193,39 @@ namespace FinalProject.Controllers
                     ExpiresUtc = DateTimeOffset.UtcNow.AddDays(1)
                 });
         }
-
+        // 依照角色導向不同頁面
         private IActionResult RedirectToRoleIndex(string? role)
         {
             return role == "driver"
                 ? RedirectToAction("Index", "Driver")
                 : RedirectToAction("Index", "Home");
         }
-
+        // 定義 VerifyPassword，舊版明文密碼規則
         private static bool VerifyPassword(
+            // suppliedPassword: 使用者輸入的密碼
             string suppliedPassword,
+            // storedPassword: 資料庫中存放的密碼（可能是 BCrypt 雜湊或舊版明文）
             string storedPassword,
             bool allowLegacyPlainText,
             out bool usedLegacyPlainText)
         {
+            // 預設無舊版明文密碼
             usedLegacyPlainText = false;
 
             try
             {
+                // 使用 BCrypt 驗證密碼，若驗證成功回傳 true，否則回傳 false
                 return BCrypt.Net.BCrypt.Verify(suppliedPassword, storedPassword);
             }
             catch
             {
+                // 判斷: 非舊版明文密碼、密碼錯誤
                 if (!allowLegacyPlainText || storedPassword != suppliedPassword)
                 {
+                    // 回傳 不登入
                     return false;
                 }
-
+                // 以上皆非，登入
                 usedLegacyPlainText = true;
                 return true;
             }
@@ -244,6 +250,7 @@ namespace FinalProject.Controllers
         [HttpPost("Join")]
         public async Task<IActionResult> Join([FromBody] Member request)
         {
+            // 生日限制
             DateOnly today = DateOnly.FromDateTime(DateTime.Today);
 
             if (request.Birthday > today)
@@ -254,7 +261,7 @@ namespace FinalProject.Controllers
                 });
             }
 
-            // 後端安全檢查
+            // 後端安全檢查，防止惡意內容或欄位不完整
             if (string.IsNullOrEmpty(request.Account) || request.Account.Contains("<script>") || request.Account.Contains("while"))
             {
                 return BadRequest(new { message = "偵測到惡意內容或欄位不完整！" });
@@ -264,17 +271,17 @@ namespace FinalProject.Controllers
             var isExist = await _context.Members.AnyAsync(
                 m => m.Account == request.Account || m.Email == request.Email
             );
-
+            // 如果重複，就回傳以下字串
             if (isExist)
             {
                 return BadRequest(new { message = "帳號或 Email 已被註冊" });
             }
-
+            // 將密碼進行 BCrypt 雜湊加密，確保安全性
             request.Password = BCrypt.Net.BCrypt.HashPassword(request.Password);
-
+            // 將新會員資料存入資料庫
             _context.Members.Add(request);
             await _context.SaveChangesAsync();
-
+            // 回傳註冊成功訊息
             return Ok(new
             {
                 success = true,
@@ -292,7 +299,7 @@ namespace FinalProject.Controllers
             // 清除舊版登入流程可能殘留的 Cookie。
             Response.Cookies.Delete("Account", new CookieOptions { Path = "/" });
             Response.Cookies.Delete("Role", new CookieOptions { Path = "/" });
-
+            // 回傳登入頁面
             return RedirectToAction(nameof(Login));
         }
 
@@ -304,7 +311,9 @@ namespace FinalProject.Controllers
         }
 
         [HttpPost("Change")]
+        // 限制只有已登入的使用者才能修改密碼
         [Authorize]
+        // 防止 CSRF 攻擊: 比對欄位跟 cookies 是否一致
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> ChangeP([FromBody] ChangePasswordDto dto)
         {
