@@ -25,7 +25,7 @@
             <div class="col-4">
                 <button class="order-tab active" type="button" data-status="processing">
                     <i class="bi bi-hourglass-split"></i>
-                    <span>進行中/行程中</span>
+                    <span>行程中/待執行</span>
                 </button>
             </div>
             <div class="col-4">
@@ -54,7 +54,17 @@
                         <!-- ========================= 左側：狀態 + 交通工具 ========================== -->
                         <div class="col-4 col-sm-2 col-md-2">
                             <div class="order-icon-area">
-                                    <span class="status-badge status-processing">@order.TripStatusView</span>
+                                @{
+                                        var statusClass = order.TripStatusView switch
+                                        {
+                                            "行程中" => "status-processing",
+                                            "已完成" => "status-completed",
+                                            "已取消" => "status-cancelled",
+                                            "待執行" => "status-pending",
+                                            _ => "status-default"
+                                        };
+                                    }
+                                <span class="status-badge @statusClass">@order.TripStatusView</span>
                                 <div class="transport-icon">
                                     <i class="bi bi-airplane-engines-fill"></i>
                                 </div>
@@ -96,24 +106,42 @@
                         <!-- ========================= 右側：操作按鈕 ========================== -->
                         @* @{ var canCancel = order.DepartureTimeView > DateTime.Now.AddDays(1); } *@
                         @{
+                            // 取消訂單鈕
                             var isCancelled = order.TripStatusView == "已取消";
                             var isCompleted = order.TripStatusView == "已完成";
                             var isWithin24Hours = order.DepartureTimeView <= DateTime.Now.AddHours(24);
                             var canCancel = !isCancelled && !isCompleted && !isWithin24Hours;
-                        }
+
+                            // 司機狀態鈕
+                            var canViewDriverStatus = false;
+                            if (order.TripStatusView == "行程中")
+                                // 行程中：可以按
+                                { canViewDriverStatus = true; }
+                            else if (order.TripStatusView == "待執行")
+                                // 待執行：出發前 30 分鐘～出發時間，可以按
+                                {
+                                    var now = DateTime.Now;
+                                    var startTime = order.DepartureTimeView;
+                                if (now >= startTime?.AddMinutes(-30) && now <= startTime)
+                                    { canViewDriverStatus = true; }
+                                }
+                            }
                         <div class="col-12 col-sm-4 col-md-3">
                             <div class="order-actions">
+                                <!-- ========== 按鈕 1 - 取消訂單 ========== -->
                                 @* 
                                 - 版本 1 (沒限制)
                                 <button class="btn btn-cancel" type="button" onclick="cancelOrder('@order.OrderNoView')">
                                 <i class="bi bi-x-circle"></i>
                                     取消訂單
                                 </button>
+
                                 - 版本 2 (距離出發時間 < 24 小時，就不能取消)
                                 <button class="btn btn-cancel" type="button" onclick="cancelOrder('@order.OrderNoView')" @(canCancel ? "" : "disabled")>
                                     <i class="bi bi-x-circle"></i>
                                     @(canCancel ? "取消訂單" : "無法取消")
                                 </button> *@
+
                                 @* 版本 3 (距離出發 ≤ 24 小時、已取消、已完成 -> 不能取消) *@
                                 <button class="btn btn-cancel"
                                         type="button"
@@ -123,13 +151,36 @@
                                     @(canCancel ? "取消訂單" : "無法取消")
                                 </button>
 
-                                @* <button class="btn btn-driver" type="button" onclick="showDriverStatus('R-342827955')">
-                                    <i class="bi bi-person-badge"></i>
+                                <!-- ========== 按鈕 2 - 司機狀態 ========== -->
+								@* 
+                                - 版本 1 (按鈕)
+                                <button class="btn btn-driver" type="button" onclick="showDriverStatus('R-342827955')">
+                                <i class="bi bi-person-badge"></i>
                                     司機狀態
-                                </button> *@
+                                </button>
 
+                                - 版本 2 (<a>，連接到地圖)
                                 <a class="btn btn-driver"
                                    href="@Url.Action("DriverStatus", "Passenger", new { orderNo = order.OrderNoView })">
+                                    <i class="bi bi-person-badge"></i>
+                                    司機狀態
+                                </a> 
+
+                                - 版本 3 (行程中、距離出發 ≤ 30 分鐘 -> 可以點擊；距離出發 ≥ 30 分鐘、已取消、已完成 -> 不能點擊)
+                                @if (canViewDriverStatus) {
+                                    <a class="btn btn-driver" href="@Url.Action("DriverStatus", "Passenger", new { orderNo = order.OrderNoView })">
+                                        <i class="bi bi-person-badge"></i>
+                                        司機狀態
+                                    </a> }
+                                else {
+                                    <button type="button" class="btn btn-driver" disabled>
+                                        <i class="bi bi-person-badge"></i>
+                                        司機狀態
+                                    </button> }*@
+								@* 版本 4 (行程中、0分鐘 ≤ 距離出發 ≤ 30分鐘 -> 可以點擊；距離出發 ≥ 30分鐘、距離出發 < 0分鐘、已取消、已完成 -> 不能點擊) *@
+                                <a class="btn btn-driver @(canViewDriverStatus ? "" : "disabled")"
+                                   href="@(canViewDriverStatus ? Url.Action("DriverStatus", "Passenger", new { orderNo = order.OrderNoView }) : "#")"
+                                    @(canViewDriverStatus ? "" : "aria-disabled=\"true\"")>
                                     <i class="bi bi-person-badge"></i>
                                     司機狀態
                                 </a>

@@ -158,35 +158,47 @@ body {
 }
 
 
-/* 進行中 */
+/* 行程中 */
 
 .status-processing {
-    background-color: #e8f1ff;
+/*    background-color: #e8f1ff;
     color: #0d6efd;
+*/    
+    background-color: #FFF4E5;
+    color: #9A6700;
 }
 
 
 /* 待執行 */
 
 .status-pending {
-    background-color: #eef1f4;
+/*    background-color: #eef1f4;
     color: #52606d;
+*/    
+    background-color: #E8F1FF;
+    color: #1557A6;
 }
 
 
 /* 已完成 */
 
 .status-completed {
-    background-color: #e7f6ee;
+/*    background-color: #e7f6ee;
     color: #198754;
+*/
+    background-color: #E8F7EF;
+    color: #16794C;
 }
 
 
 /* 已取消 */
 
 .status-cancelled {
-    background-color: #fdecec;
+/*    background-color: #fdecec;
     color: #dc3545;
+*/
+    background-color: #FDECEC;
+    color: #B42318;
 }
 
 
@@ -300,6 +312,11 @@ body {
         font-size: 16px;
         font-weight: 600;
         transition: all 0.2s ease;
+        /* 因為司機狀態按鈕需用<a ...>會跑版，所以下方新增水平垂直致中的調整 */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
     }
 
 
