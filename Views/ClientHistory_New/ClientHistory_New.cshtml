@@ -132,15 +132,17 @@
                                     <i class="bi bi-x-circle"></i>
                                     @(canCancel ? "取消訂單" : "無法取消")
                                 </button>
-                                <button class="btn btn-driver" type="button" onclick="showDriverStatus('R-342827955')">
+
+                                @* <button class="btn btn-driver" type="button" onclick="showDriverStatus('R-342827955')">
                                     <i class="bi bi-person-badge"></i>
                                     司機狀態
-                                </button>
-                                @* <a class="btn btn-driver"
-                                    href="@Url.Action("DriverStatus", "ClientHistory_New", new { orderNumber = order.OrderNo })">
+                                </button> *@
+
+                                <a class="btn btn-driver"
+                                   href="@Url.Action("DriverStatus", "Passenger", new { orderNo = order.OrderNoView })">
                                     <i class="bi bi-person-badge"></i>
                                     司機狀態
-                                </a> *@
+                                </a>
                             </div>
                         </div>
                     </div>

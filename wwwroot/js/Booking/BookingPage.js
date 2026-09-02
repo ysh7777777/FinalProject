@@ -1,9 +1,7 @@
 // JavaScript
 
-/* =========================================================
-   台灣縣市／行政區資料
-========================================================== */
-
+/* 台灣縣市／行政區資料
+========================================= */
 const taiwanDistricts = {
     "台北市": ["中正區", "大同區", "中山區", "松山區", "大安區", "萬華區", "信義區", "士林區", "北投區", "內湖區", "南港區", "文山區"],
     "新北市": ["板橋區", "三重區", "中和區", "永和區", "新莊區", "新店區", "樹林區", "鶯歌區", "三峽區", "淡水區", "汐止區", "瑞芳區", "土城區", "蘆洲區", "五股區", "泰山區", "林口區", "深坑區", "石碇區", "坪林區", "三芝區", "石門區", "八里區", "平溪區", "雙溪區", "貢寮區", "金山區", "萬里區", "烏來區"],
@@ -29,19 +27,18 @@ const taiwanDistricts = {
     "連江縣": ["南竿鄉", "北竿鄉", "莒光鄉", "東引鄉"]
 };
 
-/* =========================================================
-   機場資料
-========================================================== */
+/* 機場資料
+========================================= */
 const airportData = {
     "桃園國際機場": ["第一航廈 T1", "第二航廈 T2"],
     "臺北松山機場": ["國內線航廈", "國際線航廈"],
     "臺中國際機場": ["國際航廈", "國內航廈"],
     "高雄國際機場": ["國際航廈", "國內航廈"]
 };
-/* =========================================================
-   Flatpickr
-========================================================== */
-flatpickr("#rideDate", {
+
+/* Flatpickr(舊) - 日期設定
+========================================= */
+/* flatpickr("#rideDate", {
     locale: "zh_tw",
     dateFormat: "Y-m-d",
     minDate: "today",
@@ -49,10 +46,35 @@ flatpickr("#rideDate", {
     onChange: function () {
         updateSummary();
     }
+    });*/
+/* Flatpickr(新) - 日期設定
+========================================= */
+const today = new Date();
+
+// 最早可預約：兩天後
+const minDate = new Date();
+minDate.setDate(today.getDate() + 2);
+
+// 最晚可預約：三個月後
+const maxDate = new Date();
+maxDate.setMonth(today.getMonth() + 3);
+
+flatpickr("#rideDate", {
+    locale: "zh_tw",
+    dateFormat: "Y-m-d",
+
+    minDate: minDate,
+    maxDate: maxDate,
+
+    disableMobile: true,
+
+    onChange: function () {
+        updateSummary();
+    }
 });
-/* =========================================================
-   建立時間下拉
-========================================================== */
+
+/* 建立時間下拉
+========================================= */
 const rideHour = document.getElementById("rideHour");
 const rideMinute = document.getElementById("rideMinute");
 for (let hour = 0; hour < 24; hour++) {
@@ -69,9 +91,9 @@ for (let minute = 0; minute < 60; minute += 5) {
 }
 rideHour.addEventListener("change", updateSummary);
 rideMinute.addEventListener("change", updateSummary);
-/* =========================================================
-   功能：初始化縣市
-========================================================== */
+
+/* 功能：初始化縣市
+========================================= */
 function initializeCitySelect(selectId) {
     const select = document.getElementById(selectId);
     Object.keys(taiwanDistricts).forEach(city => {
@@ -83,43 +105,42 @@ function initializeCitySelect(selectId) {
 }
 initializeCitySelect("pickupCity");
 initializeCitySelect("dropoffCity");
-/* =========================================================
-   功能：縣市 → 行政區
-========================================================== */
-// function bindDistrictSelect(citySelectId, districtSelectId) {
-//     const citySelect = document.getElementById(citySelectId);
-//     const districtSelect = document.getElementById(districtSelectId);
-//     citySelect.addEventListener("change", function () {
-//         const city = this.value;
-//         districtSelect.innerHTML = "";
-//         if (!city) {
-//             districtSelect.disabled = true;
-//             const option = document.createElement("option");
-//             option.value = "";
-//             option.textContent = "請先選擇縣市";
-//             districtSelect.appendChild(option);
-//             updateSummary();
-//             return;
-//         }
-//         districtSelect.disabled = false;
-//         const firstOption = document.createElement("option");
-//         firstOption.value = "";
-//         firstOption.textContent = "請選擇行政區";
-//         districtSelect.appendChild(firstOption);
-//         taiwanDistricts[city].forEach(district => {
-//             const option = document.createElement("option");
-//             option.value = district;
-//             option.textContent = district;
-//             districtSelect.appendChild(option);
-//         });
-//         updateSummary();
-//     });
-//     districtSelect.addEventListener("change", updateSummary);
-// }
+   
+/* 功能：縣市 → 行政區(舊)
+========================================= */
+/* function bindDistrictSelect(citySelectId, districtSelectId) {
+    const citySelect = document.getElementById(citySelectId);
+    const districtSelect = document.getElementById(districtSelectId);
+    citySelect.addEventListener("change", function () {
+        const city = this.value;
+        districtSelect.innerHTML = "";
+        if (!city) {
+            districtSelect.disabled = true;
+            const option = document.createElement("option");
+            option.value = "";
+            option.textContent = "請先選擇縣市";
+            districtSelect.appendChild(option);
+            updateSummary();
+            return;
+        }
+        districtSelect.disabled = false;
+        const firstOption = document.createElement("option");
+        firstOption.value = "";
+        firstOption.textContent = "請選擇行政區";
+        districtSelect.appendChild(firstOption);
+        taiwanDistricts[city].forEach(district => {
+            const option = document.createElement("option");
+            option.value = district;
+            option.textContent = district;
+            districtSelect.appendChild(option);
+        });
+        updateSummary();
+    });
+    districtSelect.addEventListener("change", updateSummary);
+}*/
 
-/* =========================================================
-   功能：縣市 → 行政區
-========================================================== */
+/* 功能：縣市 → 行政區(新)
+========================================= */
 function bindDistrictSelect(citySelectId, districtSelectId) {
     const citySelect = document.getElementById(citySelectId);
     const districtSelect = document.getElementById(districtSelectId);
@@ -195,22 +216,11 @@ function bindDistrictSelect(citySelectId, districtSelectId) {
         updateSummary();
     });
 }
-
-
-
-
-
-
-
-
-
-
-
 bindDistrictSelect("pickupCity", "pickupDistrict");
 bindDistrictSelect("dropoffCity", "dropoffDistrict");
-/* =========================================================
-   功能：初始化機場
-========================================================== */
+
+/* 功能：初始化機場
+========================================= */
 function initializeAirportSelect(selectId) {
     const select = document.getElementById(selectId);
     Object.keys(airportData).forEach(airport => {
@@ -222,9 +232,9 @@ function initializeAirportSelect(selectId) {
 }
 initializeAirportSelect("pickupAirport");
 initializeAirportSelect("dropoffAirport");
-/* =========================================================
-   功能：機場 → 航廈
-========================================================== */
+
+/* 功能：機場 → 航廈
+========================================= */
 function bindTerminalSelect(airportSelectId, terminalSelectId) {
     const airportSelect = document.getElementById(airportSelectId);
     const terminalSelect = document.getElementById(terminalSelectId);
@@ -287,9 +297,9 @@ function bindTerminalSelect(airportSelectId, terminalSelectId) {
 }
 bindTerminalSelect("pickupAirport", "pickupTerminal");
 bindTerminalSelect("dropoffAirport", "dropoffTerminal");
-/* =========================================================
-   功能：地點類型切換
-========================================================== */
+
+/* 功能：地點類型切換
+========================================= */
 function setupLocationSwitch(locationName) {
     const buttons = document.querySelectorAll(
         `[data-location="${locationName}"]`
@@ -334,12 +344,11 @@ setupLocationSwitch("pickup");
 setupLocationSwitch("dropoff");
 
 
-/* =========================================================
-   功能：切換為地址輸入模式
+/* 功能：切換為地址輸入模式
    - 清除城市
    - 清除行政區
    - 清除常用地址選擇
-========================================================== */
+========================================= */
 function switchToAddressMode(location) {
     const citySelect = document.getElementById(`${location}City`);
     const districtSelect = document.getElementById(`${location}District`);
@@ -367,9 +376,8 @@ function switchToAddressMode(location) {
 
 
 
-/* =========================================================
-   功能：清除城市／行政區選擇
-========================================================== */
+/* 功能：清除城市／行政區選擇
+========================================= */
 function clearCityDistrict(location) {
     const citySelect = document.getElementById(`${location}City`);
     const districtSelect = document.getElementById(`${location}District`);
@@ -391,42 +399,31 @@ function clearCityDistrict(location) {
 
 
 
+/* 常用地址(舊) → 地址欄
+========================================= */
+/* document
+    .getElementById("pickupFavorite")
+    .addEventListener("change", function () {
+        if (this.value) {
+            document
+                .getElementById("pickupAddress")
+                .value = this.value;
+        }
+        updateSummary();
+    });
+document
+    .getElementById("dropoffFavorite")
+    .addEventListener("change", function () {
+        if (this.value) {
+            document
+                .getElementById("dropoffAddress")
+                .value = this.value;
+        }
+        updateSummary();
+    });*/
 
-
-
-
-
-
-
-
-
-/* =========================================================
-   常用地址 → 地址欄
-========================================================== */
-// document
-//     .getElementById("pickupFavorite")
-//     .addEventListener("change", function () {
-//         if (this.value) {
-//             document
-//                 .getElementById("pickupAddress")
-//                 .value = this.value;
-//         }
-//         updateSummary();
-//     });
-// document
-//     .getElementById("dropoffFavorite")
-//     .addEventListener("change", function () {
-//         if (this.value) {
-//             document
-//                 .getElementById("dropoffAddress")
-//                 .value = this.value;
-//         }
-//         updateSummary();
-//     });
-
-/* =========================================================
-   SQL 常用地址 → Booking API 共用地點資料
-========================================================== */
+/* 常用地址(新 SQL) → Booking API 共用地點資料
+========================================= */
 function bindFavoriteAddressSelect(location) {
     const select = document.getElementById(`${location}Favorite`);
 
@@ -460,18 +457,17 @@ function bindFavoriteAddressSelect(location) {
 bindFavoriteAddressSelect("pickup");
 bindFavoriteAddressSelect("dropoff");
 
-/* =========================================================
-   地址輸入
-========================================================== */
+/* 地址輸入
+========================================= */
 document
     .getElementById("pickupAddress")
     .addEventListener("input", updateSummary);
 document
     .getElementById("dropoffAddress")
     .addEventListener("input", updateSummary);
-/* =========================================================
-   功能：取得目前地點模式
-========================================================== */
+
+/* 功能：取得目前地點模式
+========================================= */
 function getLocationType(location) {
     const activeButton = document.querySelector(
         `[data-location="${location}"].active`
@@ -480,50 +476,46 @@ function getLocationType(location) {
         ? activeButton.dataset.type
         : "api";
 }
-/* =========================================================
-   功能：取得地點文字
-========================================================== */
-// function getLocationText(location) {
-//     const type = getLocationType(location);
-//     if (type === "city") {
-//         const city = document.getElementById(
-//             `${location}City`
-//         ).value;
-//         const district = document.getElementById(
-//             `${location}District`
-//         ).value;
-//         const address = document.getElementById(
-//             `${location}Address`
-//         ).value.trim();
-//         const parts = [
-//             city,
-//             district,
-//             address
-//         ].filter(Boolean);
-//         return parts.length
-//             ? parts.join("")
-//             : "尚未選擇";
-//     }
-//     const airport = document.getElementById(
-//         `${location}Airport`
-//     ).value;
-//     const terminal = document.getElementById(
-//         `${location}Terminal`
-//     ).value;
-//     if (!airport) {
-//         return "尚未選擇";
-//     }
-//     return terminal
-//         ? `${airport}｜${terminal}`
-//         : airport;
-// }
 
-/* =========================================================
-   功能：取得地點文字
-========================================================== */
-/* =========================================================
-   功能：取得地點文字
-========================================================== */
+/* 功能：取得地點文字(舊)
+========================================= */
+/* function getLocationText(location) {
+    const type = getLocationType(location);
+    if (type === "city") {
+        const city = document.getElementById(
+            `${location}City`
+        ).value;
+        const district = document.getElementById(
+            `${location}District`
+        ).value;
+        const address = document.getElementById(
+            `${location}Address`
+        ).value.trim();
+        const parts = [
+            city,
+            district,
+            address
+        ].filter(Boolean);
+        return parts.length
+            ? parts.join("")
+            : "尚未選擇";
+    }
+    const airport = document.getElementById(
+        `${location}Airport`
+    ).value;
+    const terminal = document.getElementById(
+        `${location}Terminal`
+    ).value;
+    if (!airport) {
+        return "尚未選擇";
+    }
+    return terminal
+        ? `${airport}｜${terminal}`
+        : airport;
+}*/
+
+/* 功能：取得地點文字(新)
+========================================= */
 function getLocationText(location) {
     const type = getLocationType(location);
 
@@ -556,167 +548,167 @@ function getLocationText(location) {
 
 
 
-/* =========================================================
-   上下車互換
-========================================================== */
-//document
-//    .getElementById("swapLocationBtn")
-//    .addEventListener("click", function () {
-//        swapLocationType();
-//        swapCityData();
-//        swapAirportData();
-//        swapFavoriteData();
-//        swapAddressData();
-//        updateSummary();
-//    });
-/* =========================================================
-   交換地點類型
-========================================================== */
-// function swapLocationType() {
-//     const pickupType = getLocationType("pickup");
-//     const dropoffType = getLocationType("dropoff");
-//     setLocationType("pickup", dropoffType);
-//     setLocationType("dropoff", pickupType);
-// }
-// function setLocationType(location, type) {
-//     const button = document.querySelector(
-//         `[data-location="${location}"][data-type="${type}"]`
-//     );
-//     if (button) {
-//         button.click();
-//     }
-// }
-/* =========================================================
-   交換縣市 / 行政區
-========================================================== */
-// function swapCityData() {
-//     const pickupCity = document.getElementById("pickupCity");
-//     const dropoffCity = document.getElementById("dropoffCity");
-//     const pickupDistrict = document.getElementById("pickupDistrict");
-//     const dropoffDistrict = document.getElementById("dropoffDistrict");
-//     const cityTemp = pickupCity.value;
-//     const districtTemp = pickupDistrict.value;
-//     pickupCity.value = dropoffCity.value;
-//     dropoffCity.value = cityTemp;
-//     refreshDistrict(
-//         "pickupCity",
-//         "pickupDistrict",
-//         pickupDistrict.value
-//     );
-//     refreshDistrict(
-//         "dropoffCity",
-//         "dropoffDistrict",
-//         districtTemp
-//     );
-// }
-// function refreshDistrict(
-//     cityId,
-//     districtId,
-//     selectedDistrict
-// ) {
-//     const city = document.getElementById(cityId).value;
-//     const district = document.getElementById(districtId);
-//     district.innerHTML = "";
-//     if (!city) {
-//         district.disabled = true;
-//         const option = document.createElement("option");
-//         option.value = "";
-//         option.textContent = "請先選擇縣市";
-//         district.appendChild(option);
-//         return;
-//     }
-//     district.disabled = false;
-//     const firstOption = document.createElement("option");
-//     firstOption.value = "";
-//     firstOption.textContent = "請選擇行政區";
-//     district.appendChild(firstOption);
-//     taiwanDistricts[city].forEach(item => {
-//         const option = document.createElement("option");
-//         option.value = item;
-//         option.textContent = item;
-//         if (item === selectedDistrict) {
-//             option.selected = true;
-//         }
-//         district.appendChild(option);
-//     });
-// }
-/* =========================================================
-   交換機場
-========================================================== */
-//function swapAirportData() {
-//    const pickupAirport = document.getElementById("pickupAirport");
-//    const dropoffAirport = document.getElementById("dropoffAirport");
-//    const pickupTerminal = document.getElementById("pickupTerminal");
-//    const dropoffTerminal = document.getElementById("dropoffTerminal");
-//    const airportTemp = pickupAirport.value;
-//    const terminalTemp = pickupTerminal.value;
-//    pickupAirport.value = dropoffAirport.value;
-//    dropoffAirport.value = airportTemp;
-//    refreshTerminal(
-//        "pickupAirport",
-//        "pickupTerminal",
-//        pickupTerminal.value
-//    );
-//    refreshTerminal(
-//        "dropoffAirport",
-//        "dropoffTerminal",
-//        terminalTemp
-//    );
-//}
-//function refreshTerminal(
-//    airportId,
-//    terminalId,
-//    selectedTerminal
-//) {
-//    const airport = document.getElementById(airportId).value;
-//    const terminal = document.getElementById(terminalId);
-//    terminal.innerHTML = "";
-//    if (!airport) {
-//        terminal.disabled = true;
-//        const option = document.createElement("option");
-//        option.value = "";
-//        option.textContent = "請先選擇機場";
-//        terminal.appendChild(option);
-//        return;
-//    }
-//    terminal.disabled = false;
-//    const firstOption = document.createElement("option");
-//    firstOption.value = "";
-//    firstOption.textContent = "請選擇航廈";
-//    terminal.appendChild(firstOption);
-//    airportData[airport].forEach(item => {
-//        const option = document.createElement("option");
-//        option.value = item;
-//        option.textContent = item;
-//        if (item === selectedTerminal) {
-//            option.selected = true;
-//        }
-//        terminal.appendChild(option);
-//    });
-//}
-/* =========================================================
-   交換常用地址
-========================================================== */
-//function swapFavoriteData() {
-//    const pickup = document.getElementById("pickupFavorite");
-//    const dropoff = document.getElementById("dropoffFavorite");
-//    const temp = pickup.value;
-//    pickup.value = dropoff.value;
-//    dropoff.value = temp;
-//}
-/* =========================================================
-   交換地址
-========================================================== */
-//function swapAddressData() {
-//    const pickup = document.getElementById("pickupAddress");
-//    const dropoff = document.getElementById("dropoffAddress");
-//    const temp = pickup.value;
-//    pickup.value = dropoff.value;
-//    dropoff.value = temp;
-//}
-/* =========================================================
-   訂單總覽
-========================================================== */
+/* 上下車互換
+========================================= */
+/*document
+   .getElementById("swapLocationBtn")
+   .addEventListener("click", function () {
+       swapLocationType();
+       swapCityData();
+       swapAirportData();
+       swapFavoriteData();
+       swapAddressData();
+       updateSummary();
+   });*/
+
+/* 交換地點類型
+========================================= */
+/* function swapLocationType() {
+    const pickupType = getLocationType("pickup");
+    const dropoffType = getLocationType("dropoff");
+    setLocationType("pickup", dropoffType);
+    setLocationType("dropoff", pickupType);
+    }
+    function setLocationType(location, type) {
+        const button = document.querySelector(
+            `[data-location="${location}"][data-type="${type}"]`
+        );
+        if (button) {
+            button.click();
+        }
+    } */
+
+/* 交換縣市 / 行政區
+========================================= */
+/* function swapCityData() {
+    const pickupCity = document.getElementById("pickupCity");
+    const dropoffCity = document.getElementById("dropoffCity");
+    const pickupDistrict = document.getElementById("pickupDistrict");
+    const dropoffDistrict = document.getElementById("dropoffDistrict");
+    const cityTemp = pickupCity.value;
+    const districtTemp = pickupDistrict.value;
+    pickupCity.value = dropoffCity.value;
+    dropoffCity.value = cityTemp;
+    refreshDistrict(
+        "pickupCity",
+        "pickupDistrict",
+        pickupDistrict.value
+    );
+    refreshDistrict(
+        "dropoffCity",
+        "dropoffDistrict",
+        districtTemp
+    );
+    }
+    function refreshDistrict(
+        cityId,
+        districtId,
+        selectedDistrict
+    ) {
+        const city = document.getElementById(cityId).value;
+        const district = document.getElementById(districtId);
+        district.innerHTML = "";
+        if (!city) {
+            district.disabled = true;
+            const option = document.createElement("option");
+            option.value = "";
+            option.textContent = "請先選擇縣市";
+            district.appendChild(option);
+            return;
+        }
+        district.disabled = false;
+        const firstOption = document.createElement("option");
+        firstOption.value = "";
+        firstOption.textContent = "請選擇行政區";
+        district.appendChild(firstOption);
+        taiwanDistricts[city].forEach(item => {
+            const option = document.createElement("option");
+            option.value = item;
+            option.textContent = item;
+            if (item === selectedDistrict) {
+                option.selected = true;
+            }
+            district.appendChild(option);
+        });
+    } */
+
+/* 交換機場
+========================================= */
+/* function swapAirportData() {
+   const pickupAirport = document.getElementById("pickupAirport");
+   const dropoffAirport = document.getElementById("dropoffAirport");
+   const pickupTerminal = document.getElementById("pickupTerminal");
+   const dropoffTerminal = document.getElementById("dropoffTerminal");
+   const airportTemp = pickupAirport.value;
+   const terminalTemp = pickupTerminal.value;
+   pickupAirport.value = dropoffAirport.value;
+   dropoffAirport.value = airportTemp;
+   refreshTerminal(
+       "pickupAirport",
+       "pickupTerminal",
+       pickupTerminal.value
+   );
+   refreshTerminal(
+       "dropoffAirport",
+       "dropoffTerminal",
+       terminalTemp
+   );
+    }
+    function refreshTerminal(
+       airportId,
+       terminalId,
+       selectedTerminal
+    ) {
+       const airport = document.getElementById(airportId).value;
+       const terminal = document.getElementById(terminalId);
+       terminal.innerHTML = "";
+       if (!airport) {
+           terminal.disabled = true;
+           const option = document.createElement("option");
+           option.value = "";
+           option.textContent = "請先選擇機場";
+           terminal.appendChild(option);
+           return;
+       }
+       terminal.disabled = false;
+       const firstOption = document.createElement("option");
+       firstOption.value = "";
+       firstOption.textContent = "請選擇航廈";
+       terminal.appendChild(firstOption);
+       airportData[airport].forEach(item => {
+           const option = document.createElement("option");
+           option.value = item;
+           option.textContent = item;
+           if (item === selectedTerminal) {
+               option.selected = true;
+           }
+           terminal.appendChild(option);
+       });
+    } */
+
+/* 交換常用地址
+========================================= */
+/* function swapFavoriteData() {
+    const pickup = document.getElementById("pickupFavorite");
+    const dropoff = document.getElementById("dropoffFavorite");
+    const temp = pickup.value;
+    pickup.value = dropoff.value;
+    dropoff.value = temp;
+    } */
+
+/* 交換地址
+========================================= */
+/* function swapAddressData() {
+    const pickup = document.getElementById("pickupAddress");
+    const dropoff = document.getElementById("dropoffAddress");
+    const temp = pickup.value;
+    pickup.value = dropoff.value;
+    dropoff.value = temp;
+    } */
+
+   
+/* 訂單總覽
+========================================= */
 function updateSummary() {
     const date = document.getElementById("rideDate").value;
     const hour = document.getElementById("rideHour").value;
@@ -1465,7 +1457,17 @@ bookingForm.addEventListener(
     async function (event) {
 
         event.preventDefault();
+        /* ======================= 日期驗證 ======================= */
+        // 若沒填會跳到最上面
+        const rideDate = document.getElementById("rideDate");
 
+        if (!rideDate.value.trim()) {
+            event.stopPropagation();
+            bookingForm.classList.add("was-validated");
+
+            rideDate.focus();
+            return;
+        }
         /* ======================= Bootstrap 表單驗證 ======================= */
         if (!bookingForm.checkValidity()) {
             event.stopPropagation();

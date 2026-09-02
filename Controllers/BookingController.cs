@@ -1,5 +1,7 @@
 ﻿using FinalProject.DTO;
 using FinalProject.Models;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Reflection.Metadata;
@@ -7,39 +9,29 @@ using System.Security.Claims;
 
 namespace FinalProject.Controllers
 {
+    [Authorize(Roles = "passenger")]
+
     public class BookingController : Controller
     {    
-        private const string TemporaryAccount = "user01";
+        //private const string TemporaryAccount = "user01";
         private readonly RideHailingDbContext _context;
 
         public BookingController(RideHailingDbContext context)
         {
             _context = context;
         }
-
-        private string GetCurrentAccount()
-        {
-            // TODO: 登入驗證完成後，統一以 NameIdentifier claim 存放會員 account。
-            var authenticatedAccount =
-                User.FindFirst(ClaimTypes.NameIdentifier)?.Value ??
-                User.Identity?.Name;
-
-            return User.Identity?.IsAuthenticated == true &&
-                   !string.IsNullOrWhiteSpace(authenticatedAccount)
-                ? authenticatedAccount
-                : TemporaryAccount;
-        }
-
-
-        //public IActionResult BookingPage()
-        //{
-        //    return View();
-        //}
         // 連接資料庫測試用(成功)
         public async Task<IActionResult> BookingPage(string id)
         {
+            // 取得目前登入會員帳號
+            string? currentAccount = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrWhiteSpace(currentAccount))
+            { return Unauthorized(); }
+
+            // 取得車型選單
             var VehicleMenu = await _context.VehicleMenu.ToListAsync();
-            var currentAccount = GetCurrentAccount();
+
+            // 取得目前會員的常用地址
             var savedAddresses = await _context.MemberSavedAddresses
                 .AsNoTracking()
                 .Where(address => address.Account == currentAccount)
@@ -49,20 +41,31 @@ namespace FinalProject.Controllers
 
             ViewBag.VehicleMenu = VehicleMenu;
             ViewBag.SavedAddresses = savedAddresses;
-            ViewBag.CurrentAccount = currentAccount;
-            ViewData["VehicleMenuSin"] = VehicleMenu;  // 我想要一個一個取
+            //ViewBag.CurrentAccount = currentAccount;
+            //ViewData["VehicleMenuSin"] = VehicleMenu;  // 我想要一個一個取
 
             return View();
             //return View("~/Views/Booking/BookingPage.cshtml", data);
         }
 
-        // 生成訂單編號
+        // 生成訂單編號(與建立訂單日同)
         public string GenerateOrderNumber()
         {
             string date = DateTime.Now.ToString("yyyyMMdd");
-            string random = new Random().Next(1000, 10000).ToString();
 
-            return $"ORD{date}{random}";
+            // 產生隨機數(舊版 可能重複)
+            //string random = new Random().Next(100, 1000).ToString();
+
+            // 產生隨機數(新版 不重複)
+            Random number = new Random();
+            HashSet<int> used = new HashSet<int>();
+            int result;
+            do { result = number.Next(100, 1000); }
+            while (!used.Add(result));
+            string random = result.ToString();
+
+            // 產出完整訂單號
+            return $"T{date}{random}";
         }
 
 
@@ -294,6 +297,15 @@ namespace FinalProject.Controllers
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] CreateBookingDto dto)
         {
+            // 取得登入帳號：
+            string? account = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            // Null 處理：
+            if (string.IsNullOrWhiteSpace(account))
+            {
+                return Unauthorized();
+            }
+
+
             if (!ModelState.IsValid)
             {
                 var errors = ModelState
@@ -319,7 +331,7 @@ namespace FinalProject.Controllers
                 OrderNo = GenerateOrderNumber(),
 
                 // 暫時測試用
-                Account = GetCurrentAccount(),
+                Account = account,
 
                 DepartureTime = dto.DepartureTime,
                 PickupLocation = dto.PickupLocation,
