@@ -1,11 +1,11 @@
 document.addEventListener('DOMContentLoaded', function () {
-    const loginForm = document.getElementById('loginForm');
-    const passengerBtn = document.getElementById('passengerTab');
-    const driverBtn = document.getElementById('driverTab');
-    const loginBtn = document.getElementById('loginBtn');
-    const accountInput = document.getElementById('account');
-    const accountValidationMessage = document.getElementById('accountValidationMessage');
-
+    const loginForm = document.getElementById('loginForm');        // 登入表單整體
+    const passengerBtn = document.getElementById('passengerTab');  // 乘客端分頁按鈕
+    const driverBtn = document.getElementById('driverTab');        // 司機端分頁按鈕
+    const loginBtn = document.getElementById('loginBtn');          // 登入按鈕
+    const accountInput = document.getElementById('account');       // 帳號輸入框
+    const accountValidationMessage = document.getElementById('accountValidationMessage');  // 帳號錯誤提示文字
+    // 預防網頁壞掉
     if (!loginForm || !loginBtn || !accountInput) {
         return;
     }
