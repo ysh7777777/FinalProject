@@ -10,6 +10,7 @@ namespace FinalProject.Controllers
 {
     public class MembersController : Controller
     {
+        
         private readonly RideHailingDbContext _context;
         private readonly ILogger<MembersController> _logger;
 
@@ -23,32 +24,39 @@ namespace FinalProject.Controllers
         [HttpGet("Login")]
         public IActionResult Login()
         {
+            // 判斷身分、登入狀態
             if (User.Identity?.IsAuthenticated == true)
             {
-                return RedirectToRoleIndex(User.FindFirstValue(ClaimTypes.Role));
+                // 依照角色，回傳對應頁面
+                return RedirectToRoleIndex(User.FindFirstValue(ClaimTypes.Role)); 
             }
-
+            // 未登入，顯示登入頁面
             return View();
         }
 
         [HttpPost("Login")]
+        // 防止 CSRF 攻擊: 比對欄位跟 cookies 是否一致
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Login([FromBody] LoginData data)
         {
+            // 判斷 null 
             if (data == null || string.IsNullOrWhiteSpace(data.Account) || string.IsNullOrEmpty(data.Password))
             {
+                // 回傳 BadRequest JSON，前端顯示錯誤訊息
                 return BadRequest(new { success = false, message = "請輸入帳號與密碼" });
             }
-
+            // 判斷角色是否正確
             if (data.Role is not ("passenger" or "driver"))
             {
+                // 回傳 BadRequest JSON，前端顯示錯誤訊息
                 return BadRequest(new { success = false, message = "登入角色不正確" });
             }
-
+            // 去除帳號前後空白，避免使用者輸入空格造成登入失敗
             data.Account = data.Account.Trim();
-
+            
             try
             {
+                // 根據角色判定，呼叫對應的登入方法
                 if (data.Role == "driver")
                 {
                     return await LoginDriver(data);
@@ -56,6 +64,7 @@ namespace FinalProject.Controllers
 
                 return await LoginPassenger(data);
             }
+            // 登入過程中可能發生的例外，並記錄錯誤日誌
             catch (Exception ex)
             {
                 _logger.LogError(
@@ -71,12 +80,13 @@ namespace FinalProject.Controllers
                 });
             }
         }
-
+        // 司機登入
         private async Task<IActionResult> LoginDriver(LoginData data)
         {
+            // 從資料庫中查詢司機帳號
             var driver = await _context.Drivers
                 .FirstOrDefaultAsync(d => d.DriverId == data.Account);
-
+            // 若查無此司機帳號，回傳 NotFound ，前端顯示錯誤訊息
             if (driver == null)
             {
                 return NotFound(new
@@ -86,13 +96,13 @@ namespace FinalProject.Controllers
                     message = "帳號尚未註冊，請與人資聯絡"
                 });
             }
-
+            // 驗證密碼，允許舊版明文密碼登入，並回傳是否使用了舊版明文密碼
             bool isPasswordValid = VerifyPassword(
                 data.Password,
                 driver.Password,
                 allowLegacyPlainText: true,
                 out bool usedLegacyPlainText);
-
+            // 若密碼驗證失敗，回傳 Unauthorized(授權)，前端顯示錯誤訊息
             if (!isPasswordValid)
             {
                 return Unauthorized(new { success = false, message = "司機帳號或密碼錯誤" });
@@ -104,9 +114,9 @@ namespace FinalProject.Controllers
                 driver.Password = BCrypt.Net.BCrypt.HashPassword(data.Password);
                 await _context.SaveChangesAsync();
             }
-
+            // 登入成功，建立 Cookie 登入憑證，並將司機帳號、角色、姓名存入 Cookie Claims
             await SignInAsync(driver.DriverId, "driver", driver.DriverName ?? driver.DriverId);
-
+            // 回傳成功 JSON，前端顯示登入成功訊息，並導向司機端首頁
             return Ok(new
             {
                 success = true,
@@ -116,12 +126,13 @@ namespace FinalProject.Controllers
                 redirectUrl = Url.Action("Index", "Driver")
             });
         }
-
+        // 乘客登入
         private async Task<IActionResult> LoginPassenger(LoginData data)
         {
+            // 從資料庫中查詢乘客帳號
             var member = await _context.Members
                 .FirstOrDefaultAsync(m => m.Account == data.Account);
-
+            // 若查無此乘客帳號，回傳 NotFound ，前端顯示錯誤訊息
             if (member == null)
             {
                 return NotFound(new
@@ -131,16 +142,17 @@ namespace FinalProject.Controllers
                     message = "帳號尚未註冊，請先進行註冊！"
                 });
             }
-
+            // 驗證密碼，僅允許 BCrypt 雜湊密碼登入，不允許舊版明文密碼登入，考量金流安全性
             if (!VerifyPassword(
                 data.Password,
                 member.Password,
                 allowLegacyPlainText: false,
                 out _))
             {
+                // 若密碼驗證失敗，回傳 Unauthorized(授權)，前端顯示錯誤訊息
                 return Unauthorized(new { success = false, message = "乘客帳號或密碼錯誤" });
             }
-
+            // 登入成功，建立 Cookie 登入憑證，並將乘客帳號、角色、姓名存入 Cookie Claims
             await SignInAsync(member.Account, "passenger",member.FullName??member.Account);
 
             return Ok(new
@@ -152,9 +164,10 @@ namespace FinalProject.Controllers
                 redirectUrl = Url.Action("Index", "Home")
             });
         }
-
+        // 建立 Cookie 登入憑證
         private async Task SignInAsync(string account, string role, string displayName)
         {
+            // 建立 Claims，包含編號、帳號、角色、顯示名稱
             var claims = new List<Claim>
             {
                 new(ClaimTypes.NameIdentifier, account),
@@ -162,11 +175,11 @@ namespace FinalProject.Controllers
                 new(ClaimTypes.Role, role),
                 new(ClaimTypes.GivenName,displayName)
             };
-
+            // 建立 ClaimsIdentity，指定 Cookie 驗證方案
             var identity = new ClaimsIdentity(
                 claims,
                 CookieAuthenticationDefaults.AuthenticationScheme);
-
+            // 建立 ClaimsPrincipal，並將其簽入 HttpContext，設定 Cookie 過期時間為 1 天
             await HttpContext.SignInAsync(
                 CookieAuthenticationDefaults.AuthenticationScheme,
                 new ClaimsPrincipal(identity),
