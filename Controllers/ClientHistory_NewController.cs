@@ -44,6 +44,7 @@ namespace FinalProject.Controllers
 
                     LicensePlateView = o.LicensePlate,
                     VehicleTypeView = o.VehicleType,
+                    AssignedDriverIdView = o.AssignedDriverId,
 
                     PassengerCountView = o.PassengerCount,
                     LuggageCountView = o.LuggageCount,

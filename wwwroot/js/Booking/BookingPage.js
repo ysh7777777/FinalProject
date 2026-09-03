@@ -83,7 +83,7 @@ for (let hour = 0; hour < 24; hour++) {
     option.textContent = String(hour).padStart(2, "0");
     rideHour.appendChild(option);
 }
-for (let minute = 0; minute < 60; minute += 5) {
+for (let minute = 0; minute < 60; minute += 10) {
     const option = document.createElement("option");
     option.value = String(minute).padStart(2, "0");
     option.textContent = String(minute).padStart(2, "0");

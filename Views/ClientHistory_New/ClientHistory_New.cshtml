@@ -196,15 +196,17 @@
                     <!-- ========================= 訂單摘要 ========================== -->
                     <div class="order-extra">
                         <div class="row g-2 order-detail">
-                            <!-- 車牌 / 車型 -->
+                            <!-- 司機編號 / 車牌 / 車型 -->
                             <div class="col-6 col-md-3">
                                 <div class="detail-item">
                                     <div class="detail-title">
                                         <i class="bi bi-car-front"></i>
-                                        車牌 / 車型
+                                        司機編號 / 車牌 / 車型
                                     </div>
                                     <div class="detail-content">
-                                        @order.LicensePlateView
+										@order.AssignedDriverIdView
+                                        <br>
+										@order.LicensePlateView
                                         <br>
                                         @order.VehicleTypeView
                                     </div>

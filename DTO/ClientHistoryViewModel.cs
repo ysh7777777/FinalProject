@@ -22,6 +22,8 @@ namespace FinalProject.DTO
 
         public string? VehicleTypeView { get; set; }
 
+        public string? AssignedDriverIdView { get; set; }
+
         public byte? PassengerCountView { get; set; }
 
         public byte? LuggageCountView { get; set; }
