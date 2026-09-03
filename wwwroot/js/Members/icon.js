@@ -1,16 +1,16 @@
 ﻿document.addEventListener('DOMContentLoaded', function () {
 
     // 控制「原密碼」眼睛 (新增)
-    const toggleOldPassword = document.querySelector('#toggleOldPassword');
+    const toggleOldPassword = document.querySelector('#toggleOldPassword'); 
     if (toggleOldPassword) {
         toggleOldPassword.addEventListener('click', function () {
             const oldPasswordInput = document.querySelector('#oldPassword');
             const img = this.querySelector('img');
-
+            // 預防壞掉: 如果找不到輸入框或圖片，直接返回
             if (!oldPasswordInput || !img) {
                 return;
             }
-
+            // 取得目前的圖片路徑
             const currentSrc = img.getAttribute('src');
 
             if (oldPasswordInput.type === 'password') {
