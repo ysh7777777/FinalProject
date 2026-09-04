@@ -1535,7 +1535,8 @@ bookingForm.addEventListener(
 
             EstimatedDuration: mapData.estimatedDuration,
 
-            VehicleType: document.querySelector(".car-name").textContent.trim(),
+            // VehicleType: document.querySelector(".car-name").textContent.trim(),
+            VehicleType: window.selectedCar.name,
 
             PassengerCount: Number(document.getElementById("passengerCount").value ),
 
