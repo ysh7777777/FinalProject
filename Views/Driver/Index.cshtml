@@ -85,6 +85,19 @@
                 }
 
 
+            /* 調整 Leaflet 右下角元件位置 */
+            .leaflet-bottom.leaflet-right {
+                /* 抬高高度：避免蓋到 130px 高度的卡片與 60px 的底部狀態列 */
+                bottom: 150px !important;
+                right: 15px !important;
+                z-index: 999 !important;
+            }
+
+            /* 全螢幕模式下的極致避開 */
+            .driver-dashboard.map-fullscreen .leaflet-bottom.leaflet-right {
+                bottom: 230px !important;
+            }
+
             /* ==============================
                    地圖全螢幕狀態
                    ============================== */
