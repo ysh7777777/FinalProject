@@ -46,8 +46,10 @@ public partial class Trip
 
     // 新增資料
     public byte? BabySeat { get; set; }
-
     public int? Fare { get; set; }
+
+    // 新增資料 (0907)
+    public string? FlightNo { get; set; }
 
     public DateTime? CompletedAt { get; set; }
 

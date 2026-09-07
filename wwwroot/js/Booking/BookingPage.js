@@ -1546,6 +1546,8 @@ bookingForm.addEventListener(
             BabySeat: Number(document.getElementById("babySeatCount").value ),
             Fare: fare,
 
+            // 新增資料 (0907)
+            FlightNo: document.getElementById("flightNumber").value.trim(),
 
         };
 

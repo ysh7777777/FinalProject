@@ -349,8 +349,10 @@ namespace FinalProject.Controllers
                 // 新增資料
                 BabySeat = dto.BabySeat,
                 Fare = dto.Fare,
-
                 TripStatus = "待執行",
+
+                // 新增資料 (0907)
+                FlightNo = dto.FlightNo,
 
                 // 暫時測試用
                 EstimatedDuration = dto.EstimatedDuration
