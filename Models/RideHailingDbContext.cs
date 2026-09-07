@@ -295,6 +295,12 @@ public partial class RideHailingDbContext : DbContext
                 .HasColumnName("baby_seat");
             entity.Property(e => e.Fare)
                 .HasColumnName("fare");
+
+            // 決定將班機號加入，0907
+            entity.Property(e => e.FlightNo)
+                .HasMaxLength(10)
+                .IsUnicode(false)
+                .HasColumnName("flight_no");
         });
 
         modelBuilder.Entity<Vehicle>(entity =>

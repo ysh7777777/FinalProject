@@ -567,12 +567,52 @@
                     </div>
                 </section>
                 <!-- ======================= 航班資訊 section ======================= -->
-                <!-- 0812 END ------------------------------------------------------------------------------------------- -->
+                <section class="booking-card" id="flightSection">
+                    <div class="booking-card-header">
+                        <h2 class="booking-card-title">
+                            <i class="bi bi-airplane-fill"></i>
+                            航班資訊
+                        </h2>
+                    </div>
+                    <div class="booking-card-body">
+                        <!-- 追蹤航班 -->
+                        <div class="form-check form-switch flight-track-switch">
+                            <input class="form-check-input" type="checkbox" role="switch" id="trackFlight"
+                                    name="trackFlight">
+                            <label class="form-check-label" for="trackFlight">
+                                <span class="flight-switch-title">
+                                    <i class="bi bi-broadcast"></i>
+                                    是否追蹤航班
+                                </span>
+                                <span class="flight-switch-description">
+                                    開啟後我們會依航班資訊追蹤抵達時間
+                                </span>
+                            </label>
+                        </div>
+                        <!-- ======================= 航班編號 / 預設隱藏 div ======================= -->
+                        <div class="flight-number-wrapper d-none" id="flightNumberWrapper">
+                            <label for="flightNumber" class="form-label">
+                                航班編號
+                                <span class="text-danger">
+                                    *
+                                </span>
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text">
+                                    <i class="bi bi-airplane"></i>
+                                </span>
+                                <input type="text" class="form-control" id="flightNumber" name="flightNumber"
+                                        placeholder="例如：BR108" autocomplete="off" maxlength="10">
+                            </div>
+                            <div class="form-text">
+                                請輸入航空公司航班編號，例如 BR108、CI100
+                            </div>
+                        </div>
+                    </div>
+                </section> 
             </div>
-        
-
+            <!-- ======================= 訂單總覽 section ======================= -->
             <div class="col-12">
-                <!-- ======================= 訂單總覽 section ======================= -->
                 <!-- 舊 -->
                 <section class="booking-card summary-card">
                     <div class="booking-card-header">
