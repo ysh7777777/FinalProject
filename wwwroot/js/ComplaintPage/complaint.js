@@ -43,10 +43,29 @@ document.addEventListener("DOMContentLoaded", function () {
             handleFiles(e.dataTransfer.files);
         });
     }
-    // ==========================================
-    // 處理圖片
-    // ==========================================
+
+    /* ================= 處理圖片 - 只能放一張(將cshtml中input的multiple拿掉) ================= */
     function handleFiles(files) {
+        // 沒有圖片
+        if (!files || files.length === 0) { return; }
+        // 只取第一張
+        const file = files[0];
+        // 檔案類型
+        if (file.type !== "image/jpeg" && file.type !== "image/png")
+        { alert("只允許上傳 JPG、JPEG、PNG 圖片。");
+            return; }
+        // 5MB
+        if (file.size > 5 * 1024 * 1024) {
+            alert(`圖片「${file.name}」超過 5MB。`);
+            return; }
+        // 如果已經有圖片，不允許再加入
+        if (previewContainer.querySelector(".preview-item")) {
+            alert("只能上傳一張圖片。");
+            return; }
+        createPreview(file);
+    }
+    //處理圖片 - 可以放多張(需要再多件一個圖的資料表)
+    /* function handleFiles(files) {
         Array.from(files).forEach(function (file) {
             // 檔案類型
             if (
@@ -65,7 +84,8 @@ document.addEventListener("DOMContentLoaded", function () {
             }
             createPreview(file);
         });
-    }
+    } */
+
     // ==========================================
     // 建立圖片預覽
     // ==========================================
