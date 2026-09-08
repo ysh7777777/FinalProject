@@ -192,3 +192,29 @@ CREATE TABLE project_image (
     image_url NVARCHAR(500),                -- 圖片網址 / 檔案路徑
     description NVARCHAR(500)               -- 圖片說明 / 備註
 );
+
+
+-- 10. 行程評價表 (RidesRating) - 0908 益
+CREATE TABLE rides_rating (
+    rating_id INT IDENTITY(1,1) PRIMARY KEY,  -- 評價編號 (主鍵，自動遞增)
+    order_no VARCHAR(15) NOT NULL UNIQUE,  -- 訂單編號 (外鍵，加上 UNIQUE 保障一單一評)
+    driver_name NVARCHAR(50) NOT NULL,        -- 司機姓名
+    score TINYINT NOT NULL,                   -- 行程滿意度 (1 ~ 5 星)
+    tags NVARCHAR(255) NULL,                  -- 快捷標籤
+    FOREIGN KEY (order_no) REFERENCES trip(order_no),                 -- 外鍵連結至行程表 (trip)
+    CONSTRAINT CK_rides_ratings_score CHECK (score BETWEEN 1 AND 5)   -- 確保分數介於 1 到 5 星之間
+);
+
+-- 11. 投訴表 (Complaint) - 0908 益
+   CREATE TABLE complaint
+(
+    complaint_id VARCHAR(15) PRIMARY KEY,
+    order_no VARCHAR(15) NOT NULL,  -- 訂單編號
+    account NVARCHAR(50) NOT NULL,   -- 會員名稱
+    complaint_type NVARCHAR(50) NOT NULL,  -- 投訴類型
+    description NVARCHAR(2000) NOT NULL,   -- 投訴說明
+    status NVARCHAR(20) NOT NULL DEFAULT 'Pending',   -- 處理狀態
+    FOREIGN KEY (order_no) REFERENCES trip(order_no),-- 連結至訂單表
+    FOREIGN KEY (account) REFERENCES member(account)-- 連結至會員表
+);
+

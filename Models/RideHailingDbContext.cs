@@ -36,6 +36,10 @@ public partial class RideHailingDbContext : DbContext
     // 因為新增 VehicleMenu 表單，所以新增 (08/23 益)
     public virtual DbSet<VehicleMenu> VehicleMenu { get; set; }
 
+    // 因為新增 RidesRating 及 Complaint 表單，所以新增 (09/08 益)
+    public virtual DbSet<RidesRating> RidesRatings { get; set; }
+    public virtual DbSet<Complaint> Complaints { get; set; }
+
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         => optionsBuilder.UseSqlServer("Server=.;Database=RideHailingDB;Trusted_Connection=True;Integrated Security=True;TrustServerCertificate=True;");
 
@@ -329,6 +333,7 @@ public partial class RideHailingDbContext : DbContext
                 .HasMaxLength(20)
                 .HasColumnName("vehicle_type");
         });
+
         // 因為新增 VehicleMenu 表單，所以新增 (08/23 益)
         modelBuilder.Entity<VehicleMenu>(entity =>
         {
@@ -371,6 +376,99 @@ public partial class RideHailingDbContext : DbContext
                 .HasColumnName("description");
         });
 
+        // 因為新增 RidesRating 表單，所以新增 (09/08 益)
+        modelBuilder.Entity<RidesRating>(entity =>
+        {
+            entity.ToTable("rides_ratings", table =>
+            {
+                table.HasCheckConstraint(
+                    "CK_rides_ratings_score",
+                    "[score] BETWEEN 1 AND 5"
+                );
+            });
+
+            entity.HasKey(e => e.RatingId);
+
+            entity.Property(e => e.OrderNo)
+                .HasColumnName("order_no")
+                .HasMaxLength(15)
+                .IsUnicode(false)
+                .IsRequired();
+
+            entity.Property(e => e.DriverName)
+                .HasColumnName("driver_name")
+                .HasMaxLength(50)
+                .IsRequired();
+
+            entity.Property(e => e.Score)
+                .HasColumnName("score")
+                .IsRequired();
+
+            entity.Property(e => e.Tags)
+                .HasColumnName("tags")
+                .HasMaxLength(255);
+
+            entity.HasIndex(e => e.OrderNo)
+                .IsUnique();
+
+            entity.HasOne(e => e.Trip)
+                .WithOne()
+                .HasForeignKey<RidesRating>(e => e.OrderNo)
+                .HasPrincipalKey<Trip>(e => e.OrderNo);
+        });
+
+
+        // 因為新增 Complaint 表單，所以新增 (09/08 益)
+        modelBuilder.Entity<Complaint>(entity =>
+        {
+            entity.ToTable("complaint");
+
+            entity.HasKey(e => e.ComplaintId);
+
+            entity.Property(e => e.ComplaintId)
+                .HasColumnName("complaint_id")
+                .HasMaxLength(15)
+                .IsUnicode(false);
+
+            entity.Property(e => e.OrderNo)
+                .HasColumnName("order_no")
+                .HasMaxLength(15)
+                .IsUnicode(false)
+                .IsRequired();
+
+            entity.Property(e => e.Account)
+                .HasColumnName("account")
+                .HasMaxLength(50)
+                .IsRequired();
+
+            entity.Property(e => e.ComplaintType)
+                .HasColumnName("complaint_type")
+                .HasMaxLength(50)
+                .IsRequired();
+
+            entity.Property(e => e.Description)
+                .HasColumnName("description")
+                .HasMaxLength(2000)
+                .IsRequired();
+
+            entity.Property(e => e.Status)
+                .HasColumnName("status")
+                .HasMaxLength(20)
+                .HasDefaultValue("Pending")
+                .IsRequired();
+
+            // complaint → trip
+            entity.HasOne(e => e.Trip)
+                .WithMany()
+                .HasForeignKey(e => e.OrderNo)
+                .HasPrincipalKey(e => e.OrderNo);
+
+            // complaint → member
+            entity.HasOne(e => e.Member)
+                .WithMany()
+                .HasForeignKey(e => e.Account)
+                .HasPrincipalKey(e => e.Account);
+        });
 
         OnModelCreatingPartial(modelBuilder);
     }
