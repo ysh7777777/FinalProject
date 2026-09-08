@@ -93,7 +93,7 @@
         background: transparent;
     }
 
-    .client-v2 .nav-link::after {
+    .client-v2 .nav-link:not(.dropdown-toggle)::after {
         position: absolute;
         right: .85rem;
         bottom: .35rem;
@@ -105,8 +105,8 @@
         transition: transform .2s ease;
     }
 
-    .client-v2 .nav-link:hover::after,
-    .client-v2 .nav-link:focus::after {
+    .client-v2 .nav-link:not(.dropdown-toggle):hover::after,
+    .client-v2 .nav-link:not(.dropdown-toggle):focus::after {
         transform: scaleX(1);
     }
 
