@@ -1,4 +1,5 @@
 ﻿document.getElementById('btnSubmitRating').addEventListener('click', function (event) {
+    // 評價
     // 檢查使用者是否有選取星星 (根據您的實作調整 selector)
     const hasRating = document.querySelector('input[name="rating"]:checked');
 
