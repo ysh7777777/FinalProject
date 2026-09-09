@@ -1,6 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.Data.SqlClient;
+﻿using Azure;
 using FinalProject.Models;
+using FinalProject.Services;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Data.SqlClient;
 
 namespace FinalProject.Controllers
 {
@@ -8,20 +10,41 @@ namespace FinalProject.Controllers
     {
         //  1. 宣告用來儲存連線字串的私有欄位 (Private Field)
         private readonly string _connectionString;
+        //  2. 宣告 TdxFlightService 欄位
+        private readonly TdxFlightService _tdxFlightService;
 
         // 2. 建構子 (Constructor)：程式執行時，ASP.NET Core 會自動把 configuration 傳進來
         // 透過 DI 注入讀取 appsettings.json 的連線字串
-        public DriverController(IConfiguration configuration)
+        public DriverController(IConfiguration configuration, TdxFlightService tdxFlightService)
         {
             _connectionString = configuration.GetConnectionString("letmesee")
                 ?? throw new InvalidOperationException("未找到 letmesee 連線字串");
+            _tdxFlightService = tdxFlightService;
         }
 
         // 1. 地圖主頁 (Index.cshtml)
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
             List<Trip> activeTrips = GetActiveTripOrders();
-            return View(activeTrips); // 將當前行程傳給 View
+
+            // 範例：如果第一筆訂單有航班資訊 (假設您資料庫未來加入航班欄位或從 Destination 解析)
+            // 這裡可以透過 TDX API 查詢即時航班狀態並傳給 View
+            var firstTrip = activeTrips.FirstOrDefault();
+                if (firstTrip != null)
+                {
+                    // 假設要查詢長榮 BR-198，可改為從 firstTrip 裡面撈出的航班號碼
+                    string airlineId = "BR";
+            string flightNumber = "198";
+
+            var flightInfo = await _tdxFlightService.GetLiveFlightAsync(airlineId, flightNumber);
+
+            ViewBag.FlightNumber = $"{airlineId}-{flightNumber}";
+                    ViewBag.FlightStatus = string.IsNullOrEmpty(flightInfo?.ArrivalRemark) ? "正常" : flightInfo.ArrivalRemark;
+                
+                    DateTime? eta = flightInfo?.EstimatedArrivalTime ?? flightInfo?.ScheduleArrivalTime;
+            ViewBag.EstimatedTime = eta.HasValue? eta.Value.ToString("HH:mm") : "--:--";
+                }
+                return View(activeTrips); // 將當前行程傳給 View
         }
 
         // 私有方法：取得司機當前進行中或下一筆待出發的訂單

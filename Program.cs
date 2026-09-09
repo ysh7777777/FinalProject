@@ -4,6 +4,8 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddHttpClient<FinalProject.Services.TdxFlightService>();
+
 // 連線到資料庫，勿動。名稱 "letmesee" 與 appsettings.json 的名稱有關係
 builder.Services.AddDbContext<RideHailingDbContext>(
             options => options.UseSqlServer(builder.Configuration.GetConnectionString("letmesee")));
