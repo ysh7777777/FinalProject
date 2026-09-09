@@ -127,7 +127,7 @@
 
 /* 當滑鼠懸停在星星區塊時，優先以 Hover 的星星為主（覆蓋已 Checked 的狀態） */
 .star-rating:hover input[type="radio"]:checked ~ label {
-    color: #e0e0e0; /* 先還原灰色 */
+    color: yellow;
 }
 
 .star-rating:hover label:hover,
