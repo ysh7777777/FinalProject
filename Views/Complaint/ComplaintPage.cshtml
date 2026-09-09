@@ -1,4 +1,5 @@
-﻿
+﻿@model FinalProject.DTO.ComplaintViewModel
+
 @{
 }
 <!DOCTYPE html>
@@ -57,7 +58,8 @@
                                     訂單編號
                                 </div>
                                 <div class="info-value">
-                                    @* @Model.OrderNumber *@
+                                    @Model.OrderNoView
+                                    <input type="hidden" asp-for="OrderNoView" />
                                 </div>
                             </div>
                         </div>
@@ -69,7 +71,9 @@
                                     會員名稱
                                 </div>
                                 <div class="info-value">
-                                    @* @Model.MemberName *@
+                                    @Model.FullNameView
+                                    <input type="hidden" asp-for="AccountView" />
+                                    <input type="hidden" asp-for="FullNameView" />
                                 </div>
                             </div>
                         </div>
@@ -81,7 +85,7 @@
                                     聯絡電話
                                 </div>
                                 <div class="info-value">
-                                    @* @Model.Phone *@
+                                    @Model.PhoneNumberView
                                 </div>
                             </div>
                         </div>
@@ -93,7 +97,7 @@
                                     Email
                                 </div>
                                 <div class="info-value">
-                                    @* @Model.Email *@
+                                    @Model.EmailView
                                 </div>
                             </div>
                         </div>
@@ -117,8 +121,8 @@
                             申訴類型
                             <span class="required">*</span>
                         </label>
-                        @* <select asp-for="ComplaintType" class="form-select custom-select"> *@
-                        <select class="form-select custom-select">
+                        <select asp-for="ComplaintTypeView" class="form-select custom-select">
+                        @* <select class="form-select custom-select"> *@
                             <option value="">
                                 請選擇申訴類型
                             </option>
@@ -141,22 +145,22 @@
                                 其他
                             </option>
                         </select>
-                        @* <span asp-validation-for="ComplaintType" class="text-danger"></span> *@
-                        <span class="text-danger"></span>
+                        <span asp-validation-for="ComplaintTypeView" class="text-danger"></span>
+                        @* <span class="text-danger"></span> *@
                     </div>
                     <!-- ========================= 問題說明 ========================= -->
                     <div class="mb-4">
-                        @* <label asp-for="Description" class="form-label custom-label"> *@
-                        <label class="form-label custom-label">
+                        <label asp-for="DescriptionView" class="form-label custom-label">
+                        @* <label class="form-label custom-label"> *@
                             問題說明
                             <span class="required">*</span>
                         </label>
-                        @* <textarea asp-for="Description" class="form-control custom-textarea" rows="6" maxlength="1000" *@
-                        <textarea class="form-control custom-textarea" rows="6" maxlength="1000"
+                        <textarea asp-for="DescriptionView" class="form-control custom-textarea" rows="6" maxlength="1000"
+                        @* <textarea class="form-control custom-textarea" rows="6" maxlength="1000" *@
                                   placeholder="請詳細描述您遇到的問題，例如發生時間、地點及相關情況..."></textarea>
                         <div class="textarea-footer">
-                            @* <span asp-validation-for="Description" class="text-danger"></span> *@
-                            <span class="text-danger"></span>
+                            <span asp-validation-for="DescriptionView" class="text-danger"></span>
+                            @* <span class="text-danger"></span> *@
                             <span id="charCount">
                                 0 / 1000
                             </span>
@@ -190,7 +194,7 @@
                             選擇圖片
                         </label>
                         @* <input asp-for="Images" type="file" id="imageInput" class="d-none" accept="image/jpeg,image/png" multiple /> *@
-                        <input type="file" id="imageInput" class="d-none" accept="image/jpeg,image/png" />
+                        <input type="file" id="imageInput" name="ImagesView" class="d-none" accept="image/jpeg,image/png" />
                     </div>
                     <!-- 圖片預覽 -->
                     <div id="previewContainer" class="row g-3 mt-3">

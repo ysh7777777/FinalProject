@@ -210,10 +210,12 @@ CREATE TABLE rides_rating (
 (
     complaint_id VARCHAR(15) PRIMARY KEY,
     order_no VARCHAR(15) NOT NULL,  -- 訂單編號
-    account NVARCHAR(50) NOT NULL,   -- 會員名稱
+    account NVARCHAR(50) NOT NULL,   -- 會員帳號
+    full_name NVARCHAR(50),     -- 會員姓名
     complaint_type NVARCHAR(50) NOT NULL,  -- 投訴類型
     description NVARCHAR(2000) NOT NULL,   -- 投訴說明
     status NVARCHAR(20) NOT NULL DEFAULT 'Pending',   -- 處理狀態
+    image_path NVARCHAR(500),     -- 圖片路徑
     FOREIGN KEY (order_no) REFERENCES trip(order_no),-- 連結至訂單表
     FOREIGN KEY (account) REFERENCES member(account)-- 連結至會員表
 );

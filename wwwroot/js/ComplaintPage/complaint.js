@@ -6,7 +6,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const uploadArea =
         document.getElementById("uploadArea");
     const description =
-        document.getElementById("Description");
+        document.getElementById("DescriptionView");
     const charCount =
         document.getElementById("charCount");
     // ==========================================
@@ -120,3 +120,35 @@ document.addEventListener("DOMContentLoaded", function () {
         reader.readAsDataURL(file);
     }
 });
+// 查傳出資料
+document.getElementById("complaintForm")
+    .addEventListener("submit", function (e) {
+
+        const formData = new FormData(this);
+
+        console.log("========== 表單送出資料 ==========");
+
+        for (const [key, value] of formData.entries()) {
+
+            if (value instanceof File) {
+
+                console.log(
+                    key,
+                    "File:",
+                    value.name,
+                    "size:",
+                    value.size,
+                    "type:",
+                    value.type
+                );
+
+            } else {
+
+                console.log(key, "=", value);
+
+            }
+        }
+
+        console.log("=================================");
+
+    });

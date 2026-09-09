@@ -437,7 +437,11 @@ public partial class RideHailingDbContext : DbContext
                 .IsRequired();
 
             entity.Property(e => e.Account)
-                .HasColumnName("account")
+                .HasMaxLength(50)
+                .HasColumnName("account");
+
+            entity.Property(e => e.FullName)
+                .HasColumnName("full_name")
                 .HasMaxLength(50)
                 .IsRequired();
 
@@ -456,6 +460,11 @@ public partial class RideHailingDbContext : DbContext
                 .HasMaxLength(20)
                 .HasDefaultValue("Pending")
                 .IsRequired();
+
+            entity.Property(e => e.ImagePath)
+                .HasColumnName("image_path")
+                .HasMaxLength(500)
+                .IsRequired(false);
 
             // complaint → trip
             entity.HasOne(e => e.Trip)
