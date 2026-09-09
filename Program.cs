@@ -52,7 +52,8 @@ app.MapControllerRoute(
     //pattern: "{controller=Home}/{action=Index}/{id?}")
     pattern: "{controller=Positive}/{action=PForm}/{id?}")
     //pattern: "{controller=Booking}/{action=BookingPage}/{id?}")
-    // pattern: "{controller=ClientHistory_New}/{action=ClientHistory_New}/{id?}")
+    //pattern: "{controller=ClientHistory_New}/{action=ClientHistory_New}/{id?}")
+    pattern: "{controller=Complaint}/{action=ComplaintPage}/{id?}")
     .WithStaticAssets();
 
 app.MapHub<DriverLocationHub>(

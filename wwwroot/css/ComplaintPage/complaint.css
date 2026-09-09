@@ -1,0 +1,320 @@
+/* ==========================================
+   Page
+========================================== */
+.complaint-page {
+    min-height: 100vh;
+/*    background: #ffffff;*/
+}
+/* ==========================================
+   Header
+========================================== */
+.page-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+.page-title {
+    color: #102a43;
+    font-weight: 700;
+    margin-bottom: 8px;
+}
+.page-title i {
+    margin-right: 8px;
+}
+.page-description {
+    color: #6c757d;
+    margin-bottom: 0;
+}
+/* ==========================================
+   Card
+========================================== */
+.complaint-card {
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 28px;
+    box-shadow: 0 4px 18px rgba(16, 42, 67, 0.08);
+    border: 1px solid #edf1f5;
+    transition: all 0.25s ease;
+}
+.complaint-card:hover {
+    box-shadow: 0 8px 25px rgba(16, 42, 67, 0.12);
+}
+/* ==========================================
+   Section Header
+========================================== */
+.section-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 24px;
+}
+.section-icon {
+    width: 46px;
+    height: 46px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+/*    background: #eaf2f8;*/
+    color: #123b5d;
+    border-radius: 12px;
+    font-size: 20px;
+}
+.section-header h4 {
+    margin: 0;
+    color: #102a43;
+    font-weight: 700;
+}
+.section-header p {
+    margin: 3px 0 0;
+    color: #7a8793;
+    font-size: 14px;
+}
+/* ==========================================
+   Order Information
+========================================== */
+.info-box {
+    padding: 16px 18px;
+    background: #f8fafc;
+    border-radius: 12px;
+    border: 1px solid #e8edf2;
+    transition: all 0.2s ease;
+}
+.info-box:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(16, 42, 67, 0.08);
+}
+.info-title {
+    color: #687887;
+    font-size: 14px;
+    margin-bottom: 6px;
+}
+.info-title i {
+    margin-right: 6px;
+}
+.info-value {
+    color: #102a43;
+    font-size: 16px;
+    font-weight: 600;
+    word-break: break-word;
+}
+/* ==========================================
+   Form
+========================================== */
+.custom-label {
+    color: #243b53;
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+.required {
+    color: #dc3545;
+    margin-left: 3px;
+}
+.custom-select,
+.custom-textarea {
+    border-radius: 12px;
+    border: 1px solid #d9e2ec;
+    padding: 12px 14px;
+    transition: all 0.2s ease;
+}
+.custom-select:focus,
+.custom-textarea:focus {
+    border-color: #123b5d;
+    box-shadow: 0 0 0 0.2rem rgba(18, 59, 93, 0.12);
+}
+.custom-textarea {
+    resize: vertical;
+    min-height: 150px;
+}
+/* ==========================================
+   Character Count
+========================================== */
+.textarea-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 6px;
+}
+#charCount {
+    color: #8795a1;
+    font-size: 13px;
+}
+/* ==========================================
+   Upload
+========================================== */
+.upload-area {
+    border: 2px dashed #cbd5df;
+    border-radius: 12px;
+    padding: 40px 20px;
+    text-align: center;
+    background: #fafcfe;
+    transition: all 0.25s ease;
+}
+.upload-area:hover {
+    border-color: #123b5d;
+    background: #f5f9fc;
+}
+.upload-area.dragover {
+    border-color: #123b5d;
+    background: #edf5fa;
+}
+.upload-icon {
+    font-size: 48px;
+    color: #123b5d;
+    display: block;
+    margin-bottom: 12px;
+}
+.upload-area h5 {
+    color: #243b53;
+    font-weight: 700;
+}
+.upload-area p {
+    color: #6c757d;
+    margin-bottom: 5px;
+}
+.upload-area small {
+    display: block;
+    color: #9aa6b2;
+    margin-bottom: 20px;
+}
+/* ==========================================
+   Upload Button
+========================================== */
+.btn-upload {
+    background: #123b5d;
+    color: #ffffff;
+    border-radius: 12px;
+    padding: 10px 20px;
+    transition: all 0.2s ease;
+}
+.btn-upload:hover {
+    background: #0d2d47;
+    color: #ffffff;
+    transform: translateY(-2px);
+}
+/* ==========================================
+   Image Preview
+========================================== */
+.preview-item {
+    position: relative;
+}
+.preview-card {
+    position: relative;
+    overflow: hidden;
+    border-radius: 12px;
+    border: 1px solid #e1e7ed;
+    background: #ffffff;
+    box-shadow: 0 3px 10px rgba(16, 42, 67, 0.08);
+}
+.preview-card img {
+    width: 100%;
+    height: 150px;
+    object-fit: cover;
+}
+.remove-image {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    width: 32px;
+    height: 32px;
+    border: none;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.65);
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+.remove-image:hover {
+    background: #dc3545;
+    transform: scale(1.08);
+}
+/* ==========================================
+   Notice
+========================================== */
+.complaint-notice {
+    display: flex;
+    gap: 12px;
+    padding: 18px 20px;
+    background: #f1f7fb;
+    border-left: 4px solid #123b5d;
+    border-radius: 12px;
+    color: #486581;
+}
+.complaint-notice > i {
+    color: #123b5d;
+    font-size: 20px;
+}
+.complaint-notice strong {
+    color: #243b53;
+}
+.complaint-notice p {
+    margin: 4px 0 0;
+}
+/* ==========================================
+   Buttons
+========================================== */
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+}
+.btn-secondary-custom,
+.btn-submit {
+    border-radius: 12px;
+    padding: 11px 24px;
+    font-weight: 600;
+    transition: all 0.2s ease;
+}
+.btn-secondary-custom {
+    background: #ffffff;
+    color: #486581;
+    border: 1px solid #ccd6df;
+}
+.btn-secondary-custom:hover {
+    background: #f5f7f9;
+    transform: translateY(-2px);
+}
+.btn-submit {
+    background: #123b5d;
+    color: #ffffff;
+    border: none;
+}
+.btn-submit:hover {
+    background: #0d2d47;
+    color: #ffffff;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(18, 59, 93, 0.2);
+}
+/* ==========================================
+   Validation
+========================================== */
+.field-validation-error {
+    font-size: 13px;
+    margin-top: 5px;
+    display: block;
+}
+/* ==========================================
+   RWD
+========================================== */
+@media (max-width: 767.98px) {
+    .complaint-card {
+        padding: 20px;
+    }
+    .page-title {
+        font-size: 24px;
+    }
+    .section-header {
+        margin-bottom: 20px;
+    }
+    .upload-area {
+        padding: 30px 15px;
+    }
+    .form-actions {
+        flex-direction: column-reverse;
+    }
+    .btn-secondary-custom,
+    .btn-submit {
+        width: 100%;
+    }
+}

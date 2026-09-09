@@ -28,5 +28,9 @@
         public int? Fare { get; set; }
 
         public int? EstimatedDuration { get; set; }
+
+        // 新增資料 (0907)
+        public string? FlightNo { get; set; }
+
     }
 }

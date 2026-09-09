@@ -146,6 +146,35 @@ CREATE TABLE trip (
     FOREIGN KEY (assigned_driver_id) REFERENCES driver(driver_id),     -- 連結至司機表
 );
 
+-- 7-2. 行程訂單表 (Trip) [新增地圖座標欄位] 更新版本 "班機號"
+CREATE TABLE trip (
+    order_no VARCHAR(15) PRIMARY KEY,       -- 訂單編號 (主鍵)
+    account NVARCHAR(50) NOT NULL,          -- 叫車會員帳號 (外鍵，必填)
+    trip_status NVARCHAR(10),               -- 行程狀態 (如：待派車、行程中、已完成、已取消)
+    departure_time SMALLDATETIME,           -- 預計出發時間
+    estimated_duration INT,                 -- 預估行程時間 (分鐘)
+    pickup_location NVARCHAR(200),          -- 上車地點名稱/地址
+    pickup_lat DECIMAL(9, 6),               -- 上車點緯度 (新增：地圖定位與導航)
+    pickup_lng DECIMAL(9, 6),               -- 上車點經度 (新增：地圖定位與導航)
+    destination NVARCHAR(200),              -- 下車地點名稱/地址
+    destination_lat DECIMAL(9, 6),          -- 下車點緯度 (新增：地圖定位與導航)
+    destination_lng DECIMAL(9, 6),          -- 下車點經度 (新增：地圖定位與導航)
+    license_plate VARCHAR(10),              -- 接單車牌 (外鍵)
+    assigned_driver_id VARCHAR(15),         -- 接單司機編號 (外鍵)
+    vehicle_type NVARCHAR(20),              -- 乘客指定的偏好車型
+    passenger_count TINYINT,                -- 搭乘人數
+    luggage_count TINYINT,                  -- 行物/行李件數
+    baby_seat TINYINT,                      -- 兒童座椅
+    fare INT,                               -- 預估總價
+    flight_no VARCHAR(10),                  -- 班機號 (9/7 新增)
+    completed_at SMALLDATETIME,             -- 訂單結束時間 (用於完成訂單排序)
+    canceled_at SMALLDATETIME,              -- 訂單取消時間 (用於取消訂單排序)
+    FOREIGN KEY (account) REFERENCES member(account),                 -- 連結至會員表
+    FOREIGN KEY (license_plate) REFERENCES vehicle(license_plate),     -- 連結至車輛表
+    FOREIGN KEY (assigned_driver_id) REFERENCES driver(driver_id),     -- 連結至司機表
+);
+
+
 
 -- 8. 地圖熱點 / 地標表 (MapLandmark) [新增 - 用於地圖搜尋自動補全或快取]
 CREATE TABLE map_landmark (
@@ -163,3 +192,29 @@ CREATE TABLE project_image (
     image_url NVARCHAR(500),                -- 圖片網址 / 檔案路徑
     description NVARCHAR(500)               -- 圖片說明 / 備註
 );
+
+
+-- 10. 行程評價表 (RidesRating) - 0908 益
+CREATE TABLE rides_rating (
+    rating_id INT IDENTITY(1,1) PRIMARY KEY,  -- 評價編號 (主鍵，自動遞增)
+    order_no VARCHAR(15) NOT NULL UNIQUE,  -- 訂單編號 (外鍵，加上 UNIQUE 保障一單一評)
+    driver_name NVARCHAR(50) NOT NULL,        -- 司機姓名
+    score TINYINT NOT NULL,                   -- 行程滿意度 (1 ~ 5 星)
+    tags NVARCHAR(255) NULL,                  -- 快捷標籤
+    FOREIGN KEY (order_no) REFERENCES trip(order_no),                 -- 外鍵連結至行程表 (trip)
+    CONSTRAINT CK_rides_ratings_score CHECK (score BETWEEN 1 AND 5)   -- 確保分數介於 1 到 5 星之間
+);
+
+-- 11. 投訴表 (Complaint) - 0908 益
+   CREATE TABLE complaint
+(
+    complaint_id VARCHAR(15) PRIMARY KEY,
+    order_no VARCHAR(15) NOT NULL,  -- 訂單編號
+    account NVARCHAR(50) NOT NULL,   -- 會員名稱
+    complaint_type NVARCHAR(50) NOT NULL,  -- 投訴類型
+    description NVARCHAR(2000) NOT NULL,   -- 投訴說明
+    status NVARCHAR(20) NOT NULL DEFAULT 'Pending',   -- 處理狀態
+    FOREIGN KEY (order_no) REFERENCES trip(order_no),-- 連結至訂單表
+    FOREIGN KEY (account) REFERENCES member(account)-- 連結至會員表
+);
+
