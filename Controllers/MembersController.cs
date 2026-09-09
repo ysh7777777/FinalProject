@@ -10,12 +10,14 @@ namespace FinalProject.Controllers
 {
     public class MembersController : Controller
     {
-        
+        // 讀取資料庫
         private readonly RideHailingDbContext _context;
+        // 記錄
         private readonly ILogger<MembersController> _logger;
-
+        // 建構子放入 RideHailingDbContext 與 ILogger<MembersController>
         public MembersController(RideHailingDbContext context, ILogger<MembersController> logger)
         {
+            // 將 RideHailingDbContext 與 ILogger<MembersController> 注入到控制器中
             _context = context;
             _logger = logger;
         }
