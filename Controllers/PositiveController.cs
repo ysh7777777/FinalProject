@@ -12,18 +12,12 @@ namespace FinalProject.Controllers
             _context = context;
         }
         // 測試: 原畫面
-        [HttpGet("~/")]
-        [HttpGet("PForm/{orderNo?}")]
+        [HttpGet("/PForm")]
         public IActionResult PForm()
         {
             return View();
         }
 
-        //[HttpGet("/PForm")]
-        //public async Task<IActionResult> PForm(string orderNo)
-        //{
-
-        //}
     }
 
 }
